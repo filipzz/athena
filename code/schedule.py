@@ -8,50 +8,57 @@ import math
 def __init__():
     pass
 
+def print_iterator(it):
+    strg = []
+    for x in it:
+        strg.append(x)
+    return strg  # for new line
 
 def main():
-    print(rla.bravo_kmin(100, 60, .1, 13))
 
     # Setting up the parameters for the audit
     roundSize = 22
-    margin = .2
-    ballotsCast = 1000
-    winner = math.floor((1+margin)/2* ballotsCast)
-    roundSchedule = [19, 50, 120]
-    maxNumberOfRounds = len(roundSchedule)
+    margin = .08
+    ballots_cast = 1000
+    winner = math.floor((1+margin)/2* ballots_cast)
+    round_schedule = [301, 518, 916, 1520, 3366]
     alpha = .1
     what = "risk"
     model = "bin"
+    max_number_of_rounds = len(round_schedule)
 
 
+    print("Proposed round sizes: " + str(round_schedule))
+    bravo_kmins = map(lambda n: rla.bravo_kmin(ballots_cast, winner, alpha, n), round_schedule )
+    print("Corresponding BRAVO kmins: " + str(print_iterator(bravo_kmins)))
 
     # Finiding BRAVO ballot by ballot risk and stopping probabilities
-    upperLimit = roundSchedule[maxNumberOfRounds - 1]
-    riskEval = risk.calculate_bad_luck_cum_probab_table_b2_sympy(upperLimit, winner, ballotsCast, alpha, "risk", model)
-    probEval = risk.calculate_bad_luck_cum_probab_table_b2_sympy(upperLimit, winner, ballotsCast, alpha, "prob", model)
-    print(riskEval["sum"])
+    upper_limit = round_schedule[max_number_of_rounds - 1]
+    risk_eval = risk.calculate_bad_luck_cum_probab_table_b2_sympy(upper_limit, winner, ballots_cast, alpha, "risk", model)
+    prob_eval = risk.calculate_bad_luck_cum_probab_table_b2_sympy(upper_limit, winner, ballots_cast, alpha, "prob", model)
+    #print(risk_eval["sum"])
 
-    riskTable = riskEval["pTable"]
-    riskGoal = [S("0")] * (maxNumberOfRounds)
-    probTable = probEval["pTable"]
-    probStop = [S("0")] * (maxNumberOfRounds)
-
-
-    # in riskGoal[] we will store how much risk can be spent for each round
-    for round in range(maxNumberOfRounds):
-        upperLimitRound = roundSchedule[round]
-        riskGoal[round] = sum(riskTable[0:upperLimitRound])
-        probStop[round] = sum(probTable[0:upperLimitRound])
-        print(str(round+1) + "\t" + str(roundSchedule[round]) + "\t" + str(riskGoal[round]) + "\t" + str(upperLimit))
+    risk_table = risk_eval["p_table"]
+    risk_goal = [S("0")] * (max_number_of_rounds)
+    prob_table = prob_eval["p_table"]
+    prob_stop = [S("0")] * (max_number_of_rounds)
 
 
-    print("Risk goal: " + str(riskGoal))
+    # in risk_goal[] we will store how much risk can be spent for each round
+    for round in range(max_number_of_rounds):
+        upper_limit_round = round_schedule[round]
+        risk_goal[round] = sum(risk_table[0:upper_limit_round])
+        prob_stop[round] = sum(prob_table[0:upper_limit_round])
+        #print(str(round+1) + "\t" + str(round_schedule[round]) + "\t" + str(risk_goal[round]) + "\t" + str(upper_limit))
+
+
+    #print("Risk goal: " + str(risk_goal))
     # initializing variables
-    pTableRbR = [S("0")] * (maxNumberOfRounds)
-    max = rla.bravo_kmin(ballotsCast, winner, alpha, upperLimit)
-    pTableCRbR = [[S("0")] * (maxNumberOfRounds)  for i in range(max)]
-    roundStartAt = 0
-    ballotsHalf = S(ballotsCast) / 2
+    pTableRbR = [S("0")] * (max_number_of_rounds)
+    max = rla.bravo_kmin(ballots_cast, winner, alpha, upper_limit)
+    p_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(max)]
+    round_start_at = 0
+    ballotsHalf = S(ballots_cast) / 2
 
 
 
@@ -60,173 +67,175 @@ def main():
     # - probability of stopping
 
     # first round is "special"
-    # {rskConsumed, kminPrime} =
-    #   FirstRoundRisk[ball, winner, alpha, roundSchedule[[1]],
-    #    riskGoal[[1]] - usedRisk, mode];
-    # Print[rskConsumed, "\t", kminPrime];
-    # kminNew[[1]] = kminPrime;
+    # {rskConsumed, kmin_prime} =
+    #   FirstRoundRisk[ball, winner, alpha, round_schedule[[1]],
+    #    risk_goal[[1]] - usedRisk, mode];
+    # Print[rskConsumed, "\t", kmin_prime];
+    # kmin_new[[1]] = kmin_prime;
 
-    nrr = risk.next_round_risk(ballotsCast, winner, alpha, roundSchedule[0], riskGoal[0], "bin", 0, 0)
+    nrr = risk.next_round_risk(ballots_cast, winner, alpha, round_schedule[0], risk_goal[0], "bin", 0, 0)
 
-    kminPrime = nrr["kmin"]
-    kminNew = [kminPrime] * maxNumberOfRounds
+    kmin_prime = nrr["kmin"]
+    kmin_new = [kmin_prime] * max_number_of_rounds
 
-    print(str((nrr["sum"])))
+    #print(str((nrr["sum"])))
 
-    print(str(nrr["kmin"]))
+    #print(str(nrr["kmin"]))
 
-    # For[i = 0, i < kminPrime, i++,
+    # For[i = 0, i < kmin_prime, i++,
     #   If[mode == "bin",
-    #     	pTableCRbR[[i + 1, 1]] =
-    #       PDF[BinomialDistribution[roundSchedule[[1]] - roundStartAt,
+    #     	p_table_c_rbr[[i + 1, 1]] =
+    #       PDF[BinomialDistribution[round_schedule[[1]] - round_start_at,
     #         wn/ball], i];,
-    #     	pTableCRbR[[i + 1, 1]] =
+    #     	p_table_c_rbr[[i + 1, 1]] =
     #       PDF[HypergeometricDistribution[
-    #         roundSchedule[[1]] - roundStartAt, wn, ball], i];
+    #         round_schedule[[1]] - round_start_at, wn, ball], i];
     #     ];
     #   ];
 
     # we do it for the first round first
     # TODO: we need to add hypergeometric (after we figure out how to deal with invalid votes)
-    for i in range(kminPrime):
-        X = Binomial('X', roundSchedule[0], S.Half)
-        pTableCRbR[i][0] = density(X).dict[i]
+    for i in range(kmin_prime):
+        X = Binomial('X', round_schedule[0], S.Half)
+        p_table_c_rbr[i][0] = density(X).dict[i]
         #print(str(i) + "\t" + str(N(density(X).dict[i])))
 
-    riskSpentSoFar = S("0")
-    for i in range(kminPrime):
-        riskSpentSoFar = riskSpentSoFar + pTableCRbR[i][0]
+    risk_spent_so_far = S("0")
+    for i in range(kmin_prime):
+        risk_spent_so_far = risk_spent_so_far + p_table_c_rbr[i][0]
 
-    print("risk after first round: ", str(N(1- riskSpentSoFar)))
+    print("risk after first round: ", str(N(1- risk_spent_so_far)))
 
 
     # (* Now the main loop going for the following rounds *)
     # For[i = 2,
-    #  i <= Length[roundSchedule], i++,
+    #  i <= Length[round_schedule], i++,
     #  Print["\n\n\t\t\tSTARTING NEW ROUND ", i];
-    #  (*Print[pTableCRbR[[;;,i-1]]//N];*)
+    #  (*Print[p_table_c_rbr[[;;,i-1]]//N];*)
     #
-    #  Print[1 - Total[pTableCRbR[[;; , i - 1]]] // N];
-    #  roundStartAt = roundSchedule[[i - 1]];
+    #  Print[1 - Total[p_table_c_rbr[[;; , i - 1]]] // N];
+    #  round_start_at = round_schedule[[i - 1]];
     #
     #  (* now the part that we are sure its is gonna work - starting from k \
     # = kMin[-1] + 1 *)
-    #  For[j = 0, j < kminNew[[i - 1]], j++,
-    #   For[k = 0, k < kminNew[[i - 1]], k++,
-    #     pTableCRbR[[k + 1, i]] +=
-    #      pTableCRbR[[j + 1, i - 1]] PDF[
-    #        BinomialDistribution[roundSchedule[[i]] - roundStartAt,
+    #  For[j = 0, j < kmin_new[[i - 1]], j++,
+    #   For[k = 0, k < kmin_new[[i - 1]], k++,
+    #     p_table_c_rbr[[k + 1, i]] +=
+    #      p_table_c_rbr[[j + 1, i - 1]] PDF[
+    #        BinomialDistribution[round_schedule[[i]] - round_start_at,
     #         wn/ball], k - j];
     #     (*If[i+j+k\[Equal]100,Print[i, "\t", j,"\t",k,"\t",
-    #     pTableCRbR[[j+1,i-1]]//N,"\t", PDF[BinomialDistribution[
-    #     roundSchedule[[i]]-roundStartAt,wn/ball],k-j]//N,"\t",
-    #     pTableCRbR[[k+1,i]]//N]];*)
+    #     p_table_c_rbr[[j+1,i-1]]//N,"\t", PDF[BinomialDistribution[
+    #     round_schedule[[i]]-round_start_at,wn/ball],k-j]//N,"\t",
+    #     p_table_c_rbr[[k+1,i]]//N]];*)
     #     ];
     #   ];
     #
-    #  Print[i, "\t", kminNew[[i - 1]]];
+    #  Print[i, "\t", kmin_new[[i - 1]]];
     #
     #  (* we compute what is the current risk spent *)
     #
-    #  riskSpentSoFar = Total[pTableCRbR[[;; , i]]];
+    #  risk_spent_so_far = Total[p_table_c_rbr[[;; , i]]];
     #
     #
-    #  correctRiskLevel = 1;
+    #  correct_risk_level = 1;
     #
-    #  (* now we need to find what is kminPrime for the current round - we \
+    #  (* now we need to find what is kmin_prime for the current round - we \
     # will try to add new, larger values of k,
-    #  as long as the riskGoal is not exceeded *)
-    #  k = kminNew[[i - 1]];
-    #  While[ correctRiskLevel == 1 ,
+    #  as long as the risk_goal is not exceeded *)
+    #  k = kmin_new[[i - 1]];
+    #  While[ correct_risk_level == 1 ,
     #   For[j = 0,
-    #    j < Min[kminNew[[i - 1]], roundSchedule[[i]] - roundStartAt], j++,
-    #    pTableCRbR[[k + 1, i]] +=
-    #     pTableCRbR[[j + 1, i - 1]] PDF[
-    #       BinomialDistribution[roundSchedule[[i]] - roundStartAt,
+    #    j < Min[kmin_new[[i - 1]], round_schedule[[i]] - round_start_at], j++,
+    #    p_table_c_rbr[[k + 1, i]] +=
+    #     p_table_c_rbr[[j + 1, i - 1]] PDF[
+    #       BinomialDistribution[round_schedule[[i]] - round_start_at,
     #        wn/ball], k - j];
-    #    (*Print[i, "\t", j,"\t",k,"\t",pTableCRbR[[j+1,i-1]]//N,"\t", PDF[
-    #    BinomialDistribution[roundSchedule[[i]]-roundStartAt,wn/ball],k-j]//
-    #    N,"\t",pTableCRbR[[k+1,i]]//N];*)
+    #    (*Print[i, "\t", j,"\t",k,"\t",p_table_c_rbr[[j+1,i-1]]//N,"\t", PDF[
+    #    BinomialDistribution[round_schedule[[i]]-round_start_at,wn/ball],k-j]//
+    #    N,"\t",p_table_c_rbr[[k+1,i]]//N];*)
     #    ];
     #
-    #   riskSpentSoFar = Total[pTableCRbR[[;; , i]]];
-    #   (*Print[k,"\t>> ", 1-riskSpentSoFar//N];*)
+    #   risk_spent_so_far = Total[p_table_c_rbr[[;; , i]]];
+    #   (*Print[k,"\t>> ", 1-risk_spent_so_far//N];*)
     #
-    #   If[1 - riskSpentSoFar < riskGoal[[i]],
-    #    kminNew[[i]] = k + 1;
-    #    correctRiskLevel = 0;
+    #   If[1 - risk_spent_so_far < risk_goal[[i]],
+    #    kmin_new[[i]] = k + 1;
+    #    correct_risk_level = 0;
     #    ];
     #   k++;
     #   ]
     #  ]
 
-    print(str(kminNew))
 
 
     # Now the main loop going for the following rounds
-    for i in range(1, maxNumberOfRounds):
+    for i in range(1, max_number_of_rounds):
         print("STARTING NEW ROUND " + str(i+1))
 
-        riskSpentSoFar = S("0")
-        for xi in range(kminPrime):
-            riskSpentSoFar = riskSpentSoFar + pTableCRbR[xi][i-1]
+        risk_spent_so_far = S("0")
+        for xi in range(kmin_prime):
+            risk_spent_so_far = risk_spent_so_far + p_table_c_rbr[xi][i-1]
 
-        print("risk spent up to: ", str(i), " round: ", str(N(1- riskSpentSoFar)))
-        roundStartAt = roundSchedule[i-1]
+        print("risk spent up to: ", str(i), " round: ", str(N(1- risk_spent_so_far)))
+        round_start_at = round_schedule[i-1]
 
         # now the part that we are sure its is gonna work - starting from k =
         #  kMin[-1] + 1
-        for j in range(kminNew[i-1]):
-            for k in range(j,kminNew[i-1]):
-                X = Binomial('X', roundSchedule[i] - roundStartAt, S.Half)
-                pTableCRbR[k][i] = pTableCRbR[k][i] + pTableCRbR[j][i-1] * density(X).dict[k-j]
-                #print(str(roundSchedule[i] - roundStartAt), "\t", str(j), "\t", str(k), "\t",  str(N(pTableCRbR[j][i-1])), "\t", str(N(density(X).dict[k-j])) )
-                #print("pTableCRbR[", str(k), ", ", str(i), "] = ", str(N(pTableCRbR[k][i])))
+        for j in range(kmin_new[i-1]):
+            for k in range(j,kmin_new[i-1]):
+                X = Binomial('X', round_schedule[i] - round_start_at, S.Half)
+                p_table_c_rbr[k][i] = p_table_c_rbr[k][i] + p_table_c_rbr[j][i-1] * density(X).dict[k-j]
+                #print(str(round_schedule[i] - round_start_at), "\t", str(j), "\t", str(k), "\t",  str(N(p_table_c_rbr[j][i-1])), "\t", str(N(density(X).dict[k-j])) )
+                #print("p_table_c_rbr[", str(k), ", ", str(i), "] = ", str(N(p_table_c_rbr[k][i])))
 
-        print(str(i) + "\t" + str(kminNew[i-1]))
+        #print(str(i) + "\t" + str(kmin_new[i-1]))
 
-        print(kminPrime)
+        #print(kmin_prime)
 
 
         # we compute what is the current risk spent
-        riskSpentSoFar = S("0")
-        for xi in range(kminNew[i-1]):
-            riskSpentSoFar = riskSpentSoFar + pTableCRbR[xi][i]
+        risk_spent_so_far = S("0")
+        for xi in range(kmin_new[i-1]):
+            risk_spent_so_far = risk_spent_so_far + p_table_c_rbr[xi][i]
 
-        print("risk spent so far: (before last while)", str(N(riskSpentSoFar)))
+        #print("risk spent so far: (before last while)", str(1 - N(risk_spent_so_far)))
 
-        correctRiskLevel = 1
+        correct_risk_level = 1
 
-        # now we need to find what is kminPrime for the current round -
+        # now we need to find what is kmin_prime for the current round -
         #  we will try to add new, larger values of k,
-        # as long as the riskGoal is not exceeded
+        # as long as the risk_goal is not exceeded
 
-        k = kminNew[i-1]
+        k = kmin_new[i-1]
 
-        print(">>" + str(kminNew[i-1]) + "\t" + str(roundSchedule[i] - roundStartAt))
-        while correctRiskLevel == 1 and k <= roundSchedule[i] - roundStartAt + 1:
-            for j in range(min(kminNew[i-1], roundSchedule[i] - roundStartAt)):
-                X = Binomial('X', roundSchedule[i] - roundStartAt, S.Half)
-                if k - j <= roundSchedule[i] - roundStartAt:
-                    pTableCRbR[k][i] = pTableCRbR[k][i] + pTableCRbR[j][i-1] * density(X).dict[k-j]
-                    #print(str(roundSchedule[i] - roundStartAt), "\t", str(j), "\t", str(k), "\t",  str(N(pTableCRbR[j][i-1])), "\t", str(N(density(X).dict[k-j])) )
-                #print("pTableCRbR[", str(k), ", ", str(i), "] = ", str(N(pTableCRbR[k][i])))
+        #print(">>" + str(kmin_new[i-1]) + "\t" + str(round_schedule[i] - round_start_at))
+        while correct_risk_level == 1:
+            for j in range(min(kmin_new[i-1], round_schedule[i] - round_start_at)):
+                X = Binomial('X', round_schedule[i] - round_start_at, S.Half)
+                if k - j <= round_schedule[i] - round_start_at:
+                    p_table_c_rbr[k][i] = p_table_c_rbr[k][i] + p_table_c_rbr[j][i-1] * density(X).dict[k-j]
+                    #print(str(round_schedule[i] - round_start_at), "\t", str(j), "\t", str(k), "\t",  str(N(p_table_c_rbr[j][i-1])), "\t", str(N(density(X).dict[k-j])) )
+                #print("p_table_c_rbr[", str(k), ", ", str(i), "] = ", str(N(p_table_c_rbr[k][i])))
 
 
-            riskSpentSoFar = S("0")
+            risk_spent_so_far = S("0")
             for xi in range(k+1):
-                riskSpentSoFar = riskSpentSoFar + pTableCRbR[xi][i]
+                risk_spent_so_far = risk_spent_so_far + p_table_c_rbr[xi][i]
+
+            print(str(i) + "\t" + str(k) + "\t" + str(N(risk_spent_so_far)))
 
 
-            if (1 - N(riskSpentSoFar)) < N(riskGoal[i]):
-                kminNew[i] = k + 1
-                correctRiskLevel = 0
-                print("new kminNew: " + str(kminNew[i]))
+            if (1 - N(risk_spent_so_far)) < N(risk_goal[i]):
+                kmin_new[i] = k + 1
+                correct_risk_level = 0
+                #print("new kmin_new: " + str(kmin_new[i]))
 
             k = k + 1
 
 
-        print(str(kminNew))
+
+    print("Found new Aurror kmins:\t\t" + str(kmin_new))
 
 
 
