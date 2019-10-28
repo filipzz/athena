@@ -108,7 +108,7 @@ def test_calculate_bad_luck_cum_probab_table_b2():
    }
 
 
-    errorLevel = 0.0000000001
+    error_level = 0.0000000001
 
     for type_of_test in tests.keys():
         print("test type: " + type_of_test)
@@ -131,8 +131,58 @@ def test_calculate_bad_luck_cum_probab_table_b2():
 
 
             #assert np.abs(computedFrac["sum"] -  computedNumpy["sum"]) < 0.00000000000000000001, 's_w failed: got {}, expected {}'.format(computedFrac["sum"], computedNumpy["sum"])
-            assert np.abs(computedFrac["sum"] - expected) < errorLevel, 's_w failed: got {}, expected {}'.format(computedFrac["sum"], computedFloat["sum"])
-            assert np.abs(computedNumpy["sum"] - expected) < errorLevel, 's_w failed: got {}, expected {}'.format(computedNumpy["sum"], computedFloat["sum"])
-            assert np.abs(computedSympy["sum"] - expected) < errorLevel, 's_w failed: got {}, expected {}'.format(computedNumpy["sum"], computedSympy["sum"])
-            assert np.abs(computedFloat["sum"] - expected) < errorLevel, 's_w failed: got {}, expected {}'.format(computedNumpy["sum"], computedSympy["sum"])
+            assert np.abs(computedFrac["sum"] - expected) < error_level, 's_w failed: got {}, expected {}'.format(computedFrac["sum"], computedFloat["sum"])
+            assert np.abs(computedNumpy["sum"] - expected) < error_level, 's_w failed: got {}, expected {}'.format(computedNumpy["sum"], computedFloat["sum"])
+            assert np.abs(computedSympy["sum"] - expected) < error_level, 's_w failed: got {}, expected {}'.format(computedNumpy["sum"], computedSympy["sum"])
+            assert np.abs(computedFloat["sum"] - expected) < error_level, 's_w failed: got {}, expected {}'.format(computedNumpy["sum"], computedSympy["sum"])
+
+
+def test_find_risk_bravo_bbb():
+    error_level = 0.01
+
+    tests = { "bin" :
+                {
+                'test1': {
+                    'nn': 1000,
+                    'wd': 600,
+                    'alpha': .1,
+                    'round_schedule': [19, 50, 120],
+                    'expected': {
+                        'kmins': [17, 34, 72],
+                        'risk_goal': [15/16384, 13082475751189/562949953421312, 40749282220389162961500860981726755/
+664613997892457936451903530140172288],
+                        'prob_stop': [38434344561/3814697265625, 4445872486532286446994218066869317/17763568394002504646778106689453125, 500942470229451850783617943781885554916226035827938067635424137086658784557215124513/752316384526264005099991383822237233803945956334136013765601092018187046051025390625]
+                    } ,
+                    'mathematica': 0.00091552734375
+                },
+                }
+    }
+
+    for type_of_test in tests.keys():
+        print("test type: " + type_of_test)
+        for test in tests[type_of_test]:
+            expected = tests[type_of_test][test]['expected']
+            nn = tests[type_of_test][test]['nn']
+            wd = tests[type_of_test][test]['wd']
+            alpha = tests[type_of_test][test]['alpha']
+            round_schedule = tests[type_of_test][test]['round_schedule']
+            print("\n" + test + "\t" + str(nn) + "\t" + str(wd) + "\t" + str(round_schedule))
+            computed = risk.find_risk_bravo_bbb(nn, wd, alpha, 'risk', round_schedule)
+            kmins = computed['kmins']
+            risk_goal = computed['risk_goal']
+            prob_stop = computed['prob_stop']
+
+            expected_kmins = expected['kmins']
+            expected_risk_goal = expected['risk_goal']
+            expected_prob_stop = expected['risk_goal']
+
+            #for i in range(len(kmins)):
+             #   assert kmins[i] == expected_kmins[i], 's_w failed: got {}, expected {}'.format(kmins[i], expected_kmins[i])
+
+            assert kmins == expected_kmins, 's_w failed: got {}, expected {}'.format(kmins, expected_kmins)
+            for i in range(len(risk_goal)):
+                assert np.abs(risk_goal[i] - expected_risk_goal[i]) < error_level, 's_w failed: got {}, expected {}'.format(risk_goal[i], expected_risk_goal[i])
+
+
+
 

@@ -116,6 +116,36 @@ def next_round_risk(ballots_cast, winner, alpha, n, goal, dist, prevround_size, 
     return {"sum" : sum, "kmin" : i+1}
 
 
+
+
+def find_risk_bravo_bbb(ballots_cast, winner, alpha, model, round_schedule):
+    # Finiding BRAVO ballot by ballot risk and stopping probabilities
+    max_number_of_rounds = len(round_schedule)
+    upper_limit = round_schedule[max_number_of_rounds - 1]
+    risk_eval = calculate_bad_luck_cum_probab_table_b2_sympy(upper_limit, winner, ballots_cast, alpha, "risk", model)
+    prob_eval = calculate_bad_luck_cum_probab_table_b2_sympy(upper_limit, winner, ballots_cast, alpha, "prob", model)
+
+    risk_table = risk_eval["p_table"]
+    risk_goal = [S("0")] * (max_number_of_rounds)
+    prob_table = prob_eval["p_table"]
+    prob_stop = [S("0")] * (max_number_of_rounds)
+
+
+    # in risk_goal[] we will store how much risk can be spent for each round
+    for round in range(max_number_of_rounds):
+        upper_limit_round = round_schedule[round]
+        risk_goal[round] = sum(risk_table[0:upper_limit_round])
+        prob_stop[round] = N(sum(prob_table[0:upper_limit_round]))
+        #print(str(round+1) + "\t" + str(round_schedule[round]) + "\t" + str(risk_goal[round]) + "\t" + str(upper_limit))
+
+    bravo_kmins = map(lambda n: rla.bravo_kmin(ballots_cast, winner, alpha, n), round_schedule )
+    kmins = []
+    for km in bravo_kmins:
+        kmins.append(km)
+
+    return {"risk_goal" : risk_goal, "prob_stop" : prob_stop, "kmins" : kmins}
+
+
 #
 #
 # next functions are for comparison only: they use different number formats floats/numpy/fraction
