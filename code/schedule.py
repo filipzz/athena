@@ -28,7 +28,7 @@ def main():
     margin = .2
     ballots_cast = 1000
     winner = math.floor((1+margin)/2* ballots_cast)
-    round_schedule = [19, 50, 120]#[301, 518, 916]#, 1520, 3366]
+    round_schedule = [19, 50, 120, 350]#[301, 518, 916]#, 1520, 3366]
     alpha = .1
     what = "risk"
     model = "bin"

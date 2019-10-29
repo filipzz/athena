@@ -120,6 +120,7 @@ def next_round_risk(ballots_cast, winner, alpha, n, goal, dist, prevround_size, 
 
 def find_risk_bravo_bbb(ballots_cast, winner, alpha, model, round_schedule):
     # Finiding BRAVO ballot by ballot risk and stopping probabilities
+    #print("find risk bravo called with: " + str(ballots_cast) + "\t" + str(winner) + "\t" + str(alpha) + "\t" + model + "\t" + str(round_schedule))
     max_number_of_rounds = len(round_schedule)
     upper_limit = round_schedule[max_number_of_rounds - 1]
     risk_eval = calculate_bad_luck_cum_probab_table_b2_sympy(upper_limit, winner, ballots_cast, alpha, "risk", model)
