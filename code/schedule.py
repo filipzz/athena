@@ -22,44 +22,22 @@ def print_election_info(ballots_cast, winner, margin, alpha, model):
     print("Model:  " + str(model))
 
 
-def main():
+def find_new_kmins_max_risk(ballots_cast, winner, alpha, round_schedule, risk_goal):
+    # in this version, we change the risk_goal for the last round by replacing it with alpha
+    modified_risk_goal = risk_goal
+    modified_risk_goal[len(risk_goal)-1] = alpha
+    return find_new_kmins(ballots_cast, winner, alpha, round_schedule, modified_risk_goal)
 
-    # Setting up the parameters for the audit
-    margin = .2
-    ballots_cast = 1000
-    winner = math.floor((1+margin)/2* ballots_cast)
-    round_schedule = [19, 50, 120, 350]#[301, 518, 916]#, 1520, 3366]
-    alpha = .1
-    what = "risk"
-    model = "bin"
+def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
+        #print("Risk goal: " + str(risk_goal))
+    # initializing variables
     max_number_of_rounds = len(round_schedule)
     upper_limit = round_schedule[max_number_of_rounds - 1]
-
-    print_election_info(ballots_cast, winner, margin, alpha, model)
-
-    # Printing
-    print("Proposed round sizes: " + str(round_schedule))
-    #bravo_kmins = map(lambda n: rla.bravo_kmin(ballots_cast, winner, alpha, n), round_schedule )
-    #print("\tBRAVO kmins: " + str(print_iterator(bravo_kmins)))
-
-
-    # this is time-consuming part -- you can use precomputed values if you have the same
-    #
-    bravo_parameters = risk.find_risk_bravo_bbb(ballots_cast, winner, alpha, model, round_schedule)
-    risk_goal = bravo_parameters["risk_goal"]
-    prob_stop_bravo = bravo_parameters["prob_stop"]
-    kmins_bravo = bravo_parameters["kmins"]
-
-
-    print("\tBRAVO risk: " + str(risk_goal))
-    print("\tBRAVO pstop: " + str(prob_stop_bravo))
-    print("\tBRAVO kmins: " + str(kmins_bravo))
-
-    #print("Risk goal: " + str(risk_goal))
-    # initializing variables
     pTableRbR = [S("0")] * (max_number_of_rounds)
     max = rla.bravo_kmin(ballots_cast, winner, alpha, upper_limit)
     p_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(max)]
+
+    # TODO: rename this variable into something that is less misleading
     risk_spent = [S("0")] * max_number_of_rounds
     prob_stop = [S("0")] * max_number_of_rounds
 
@@ -168,7 +146,44 @@ def main():
 
             k = k + 1
 
+    return {"kmin_new" : kmin_new, "risk_spent" : risk_spent}
 
+
+
+def find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal):
+    aurror = find_new_kmins(ballots_cast, winner, alpha,  round_schedule, risk_goal)
+
+    kmin_new = aurror["kmin_new"]
+    risk_spent = aurror["risk_spent"]
+
+    print("\n\tAURROR kmins:\t\t" + str(kmin_new))
+
+    print("\tAURROR risk: " + str(risk_spent))
+
+
+
+def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule):
+
+    # 1. we need to find Bravo risk for the schedule
+
+
+    # this is time-consuming part -- you can use precomputed values if you have the same
+    #
+    bravo_parameters = risk.find_risk_bravo_bbb(ballots_cast, winner, alpha, model, round_schedule)
+    risk_goal = bravo_parameters["risk_goal"]
+    prob_stop_bravo = bravo_parameters["prob_stop"]
+    kmins_bravo = bravo_parameters["kmins"]
+
+
+    print("\tBRAVO risk: " + str(risk_goal))
+    print("\tBRAVO pstop: " + str(prob_stop_bravo))
+    print("\tBRAVO kmins: " + str(kmins_bravo))
+
+    # 2. We use risk_goal to find new kmins
+    aurror = find_new_kmins(ballots_cast, winner, alpha,  round_schedule, risk_goal)
+
+    kmin_new = aurror["kmin_new"]
+    risk_spent = aurror["risk_spent"]
 
     print("\n\tAURROR kmins:\t\t" + str(kmin_new))
 
@@ -179,9 +194,23 @@ def main():
 
 
 
-
-
-
-
 if __name__ == '__main__':
-    main()
+        # Setting up the parameters for the audit
+    margin = .1
+    ballots_cast = 14000
+    winner = math.floor((1+margin)/2* ballots_cast)
+    round_schedule = [193, 332, 587, 974, 2155]#[301, 518, 916]#, 1520, 3366]
+    risk_goal = [.024, .0479, .0718, .0862, .0948]
+    alpha = .1
+    model = "bin"
+
+    print_election_info(ballots_cast, winner, margin, alpha, model)
+
+    # Calling: find_aurror_params_from_schedule(...)
+    # 1. finds parameters for BRAVO
+    # 2. finds parameters for Aurror
+    find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule)
+
+    # Calling: find_aurror_params_from_schedule_and_risk(...)
+    # just finds parameters for Aurror
+    #find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal)
