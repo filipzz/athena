@@ -5,15 +5,6 @@ from sympy.stats import Binomial, Hypergeometric, density
 import math
 
 
-def __init__():
-    pass
-
-def print_iterator(it):
-    strg = []
-    for x in it:
-        strg.append(x)
-    return strg  # for new line
-
 def print_election_info(ballots_cast, winner, margin, alpha, model):
     print("Number of valid ballots: " + str(ballots_cast))
     print("(Declared) Votes for winner: " + str(winner))
@@ -28,14 +19,29 @@ def find_new_kmins_max_risk(ballots_cast, winner, alpha, round_schedule, risk_go
     modified_risk_goal[len(risk_goal)-1] = alpha
     return find_new_kmins(ballots_cast, winner, alpha, round_schedule, modified_risk_goal)
 
+
 def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
+
+
+    # check if the risk goal is correct (it needs to be increasing with elements smaller than alpha)
+    r_prev = 0
+    for r in risk_goal:
+        if r - r_prev < 0 or r > alpha:
+            raise Exception('Incorrect risk_goal')
+        r_prev = r
+
         #print("Risk goal: " + str(risk_goal))
     # initializing variables
     max_number_of_rounds = len(round_schedule)
     upper_limit = round_schedule[max_number_of_rounds - 1]
-    pTableRbR = [S("0")] * (max_number_of_rounds)
+    #pTableRbR = [S("0")] * (max_number_of_rounds)
     max = rla.bravo_kmin(ballots_cast, winner, alpha, upper_limit)
-    p_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(max)]
+    #p_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(max)]
+    #r_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(max)]
+    #TODO: table_size = max/upper_limit - for "reasobanle" risk_goal (e.g., following bravo risk schedule) table_size = max will be smaller than bravo_kmin
+    table_size = max #or upper_limit
+    p_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(table_size)]
+    r_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(table_size)]
 
     # TODO: rename this variable into something that is less misleading
     risk_spent = [S("0")] * max_number_of_rounds
@@ -64,16 +70,21 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
     # we do it for the first round first
     # TODO: we need to add hypergeometric (after we figure out how to deal with invalid votes)
     for i in range(kmin_prime):
-        X = Binomial('X', round_schedule[0], S.Half)
+        Xr = Binomial('Xr', round_schedule[0], S.Half)
+        r_table_c_rbr[i][0] = density(Xr).dict[i]
+        X = Binomial('X', round_schedule[0], S(winner)/S(ballots_cast))
         p_table_c_rbr[i][0] = density(X).dict[i]
         #print(str(i) + "\t" + str(N(density(X).dict[i])))
 
     risk_spent_so_far = S("0")
+    prob_spent_so_far = S("0")
     for i in range(kmin_prime):
-        risk_spent_so_far = risk_spent_so_far + p_table_c_rbr[i][0]
+        risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[i][0]
+        prob_spent_so_far = prob_spent_so_far + p_table_c_rbr[i][0]
 
 
     risk_spent[0] = 1 - N(risk_spent_so_far)
+    prob_stop[0] = 1 - N(prob_spent_so_far)
 
     # print("risk after first round: ", str(N(1- risk_spent_so_far)))
 
@@ -86,7 +97,7 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
 
         risk_spent_so_far = S("0")
         for xi in range(kmin_new[i-1]):
-            risk_spent_so_far = risk_spent_so_far + p_table_c_rbr[xi][i-1]
+            risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[xi][i-1]
 
         print("\trisk spent up to: ", str(i), " round: ", str(N(1- risk_spent_so_far)))
         round_start_at = round_schedule[i-1]
@@ -95,7 +106,9 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
         #  kMin[-1] + 1
         for j in range(kmin_new[i-1]):
             for k in range(j,kmin_new[i-1]):
-                X = Binomial('X', round_schedule[i] - round_start_at, S.Half)
+                Xr = Binomial('Xr', round_schedule[i] - round_start_at, S.Half)
+                r_table_c_rbr[k][i] = r_table_c_rbr[k][i] + r_table_c_rbr[j][i-1] * density(Xr).dict[k-j]
+                X = Binomial('X', round_schedule[i] - round_start_at, S(winner)/S(ballots_cast))
                 p_table_c_rbr[k][i] = p_table_c_rbr[k][i] + p_table_c_rbr[j][i-1] * density(X).dict[k-j]
                 #print(str(round_schedule[i] - round_start_at), "\t", str(j), "\t", str(k), "\t",  str(N(p_table_c_rbr[j][i-1])), "\t", str(N(density(X).dict[k-j])) )
                 #print("p_table_c_rbr[", str(k), ", ", str(i), "] = ", str(N(p_table_c_rbr[k][i])))
@@ -108,7 +121,7 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
         # we compute what is the current risk spent
         risk_spent_so_far = S("0")
         for xi in range(kmin_new[i-1]):
-            risk_spent_so_far = risk_spent_so_far + p_table_c_rbr[xi][i]
+            risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[xi][i]
 
         #print("risk spent so far: (before last while)", str(1 - N(risk_spent_so_far)))
 
@@ -122,21 +135,27 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
 
         #print(">>" + str(kmin_new[i-1]) + "\t" + str(round_schedule[i] - round_start_at))
         while correct_risk_level == 1:
-            for j in range(min(kmin_new[i-1], round_schedule[i] - round_start_at)):
-                X = Binomial('X', round_schedule[i] - round_start_at, S.Half)
+            #for j in range(min(kmin_new[i-1], round_schedule[i] - round_start_at)):
+            for j in range(min(k + 1, round_schedule[i] - round_start_at)):
+                Xr = Binomial('Xr', round_schedule[i] - round_start_at, S.Half)
+                X = Binomial('X', round_schedule[i] - round_start_at, S(winner)/S(ballots_cast))
                 if k - j <= round_schedule[i] - round_start_at:
+                    r_table_c_rbr[k][i] = r_table_c_rbr[k][i] + r_table_c_rbr[j][i-1] * density(Xr).dict[k-j]
                     p_table_c_rbr[k][i] = p_table_c_rbr[k][i] + p_table_c_rbr[j][i-1] * density(X).dict[k-j]
                     #print(str(round_schedule[i] - round_start_at), "\t", str(j), "\t", str(k), "\t",  str(N(p_table_c_rbr[j][i-1])), "\t", str(N(density(X).dict[k-j])) )
                 #print("p_table_c_rbr[", str(k), ", ", str(i), "] = ", str(N(p_table_c_rbr[k][i])))
 
 
             risk_spent_so_far = S("0")
+            prob_spent_so_far = S("0")
             for xi in range(k+1):
-                risk_spent_so_far = risk_spent_so_far + p_table_c_rbr[xi][i]
+                risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[xi][i]
+                prob_spent_so_far = prob_spent_so_far + p_table_c_rbr[xi][i]
 
             #print(str(i) + "\t" + str(k) + "\t" + str(N(risk_spent_so_far)))
 
             risk_spent[i] = 1 - N(risk_spent_so_far)
+            prob_stop[i] = 1 - N(prob_spent_so_far)
 
 
             if (1 - N(risk_spent_so_far)) < N(risk_goal[i]):
@@ -146,7 +165,22 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
 
             k = k + 1
 
-    return {"kmin_new" : kmin_new, "risk_spent" : risk_spent}
+            if k >= table_size:
+                correct_risk_level = 0
+
+    avg_star = 0
+    prev_prob = 0.0
+
+    for prob, round_end in zip(prob_stop, round_schedule):
+        avg_star = avg_star + (prob - prev_prob) * (round_end )
+        prev_prob = prob
+
+    avg = avg_star + (1 - prev_prob) * ballots_cast
+
+
+
+
+    return {"kmin_new" : kmin_new, "risk_spent" : risk_spent, "prob_stop" : prob_stop, "avg_star" : avg_star, "avg" : avg}
 
 
 
@@ -155,11 +189,15 @@ def find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model
 
     kmin_new = aurror["kmin_new"]
     risk_spent = aurror["risk_spent"]
+    prob_stop = aurror["prob_stop"]
 
     print("\n\tAURROR kmins:\t\t" + str(kmin_new))
 
     print("\tAURROR risk: " + str(risk_spent))
 
+    print("\tAURROR pstop: " + str(prob_stop))
+    print("\t\tAVG:\t" + str(aurror["avg"]))
+    print("\t\tAVG*:\t" + str(aurror["avg_star"]))
 
 
 def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule):
@@ -174,20 +212,34 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
     prob_stop_bravo = bravo_parameters["prob_stop"]
     kmins_bravo = bravo_parameters["kmins"]
 
+    avg_star = 0
+    prev_prob = 0.0
+
+    for prob, round_end in zip(prob_stop_bravo, round_schedule):
+        avg_star = avg_star + (prob - prev_prob) * (round_end )
+        prev_prob = prob
+
+    avg = avg_star + (1 - prev_prob) * ballots_cast
 
     print("\tBRAVO risk: " + str(risk_goal))
     print("\tBRAVO pstop: " + str(prob_stop_bravo))
     print("\tBRAVO kmins: " + str(kmins_bravo))
+    print("\t\tAVG:\t" + str(avg))
+    print("\t\tAVG*:\t" + str(avg_star))
 
     # 2. We use risk_goal to find new kmins
     aurror = find_new_kmins(ballots_cast, winner, alpha,  round_schedule, risk_goal)
 
     kmin_new = aurror["kmin_new"]
     risk_spent = aurror["risk_spent"]
+    prob_stop = aurror["prob_stop"]
 
     print("\n\tAURROR kmins:\t\t" + str(kmin_new))
 
     print("\tAURROR risk: " + str(risk_spent))
+    print("\tAURROR pstop: " + str(prob_stop))
+    print("\t\tAVG:\t" + str(aurror["avg"]))
+    print("\t\tAVG*:\t" + str(aurror["avg_star"]))
 
 
 
@@ -199,18 +251,21 @@ if __name__ == '__main__':
     margin = .1
     ballots_cast = 14000
     winner = math.floor((1+margin)/2* ballots_cast)
-    round_schedule = [193, 332, 587, 974, 2155]#[301, 518, 916]#, 1520, 3366]
-    risk_goal = [.024, .0479, .0718, .0862, .0948]
+    round_schedule = [193, 332]#, 587]#, 974, 2155]#[301, 518, 916]#, 1520, 3366]
     alpha = .1
     model = "bin"
 
     print_election_info(ballots_cast, winner, margin, alpha, model)
 
+    print("Round schedule: " + str(round_schedule))
     # Calling: find_aurror_params_from_schedule(...)
     # 1. finds parameters for BRAVO
     # 2. finds parameters for Aurror
-    find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule)
+    #find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule)
 
     # Calling: find_aurror_params_from_schedule_and_risk(...)
     # just finds parameters for Aurror
-    #find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal)
+    #risk_goal = [alpha] * len(round_schedule)#, .0999999]
+    risk_goal = [.024, .0479, .0718, .0862, .0948]
+    risk_goal = [.049, alpha]#, .0862, .0948]
+    find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal)

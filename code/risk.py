@@ -10,6 +10,174 @@ def __init__(self):
     pass
 
 
+def calculate_risk_and_probability_b2_mem(round_size, winner, ballots_cast, alpha, model):
+    #TODO: take into account model -- now only Binary distribution (with replacement is used)
+    sum = S("0")
+    p_risk = S("0.5")
+    p_succ = S(winner)/S(ballots_cast)
+
+
+    if model == "bin":
+        max = rla.bravo_kmin(ballots_cast, winner, alpha, round_size)
+    else:
+        max = rla.bravo_like_kmin(ballots_cast, winner, alpha, round_size)
+
+    if max <= round_size:
+
+
+
+        p_table_c = [[S("0")] * (2)  for i in range(max)]
+        p_table_c[0][0] = (1-p_succ)
+        p_table_c[1][0] = (p_succ)
+
+
+        r_table_c = [[S("0")] * (2)  for i in range(max)]
+        r_table_c[0][0] = (1-p_risk)
+        r_table_c[1][0] = (p_risk)
+
+        p_table_tmp = [S("0")] * (round_size)
+        r_table_tmp = [S("0")] * (round_size)
+
+        # TODO: data aggregated in p_table_cs[] are only for research purposes -- remove for real world use
+        #p_table_cx = [[S("0")] * (2) for i in range(max)]
+        #p_table_cx[0][0] = 1
+        #p_table_cx[1][0] = 1
+
+
+
+        for i in range(1, round_size):
+
+            i_now = i % 2
+            i_prev = (i-1) % 2
+
+            if model == "bin":
+                kmin = rla.bravo_kmin(ballots_cast, winner, alpha, i+1)
+            else:
+                kmin = rla.bravo_like_kmin(ballots_cast, winner, alpha, i+1)
+
+            # we need to set all values back to zero
+            for k in range(kmin):
+                #print(str(i) + "\t" + str(k))
+                p_table_c[k][i_now] = S("0")
+                r_table_c[k][i_now] = S("0")
+                #p_table_cx[k][i % 2] = S("0")
+
+            p_table_c[0][i_now] = p_table_c[0][i_prev] * (1-p_succ)
+            #p_table_cx[0][i % 2] = p_table_cx[0][i_prev]
+            r_table_c[0][i_now] = p_table_c[0][i_prev] * (1-p_risk)
+
+            for k in range(kmin):
+                #print(str(i) + "\t" + str(k))
+                p_table_c[k][i_now] = p_table_c[k][i_prev] * (1-p_succ) + p_table_c[k-1][i_prev] * p_succ
+                r_table_c[k][i_now] = r_table_c[k][i_prev] * (1-p_risk) + r_table_c[k-1][i_prev] * p_risk
+                #p_table_cx[k][i % 2] = p_table_cx[k][(i-1) % 2] + p_table_cx[k-1][(i-1) % 2]
+
+
+            sum = S("0")
+            sum_risk = S("0")
+            for k in range(kmin):
+                sum = sum + p_table_c[k][i_now]
+                sum_risk = sum_risk + r_table_c[k][i_now]
+
+            p_table_tmp[i] = sum
+            r_table_tmp[i] = sum_risk
+
+
+        p_table = [S("0")] * (round_size)
+        r_table = [S("0")] * (round_size)
+
+        sum = S("0")
+        sum_risk = S("0")
+        for i in range(1,round_size):
+            p_table[i] = p_table_tmp[i-1] - p_table_tmp[i]
+            sum = sum + p_table[i]
+            r_table[i] = r_table_tmp[i-1] - r_table_tmp[i]
+            sum_risk = sum_risk + r_table[i]
+
+    #print("sympy: " + str(N(sum, 50)))
+
+    #return  {"p_table_c": p_table_c, "p_table_cx" : p_table_cx, "p_table" : p_table, "sum" : sum, "r_table": r_table, "sum_risk" : sum_risk}
+    return {"p_table": p_table, "r_table": r_table}
+
+
+def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, model):
+    #TODO: take into account model -- now only Binary distribution (with replacement is used)
+    sum = S("0")
+    p_risk = S("0.5")
+    p_succ = S(winner)/S(ballots_cast)
+
+
+    if model == "bin":
+        max = rla.bravo_kmin(ballots_cast, winner, alpha, round_size)
+    else:
+        max = rla.bravo_like_kmin(ballots_cast, winner, alpha, round_size)
+
+    if max <= round_size:
+
+        p_table = [S("0")] * (round_size)
+        p_table_tmp = [S("0")] * (round_size)
+
+
+        p_table_c = [[S("0")] * (round_size)  for i in range(max)]#] * round_size
+        p_table_c[0][0] = (1-p_succ)
+        p_table_c[1][0] = (p_succ)
+
+        r_table = [S("0")] * (round_size)
+        r_table_tmp = [S("0")] * (round_size)
+
+
+        r_table_c = [[S("0")] * (round_size)  for i in range(max)]#] * round_size
+        r_table_c[0][0] = (1-p_risk)
+        r_table_c[1][0] = (p_risk)
+
+        # TODO: data aggregated in p_table_cs[] are only for research purposes -- remove for real world use
+        p_table_cx = [[S("0")] * (round_size) for i in range(max)]
+        p_table_cx[0][0] = 1
+        p_table_cx[1][0] = 1
+
+
+
+        for i in range(1, round_size):
+            if model == "bin":
+                kmin = rla.bravo_kmin(ballots_cast, winner, alpha, i+1)
+            else:
+                kmin = rla.bravo_like_kmin(ballots_cast, winner, alpha, i+1)
+
+            p_table_c[0][i] = p_table_c[0][i-1] * (1-p_succ)
+            p_table_cx[0][i] = p_table_cx[0][i-1]
+            r_table_c[0][i] = p_table_c[0][i-1] * (1-p_risk)
+            for k in range(kmin):
+                #print(str(i) + "\t" + str(k))
+                p_table_c[k][i] = p_table_c[k][i-1] * (1-p_succ) + p_table_c[k-1][i-1] * p_succ
+                r_table_c[k][i] = r_table_c[k][i-1] * (1-p_risk) + r_table_c[k-1][i-1] * p_risk
+                p_table_cx[k][i] = p_table_cx[k][i-1] + p_table_cx[k-1][i-1]
+
+
+
+        for i in range(round_size):
+            sum = S("0")
+            sum_risk = S("0")
+            for k in range(max):
+                sum = sum + p_table_c[k][i]
+                sum_risk = sum_risk + r_table_c[k][i]
+
+            p_table_tmp[i] = sum
+            r_table_tmp[i] = sum_risk
+
+        sum = S("0")
+        sum_risk = S("0")
+        for i in range(1,round_size):
+            p_table[i] = p_table_tmp[i-1] - p_table_tmp[i]
+            sum = sum + p_table[i]
+            r_table[i] = r_table_tmp[i-1] - r_table_tmp[i]
+            sum_risk = sum_risk + r_table[i]
+
+    #print("sympy: " + str(N(sum, 50)))
+
+    #return  {"p_table_c": p_table_c, "p_table_cx" : p_table_cx, "p_table" : p_table, "sum" : sum, "r_table": r_table, "sum_risk" : sum_risk}
+    return {"p_table": p_table, "r_table": r_table}
+
+
 def calculate_risk_and_probability_b2_sympy(round_size, winner, ballots_cast, alpha, model):
     #TODO: take into account model -- now only Binary distribution (with replacement is used)
     sum = S("0")
@@ -205,8 +373,9 @@ def find_risk_bravo_bbb(ballots_cast, winner, alpha, model, round_schedule):
     #risk_eval = calculate_bad_luck_cum_probab_table_b2_sympy(upper_limit, winner, ballots_cast, alpha, "risk", model)
     #prob_eval = calculate_bad_luck_cum_probab_table_b2_sympy(upper_limit, winner, ballots_cast, alpha, "prob", model)
 
-    bravo_eval = calculate_risk_and_probability_b2_sympy(upper_limit, winner, ballots_cast, alpha, model)
+    #bravo_eval = calculate_risk_and_probability_b2_mem(upper_limit, winner, ballots_cast, alpha, model)
 
+    bravo_eval = calculate_risk_and_probability_b2(upper_limit, winner, ballots_cast, alpha, model)
     #risk_table = risk_eval["p_table"]
     risk_table = bravo_eval["r_table"]
     risk_goal = [S("0")] * (max_number_of_rounds)

@@ -11,8 +11,18 @@ def test_find_new_kmins():
                 # timing: for this parameters:
                     # mathematica: preprocessing (BRAVO): 287.7
                     # mathematica: main part (Aurror): 47.91
-                    # python all
-                    # python just main part (with risk precomputed): 116.124
+                    # mathematica: max memory consumption: 3 175 671 976 B
+                    # python all:
+                        # real	20m0,913s
+                        # user	19m55,100s
+                        # sys	0m6,120s
+                      # max memory consumption: 17 486 068 kB
+                    # python just main part (with risk precomputed): 116.124:
+                        # real	1m53,161s
+                        # user	1m52,900s
+                        # sys	0m0,704s
+
+
                 'test1': {
                     'nn': 14000,
                     'wd': 7700,
