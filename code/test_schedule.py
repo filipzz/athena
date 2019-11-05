@@ -12,12 +12,17 @@ def test_find_new_kmins():
                     # mathematica: preprocessing (BRAVO): 287.7
                     # mathematica: main part (Aurror): 47.91
                     # mathematica: max memory consumption: 3 175 671 976 B
-                    # python all:
+                    # python all NUMPY + SCIPY:
+                        # real	1m55,189s
+                        # user	1m55,076s
+                        # sys	0m0,608s
+                        # max memory consumption: 786 876 kB
+                    # python all SYMPY:
                         # real	20m0,913s
                         # user	19m55,100s
                         # sys	0m6,120s
                       # max memory consumption: 17 486 068 kB
-                    # python just main part (with risk precomputed): 116.124:
+                    # python SYMPY just main part (with risk precomputed): 116.124:
                         # real	1m53,161s
                         # user	1m52,900s
                         # sys	0m0,704s
