@@ -1,7 +1,9 @@
 import rla as rla
 import risk as risk
-from sympy import S, N
+#from sympy import S, N
 from sympy.stats import Binomial, Hypergeometric, density
+import numpy as np
+from scipy.stats import binom
 import math
 
 import tools as tools
@@ -42,12 +44,12 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
     #r_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(max)]
     #TODO: table_size = max/upper_limit - for "reasobanle" risk_goal (e.g., following bravo risk schedule) table_size = max will be smaller than bravo_kmin
     table_size = max #or upper_limit
-    p_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(table_size)]
-    r_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(table_size)]
+    p_table_c_rbr = np.zeros((table_size, max_number_of_rounds)) #[[S("0")] * (max_number_of_rounds)  for i in range(table_size)]
+    r_table_c_rbr = np.zeros((table_size, max_number_of_rounds)) #[[S("0")] * (max_number_of_rounds)  for i in range(table_size)]
 
     # TODO: rename this variable into something that is less misleading
-    risk_spent = [S("0")] * max_number_of_rounds
-    prob_stop = [S("0")] * max_number_of_rounds
+    risk_spent = np.zeros(max_number_of_rounds) # [S("0")] * max_number_of_rounds
+    prob_stop = np.zeros(max_number_of_rounds) #[S("0")] * max_number_of_rounds
 
 
 
@@ -72,21 +74,21 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
     # we do it for the first round first
     # TODO: we need to add hypergeometric (after we figure out how to deal with invalid votes)
     for i in range(kmin_prime):
-        Xr = Binomial('Xr', round_schedule[0], S.Half)
-        r_table_c_rbr[i][0] = density(Xr).dict[i]
-        X = Binomial('X', round_schedule[0], S(winner)/S(ballots_cast))
-        p_table_c_rbr[i][0] = density(X).dict[i]
+        #Xr = Binomial('Xr', round_schedule[0], S.Half)
+        r_table_c_rbr[i][0] = binom.pmf(i, round_schedule[0], .5)  #density(Xr).dict[i]
+        #X = Binomial('X', round_schedule[0], S(winner)/S(ballots_cast))
+        p_table_c_rbr[i][0] = binom.pmf(i, round_schedule[0], winner/ballots_cast) # density(X).dict[i]
         #print(str(i) + "\t" + str(N(density(X).dict[i])))
 
-    risk_spent_so_far = S("0")
-    prob_spent_so_far = S("0")
+    risk_spent_so_far = np.longdouble(0.0) #  S("0")
+    prob_spent_so_far = np.longdouble(0.0) #S("0")
     for i in range(kmin_prime):
         risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[i][0]
         prob_spent_so_far = prob_spent_so_far + p_table_c_rbr[i][0]
 
 
-    risk_spent[0] = 1 - N(risk_spent_so_far)
-    prob_stop[0] = 1 - N(prob_spent_so_far)
+    risk_spent[0] = 1 - (risk_spent_so_far)
+    prob_stop[0] = 1 - (prob_spent_so_far)
 
     # print("risk after first round: ", str(N(1- risk_spent_so_far)))
 
@@ -97,23 +99,23 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
     for i in range(1, max_number_of_rounds):
         print("\n\tSTARTING NEW ROUND " + str(i+1))
 
-        risk_spent_so_far = S("0")
+        risk_spent_so_far = np.longdouble(0.0) # S("0")
         for xi in range(kmin_new[i-1]):
             risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[xi][i-1]
 
-        print("\trisk spent up to: ", str(i), " round: ", str(N(1- risk_spent_so_far)))
+        print("\trisk spent up to: ", str(i), " round: ", str((1- risk_spent_so_far)))
         round_start_at = round_schedule[i-1]
 
         # now the part that we are sure its is gonna work - starting from k =
         #  kMin[-1] + 1
         for j in range(kmin_new[i-1]):
             for k in range(j,kmin_new[i-1]):
-                Xr = Binomial('Xr', round_schedule[i] - round_start_at, S.Half)
-                r_table_c_rbr[k][i] = r_table_c_rbr[k][i] + r_table_c_rbr[j][i-1] * density(Xr).dict[k-j]
-                X = Binomial('X', round_schedule[i] - round_start_at, S(winner)/S(ballots_cast))
-                p_table_c_rbr[k][i] = p_table_c_rbr[k][i] + p_table_c_rbr[j][i-1] * density(X).dict[k-j]
-                #print(str(round_schedule[i] - round_start_at), "\t", str(j), "\t", str(k), "\t",  str(N(p_table_c_rbr[j][i-1])), "\t", str(N(density(X).dict[k-j])) )
-                #print("p_table_c_rbr[", str(k), ", ", str(i), "] = ", str(N(p_table_c_rbr[k][i])))
+                #Xr = Binomial('Xr', round_schedule[i] - round_start_at, S.Half)
+                r_table_c_rbr[k][i] = r_table_c_rbr[k][i] + r_table_c_rbr[j][i-1] * binom.pmf(k-j, round_schedule[i] - round_start_at, .5) #density(Xr).dict[k-j]
+                #X = Binomial('X', round_schedule[i] - round_start_at, S(winner)/S(ballots_cast))
+                p_table_c_rbr[k][i] = p_table_c_rbr[k][i] + p_table_c_rbr[j][i-1] * binom.pmf(k-j, round_schedule[i] - round_start_at, winner/ballots_cast) #density(X).dict[k-j]
+                #print(str(round_schedule[i] - round_start_at), "\t", str(j), "\t", str(k), "\t",  str((p_table_c_rbr[j][i-1])), "\t", str((density(X).dict[k-j])) )
+                #print("p_table_c_rbr[", str(k), ", ", str(i), "] = ", str((p_table_c_rbr[k][i])))
 
         #print(str(i) + "\t" + str(kmin_new[i-1]))
 
@@ -121,11 +123,11 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
 
 
         # we compute what is the current risk spent
-        risk_spent_so_far = S("0")
+        risk_spent_so_far = np.longdouble(0.0) # S("0")
         for xi in range(kmin_new[i-1]):
             risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[xi][i]
 
-        #print("risk spent so far: (before last while)", str(1 - N(risk_spent_so_far)))
+        #print("risk spent so far: (before last while)", str(1 - (risk_spent_so_far)))
 
         correct_risk_level = 1
 
@@ -139,28 +141,28 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
         while correct_risk_level == 1:
             #for j in range(min(kmin_new[i-1], round_schedule[i] - round_start_at)):
             for j in range(min(k + 1, round_schedule[i] - round_start_at)):
-                Xr = Binomial('Xr', round_schedule[i] - round_start_at, S.Half)
-                X = Binomial('X', round_schedule[i] - round_start_at, S(winner)/S(ballots_cast))
+                #Xr = Binomial('Xr', round_schedule[i] - round_start_at, S.Half)
+                #X = Binomial('X', round_schedule[i] - round_start_at, S(winner)/S(ballots_cast))
                 if k - j <= round_schedule[i] - round_start_at:
-                    r_table_c_rbr[k][i] = r_table_c_rbr[k][i] + r_table_c_rbr[j][i-1] * density(Xr).dict[k-j]
-                    p_table_c_rbr[k][i] = p_table_c_rbr[k][i] + p_table_c_rbr[j][i-1] * density(X).dict[k-j]
+                    r_table_c_rbr[k][i] = r_table_c_rbr[k][i] + r_table_c_rbr[j][i-1] * binom.pmf(k-j, round_schedule[i] - round_start_at, .5) # density(Xr).dict[k-j]
+                    p_table_c_rbr[k][i] = p_table_c_rbr[k][i] + p_table_c_rbr[j][i-1] * binom.pmf(k-j, round_schedule[i] - round_start_at, winner/ballots_cast) #density(X).dict[k-j]
                     #print(str(round_schedule[i] - round_start_at), "\t", str(j), "\t", str(k), "\t",  str(N(p_table_c_rbr[j][i-1])), "\t", str(N(density(X).dict[k-j])) )
                 #print("p_table_c_rbr[", str(k), ", ", str(i), "] = ", str(N(p_table_c_rbr[k][i])))
 
 
-            risk_spent_so_far = S("0")
-            prob_spent_so_far = S("0")
+            risk_spent_so_far = np.longdouble(0) #S("0")
+            prob_spent_so_far = np.longdouble(0) #S("0")
             for xi in range(k+1):
                 risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[xi][i]
                 prob_spent_so_far = prob_spent_so_far + p_table_c_rbr[xi][i]
 
             #print(str(i) + "\t" + str(k) + "\t" + str(N(risk_spent_so_far)))
 
-            risk_spent[i] = 1 - N(risk_spent_so_far)
-            prob_stop[i] = 1 - N(prob_spent_so_far)
+            risk_spent[i] = 1 - (risk_spent_so_far)
+            prob_stop[i] = 1 - (prob_spent_so_far)
 
 
-            if (1 - N(risk_spent_so_far)) < N(risk_goal[i]):
+            if (1 - (risk_spent_so_far)) < (risk_goal[i]):
                 kmin_new[i] = k + 1
                 correct_risk_level = 0
                 #print("new kmin_new: " + str(kmin_new[i]))
@@ -258,7 +260,7 @@ if __name__ == '__main__':
     margin = .1
     ballots_cast = 14000
     winner = math.floor((1+margin)/2* ballots_cast)
-    round_schedule = [193, 332]#, 587]#, 974, 2155]#[301, 518, 916]#, 1520, 3366]
+    round_schedule = [193, 332, 587, 974, 2155]#[301, 518, 916]#, 1520, 3366]
     alpha = .1
     model = "bin"
 
