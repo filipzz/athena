@@ -4,6 +4,8 @@ from sympy import S, N
 from sympy.stats import Binomial, Hypergeometric, density
 import math
 
+import tools as tools
+
 
 def print_election_info(ballots_cast, winner, margin, alpha, model):
     print("Number of valid ballots: " + str(ballots_cast))
@@ -212,6 +214,11 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
     prob_stop_bravo = bravo_parameters["prob_stop"]
     kmins_bravo = bravo_parameters["kmins"]
 
+    # TODO: save computed data (even earlier -- to have raw values for recomputation/change of round sizes)
+    #tools.save_table(risk_goal, "1-risk_table.json")
+    #tools.save_table(prob_stop_bravo, "1-prob_stop_bravo.json")
+    #tools.save_table(kmins_bravo, "1-kmins_bravo.json")
+
     avg_star = 0
     prev_prob = 0.0
 
@@ -261,11 +268,11 @@ if __name__ == '__main__':
     # Calling: find_aurror_params_from_schedule(...)
     # 1. finds parameters for BRAVO
     # 2. finds parameters for Aurror
-    #find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule)
+    find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule)
 
     # Calling: find_aurror_params_from_schedule_and_risk(...)
     # just finds parameters for Aurror
     #risk_goal = [alpha] * len(round_schedule)#, .0999999]
     risk_goal = [.024, .0479, .0718, .0862, .0948]
     risk_goal = [.049, alpha]#, .0862, .0948]
-    find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal)
+    #find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal)
