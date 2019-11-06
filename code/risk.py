@@ -1,11 +1,10 @@
-from fractions import Fraction
-
-from scipy.stats import binom
-#from sympy import S, N
-#from sympy.stats import Binomial, Hypergeometric, density
+import sys
 
 import numpy as np
+from scipy.stats import binom
+
 import rla as rla
+import tools as tools
 
 
 def __init__(self):
@@ -14,7 +13,7 @@ def __init__(self):
 
 
 
-def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, model):
+def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, model, save_to):
     #TODO: take into account model -- now only Binary distribution (with replacement is used)
     sum = np.longdouble(0.0) #S("0")
     p_risk = .5 # S("0.5")
@@ -86,6 +85,12 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
             r_table[i] = r_table_tmp[i-1] - r_table_tmp[i]
             sum_risk = sum_risk + r_table[i]
 
+    if save_to != "false":
+        try:
+            tools.save_table(r_table, save_to + "/risk_table.json")
+        except:
+            sys.exit("Problem with writing to selected folder")
+
     #print("sympy: " + str(N(sum, 50)))
 
     #return  {"p_table_c": p_table_c, "p_table_cx" : p_table_cx, "p_table" : p_table, "sum" : sum, "r_table": r_table, "sum_risk" : sum_risk}
@@ -129,7 +134,7 @@ def next_round_risk(ballots_cast, winner, alpha, n, goal, dist, prevround_size, 
 
 
 
-def find_risk_bravo_bbb(ballots_cast, winner, alpha, model, round_schedule):
+def find_risk_bravo_bbb(ballots_cast, winner, alpha, model, round_schedule, save_to):
     # Finiding BRAVO ballot by ballot risk and stopping probabilities
     #print("find risk bravo called with: " + str(ballots_cast) + "\t" + str(winner) + "\t" + str(alpha) + "\t" + model + "\t" + str(round_schedule))
     max_number_of_rounds = len(round_schedule)
@@ -139,7 +144,7 @@ def find_risk_bravo_bbb(ballots_cast, winner, alpha, model, round_schedule):
 
     #bravo_eval = calculate_risk_and_probability_b2_mem(upper_limit, winner, ballots_cast, alpha, model)
 
-    bravo_eval = calculate_risk_and_probability_b2(upper_limit, winner, ballots_cast, alpha, model)
+    bravo_eval = calculate_risk_and_probability_b2(upper_limit, winner, ballots_cast, alpha, model, save_to)
     #risk_table = risk_eval["p_table"]
     risk_table = bravo_eval["r_table"]
     risk_goal = np.zeros(max_number_of_rounds) #[S("0")] * (max_number_of_rounds)
