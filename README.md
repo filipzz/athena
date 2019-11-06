@@ -7,7 +7,13 @@
 Typical use:
 
 ```bash
-python3 code/aurror.py --new raceName --alpha .1 --total 10000  --candidates "Candidate A" CandidateB CandidateC --ballots 5000 3000 2000 --round_schedule 200
+python3 code/aurror.py --new raceName --alpha .1 --total 10000  --candidates "Albus D." Bob Cedric --ballots 5000 3000 2000 --round_schedule 100 200
+```
+
+and with shorter parameternames:
+
+```bash
+python3 code/aurror.py -n raceName -a .1 -t 10000 -c "Albus D." Bob Cedric -b 5000 3000 2000  -r 100 200
 ```
 
 A new folder: **elections/** will be created in the current path.
@@ -54,58 +60,59 @@ optional arguments:
 
 ```
 Results of: raceName
+
 Number of valid ballots: 10000
-	1 Candidate A	5000
-	2 CandidateB	3000
-	3 CandidateC	2000
+	1 Albus D.	5000
+	2 Beatrix	3000
+	3 Cedric	2000
 
 AURROR parameters: 
 Alpha:  0.1
 Model:  bin
-Round schedule: [200]
+Round schedule: [100, 200]
 
 
-Candidate A (5000) vs CandidateB (3000)
-	Effective round schedule: [160]
-	BRAVO risk: [0.08189835]
-	BRAVO pstop: [0.9031591]
-	BRAVO kmins: [95]
-		AVG:	919.2326324555735
-		AVG*:	144.5054564804985
+Albus D. (5000) vs Beatrix (3000)
+	Effective round schedule: [80, 160]
+	BRAVO risk: [0.06235051 0.08189835]
+	BRAVO pstop: [0.6862955 0.9031591]
+	BRAVO kmins: [50, 95]
+		AVG:	864.3289922821481
+		AVG*:	89.6018163070731
 
-	AURROR kmins:		[90]
-	AURROR risk: [0.06641127]
-	AURROR pstop: [0.95576613]
-		AVG:	506.79353804690834
-		AVG*:	152.92258085618553
-
-
-Candidate A (5000) vs CandidateC (2000)
-	Effective round schedule: [140]
-	BRAVO risk: [0.08264516]
-	BRAVO pstop: [0.99592736]
-	BRAVO kmins: [89]
-		AVG:	167.93827765816798
-		AVG*:	139.42983106820066
-
-	AURROR kmins:		[79]
-	AURROR risk: [0.07526385]
-	AURROR pstop: [0.99994586]
-		AVG:	140.37141661522148
-		AVG*:	139.9924200690771
+	AURROR kmins:		[48, 91]
+	AURROR risk: [0.04645594 0.07607745]
+	AURROR pstop: [0.72018903 0.94721429]
+		AVG:	516.2248341824325
+		AVG*:	93.93916383508287
 
 
-CandidateB (3000) vs CandidateC (2000)
-	Effective round schedule: [100]
-	BRAVO risk: [0.05283925]
-	BRAVO pstop: [0.57330717]
-	BRAVO kmins: [61]
-		AVG:	2190.794843888754
-		AVG*:	57.330717471658076
+Albus D. (5000) vs Cedric (2000)
+	Effective round schedule: [70, 140]
+	BRAVO risk: [0.07876542 0.08264516]
+	BRAVO pstop: [0.95085346 0.99592736]
+	BRAVO kmins: [46, 89]
+		AVG:	101.37853526706321
+		AVG*:	72.8700886770959
 
-	AURROR kmins:		[59]
-	AURROR risk: [0.04431304]
-	AURROR pstop: [0.62253268]
-		AVG:	1949.589887001293
-		AVG*:	62.25326761221851
+	AURROR kmins:		[42, 81]
+	AURROR risk: [0.05980467 0.07910063]
+	AURROR pstop: [0.9856999  0.99984057]
+		AVG:	72.09470846760281
+		AVG*:	70.97868682907473
+
+
+Beatrix (3000) vs Cedric (2000)
+	Effective round schedule: [50, 100]
+	BRAVO risk: [0.02323915 0.05283925]
+	BRAVO pstop: [0.25028037 0.57330717]
+	BRAVO kmins: [34, 61]
+		AVG:	2178.280825342702
+		AVG*:	44.81669892560588
+
+	AURROR kmins:		[33, 59]
+	AURROR risk: [0.01641957 0.05205361]
+	AURROR pstop: [0.2368758  0.63577295]
+		AVG:	1872.868747440554
+		AVG*:	51.73350509300488
 ```
