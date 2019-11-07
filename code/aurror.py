@@ -1,6 +1,7 @@
 import json
 import math
 import os, sys, argparse
+import string
 
 import schedule as schedule
 import tools as tools
@@ -11,8 +12,7 @@ if (__name__ == '__main__'):
     parser = argparse.ArgumentParser(description=info_text)
     parser.add_argument("-v","-V", "--version", help="shows program version", action="store_true")
     parser.add_argument("-n", "--new", help="creates new election folder where all data are stored")
-    parser.add_argument("-a", "--alpha", help="set alpha (risk limit) for the election", type=float)
-    parser.add_argument("-t", "--total", help="set number of valid ballots cast", type=int)
+    parser.add_argument("-a", "--alpha", help="set alpha (risk limit) for the election", type=float, default=0.1)
     parser.add_argument("-c", "--candidates", help="set the candidate list (names)", nargs="*")
     parser.add_argument("-b", "--ballots", help="set the list of ballots cast for every candidate", nargs="*", type=int)
     parser.add_argument("-r", "-rs", "--rounds", "--round_schedule", help="set the round schedule", nargs="+", type=int)
@@ -25,27 +25,15 @@ if (__name__ == '__main__'):
     if args.new:
         mode = "new"
         name = args.new
-        if args.alpha:
-            alpha = args.alpha
-            if alpha < 0.0 or alpha > 1.0:
-                print("Value of alpha is inncorect")
-                sys.exit(2)
-        else:
-            print("Missing -a / --alpha argument")
-            sys.exit(2)
 
-        # ballots
-        if args.total:
-            ballots_cast = args.total
-        else:
-            print("Missing -t / --total argument")
+        alpha = args.alpha
+        if alpha < 0.0 or alpha > 1.0:
+            print("Value of alpha is inncorect")
             sys.exit(2)
 
         if args.ballots:
             results = args.ballots
-            if sum(results) != ballots_cast:
-                print("Number of votes for candidates does not match with number of valid ballots cast")
-                sys.exit(2)
+            ballots_cast = sum(results)
         else:
             print("Missing -b / --ballots argument")
             sys.exit(2)
@@ -56,8 +44,8 @@ if (__name__ == '__main__'):
                 print("Number of candidates does not match number of results")
                 sys.exit(2)
         else:
-            print("Missing -c / --candidates argument")
-            sys.exit(2)
+            assert len(args.ballots) <= 26
+            candidates = [string.ascii_uppercase[i] for i in range(len(args.ballots))]
 
         if args.rounds:
             round_schedule = args.rounds
