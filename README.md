@@ -7,13 +7,17 @@
 Typical use:
 
 ```bash
-python3 code/aurror.py --new raceName --alpha .1 --total 10000  --candidates "Albus D." Bob Cedric --ballots 5000 3000 2000 --round_schedule 100 200
+python3 code/aurror.py --new raceName --ballots 5000 3000 2000 --round_schedule 100 200
 ```
+where:
+
+- **--ballots** is a list of votes each candidate received
+- **--round_schedule** is the round schedule for the audit
 
 and with shorter parameternames:
 
 ```bash
-python3 code/aurror.py -n raceName -a .1 -t 10000 -c "Albus D." Bob Cedric -b 5000 3000 2000  -r 100 200
+python3 code/aurror.py -n raceName -b 5000 3000 2000  -r 100 200
 ```
 
 A new folder: **elections/** will be created in the current path.
@@ -57,6 +61,10 @@ optional arguments:
 ```
 
 ## Sample output
+
+```
+python3 code/aurror.py --new raceName --alpha .1 --candidates "Albus D." Bob Cedric --ballots 5000 3000 2000 --round_schedule 100 200
+```
 
 ```
 Results of: raceName
@@ -116,3 +124,7 @@ Beatrix (3000) vs Cedric (2000)
 		AVG:	1872.868747440554
 		AVG*:	51.73350509300488
 ```
+
+# Acknowledgements
+
+We thank [NSF (1421373 TWC: TTP Option: Small: Open-Audit Voting Systems---Protocol Models and Properties)](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1421373) for funding the implementation of this project.
