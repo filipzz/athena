@@ -15,7 +15,9 @@ if (__name__ == '__main__'):
     parser.add_argument("-a", "--alpha", help="set alpha (risk limit) for the election", type=float, default=0.1)
     parser.add_argument("-c", "--candidates", help="set the candidate list (names)", nargs="*")
     parser.add_argument("-b", "--ballots", help="set the list of ballots cast for every candidate", nargs="*", type=int)
+    parser.add_argument("-t", "--total", help="set the total number of ballots in given contest", type=int)
     parser.add_argument("-r", "-rs", "--rounds", "--round_schedule", help="set the round schedule", nargs="+", type=int)
+    parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
     parser.add_argument("-e", "--election", help="set the election to read")
     args = parser.parse_args()
@@ -33,7 +35,13 @@ if (__name__ == '__main__'):
 
         if args.ballots:
             results = args.ballots
-            ballots_cast = sum(results)
+            if args.total:
+                ballots_cast = args.total
+                if ballots_cast < sum(results):
+                    print("Incorrect number of total ballots cast")
+                    sys.exit(2)
+            else:
+                ballots_cast = sum(results)
         else:
             print("Missing -b / --ballots argument")
             sys.exit(2)
@@ -48,13 +56,22 @@ if (__name__ == '__main__'):
             candidates = [string.ascii_uppercase[i] for i in range(len(args.ballots))]
 
         if args.rounds:
+            mode_rounds = "rounds"
             round_schedule = args.rounds
+            pstop_goal = []
             if max(round_schedule) > ballots_cast:
                 print("Round schedule is incorrect")
                 sys.exit(2)
+        elif args.pstop:
+            mode_rounds = "goal"
+            pstop_goal = args.pstop
+            round_schedule = []
         else:
             print("Missing -r / --rounds argument")
             sys.exit(2)
+
+
+
 
         if args.winners:
             winners = args.winners
@@ -103,7 +120,9 @@ if (__name__ == '__main__'):
     election["winners"] = winners
     election["name"] = name
     election["model"] = model
+    election["pstop"] = pstop_goal
     election["round_schedule"] = round_schedule
+    #election["round_schedule_expected"] = map(round, (sum(results)/ballots_cast) * round_schedule)
     save_to = "elections/" + name
 
 
@@ -151,6 +170,6 @@ if (__name__ == '__main__'):
             # Calling: find_aurror_params_from_schedule(...)
             # 1. finds parameters for BRAVO
             # 2. finds parameters for Aurror
-            schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, rs, "false")
+            schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
             # for one-round better results are acheived by:
             #schedule.find_aurror_params_from_schedule_and_risk(bc, winner, alpha, model, rs, [alpha])
