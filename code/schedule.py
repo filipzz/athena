@@ -45,6 +45,9 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
     risk_spent = np.zeros(max_number_of_rounds) # [S("0")] * max_number_of_rounds
     prob_stop = np.zeros(max_number_of_rounds) #[S("0")] * max_number_of_rounds
 
+    risk_spent_arlo = np.zeros(max_number_of_rounds)
+    prob_stop_arlo = np.zeros(max_number_of_rounds)
+
 
 
 
@@ -63,6 +66,30 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
     #print(str((nrr["sum"])))
 
     #print(str(nrr["kmin"]))
+
+    #
+    #
+    # arlo start
+    # this is part for calculating arlo parameters only:
+    bravo_kmin = rla.bravo_kmin(ballots_cast, winner, alpha, round_schedule[0])
+    for i in range(bravo_kmin):
+        r_table_c_rbr[i][0] = binom.pmf(i, round_schedule[0], .5)  #density(Xr).dict[i]
+        p_table_c_rbr[i][0] = binom.pmf(i, round_schedule[0], winner/ballots_cast) # density(X).dict[i]
+
+    risk_spent_so_far = np.longdouble(0.0) #  S("0")
+    prob_spent_so_far = np.longdouble(0.0) #S("0")
+    for i in range(bravo_kmin):
+        risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[i][0]
+        prob_spent_so_far = prob_spent_so_far + p_table_c_rbr[i][0]
+
+
+    risk_spent_arlo[0] = 1 - (risk_spent_so_far)
+    prob_stop_arlo[0] = 1 - (prob_spent_so_far)
+
+    # TODO: add similar calculations for the following rounds
+    # arlo end
+    #
+    #
 
 
     # we do it for the first round first
@@ -123,6 +150,7 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
 
         #print("risk spent so far: (before last while)", str(1 - (risk_spent_so_far)))
 
+
         correct_risk_level = 1
 
         # now we need to find what is kmin_prime for the current round -
@@ -178,7 +206,7 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
 
 
 
-    return {"kmin_new" : kmin_new, "risk_spent" : risk_spent, "prob_stop" : prob_stop, "avg_star" : avg_star, "avg" : avg}
+    return {"kmin_new" : kmin_new, "risk_spent" : risk_spent, "prob_stop" : prob_stop, "avg_star" : avg_star, "avg" : avg, "risk_spent_arlo" : risk_spent_arlo, "prob_stop_arlo" : prob_stop_arlo}
 
 
 
@@ -188,6 +216,12 @@ def find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model
     kmin_new = aurror["kmin_new"]
     risk_spent = aurror["risk_spent"]
     prob_stop = aurror["prob_stop"]
+
+    risk_spent_arlo = aurror["risk_spent_arlo"]
+    prob_stop_arlo = aurror["prob_stop_arlo"]
+
+    print("\n\tARLO risk " + str(risk_spent_arlo))
+    print("\tARLO pstop: " + str(prob_stop_arlo))
 
     print("\n\tAURROR kmins:\t\t" + str(kmin_new))
 
@@ -230,7 +264,7 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
     if verbosity > 0:
         print("\tBRAVO risk: " + str(risk_goal))
         print("\tBRAVO pstop: " + str(prob_stop_bravo))
-        print("\tBRAVO kmins: " + str(kmins_bravo))
+        print("\tBRAVO kmins: \t" + str(kmins_bravo))
         print("\t\tAVG:\t" + str(avg))
         print("\t\tAVG*:\t" + str(avg_star))
 
@@ -241,7 +275,17 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
     risk_spent = aurror["risk_spent"]
     prob_stop = aurror["prob_stop"]
 
+
+    risk_spent_arlo = aurror["risk_spent_arlo"]
+    prob_stop_arlo = aurror["prob_stop_arlo"]
+
+
     if verbosity > 0:
+
+        print("\n\tARLO risk " + str(risk_spent_arlo))
+        print("\tARLO pstop: " + str(prob_stop_arlo))
+
+
         print("\n\tAURROR kmins:\t\t" + str(kmin_new))
 
         print("\tAURROR risk: " + str(risk_spent))
