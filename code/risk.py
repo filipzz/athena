@@ -27,19 +27,19 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
 
     if max <= round_size:
 
-        p_table = np.zeros(round_size) #[S("0")] * (round_size)
-        p_table_tmp = np.zeros(round_size) #[S("0")] * (round_size)
+        p_table = np.zeros(round_size + 1) #[S("0")] * (round_size)
+        p_table_tmp = np.zeros(round_size + 1) #[S("0")] * (round_size)
 
 
-        p_table_c = np.zeros((max, round_size)) # [[S("0")] * (round_size)  for i in range(max)]#] * round_size
+        p_table_c = np.zeros((max + 1, round_size+1)) # [[S("0")] * (round_size)  for i in range(max)]#] * round_size
         p_table_c[0][0] = (1-p_succ)
         p_table_c[1][0] = (p_succ)
 
-        r_table = np.zeros(round_size) # [S("0")] * (round_size)
-        r_table_tmp = np.zeros(round_size) #[S("0")] * (round_size)
+        r_table = np.zeros(round_size + 1) # [S("0")] * (round_size)
+        r_table_tmp = np.zeros(round_size + 1) #[S("0")] * (round_size)
 
 
-        r_table_c = np.zeros((max, round_size)) # [[S("0")] * (round_size)  for i in range(max)]#] * round_size
+        r_table_c = np.zeros((max + 1, round_size+1)) # [[S("0")] * (round_size)  for i in range(max)]#] * round_size
         r_table_c[0][0] = (1-p_risk)
         r_table_c[1][0] = (p_risk)
 
@@ -50,7 +50,7 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
 
 
 
-        for i in range(1, round_size):
+        for i in range(1, round_size+1):
             #if model == "bin":
             kmin = rla.bravo_kmin(ballots_cast, winner, alpha, i+1)
             #else:
@@ -67,7 +67,7 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
 
 
 
-        for i in range(round_size):
+        for i in range(round_size+1):
             sum = np.longdouble(0.0) # S("0")
             sum_risk = np.longdouble(0.0) # S("0")
             for k in range(max):
@@ -81,9 +81,19 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
         sum_risk = np.longdouble(0.0) # S("0")
         for i in range(1,round_size):
             p_table[i] = p_table_tmp[i-1] - p_table_tmp[i]
+
+            # this is stupid but it may happen because of floating precision
+            # example: python3 aurror.py -n asd -b 15038 5274 -r 30
+            # p_table[23] = -5.551115123125783e-17 = p_table_tmp[22] - p_table_tmp[23] = 0.27273331278112095 - 0.272733312781121
+            if p_table[i] < 0:
+                p_table[i] = 0.0
+
             sum = sum + p_table[i]
             r_table[i] = r_table_tmp[i-1] - r_table_tmp[i]
+            if r_table[i] < 0:
+                r_table[i] = 0.0
             sum_risk = sum_risk + r_table[i]
+            #print("p[%s] = %s = %s - %s\t\t r[%s] = %s = %s - %s" % (i, p_table[i], p_table_tmp[i-1], p_table_tmp[i], i, r_table[i], r_table_tmp[i-1], r_table_tmp[i]))
 
     if save_to != "false":
         try:
@@ -91,10 +101,13 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
         except:
             sys.exit("Problem with writing to selected folder")
 
+    #print(str(r_table))
+    #print(str(np.sum(r_table)))
+
     #print("sympy: " + str(N(sum, 50)))
 
     #return  {"p_table_c": p_table_c, "p_table_cx" : p_table_cx, "p_table" : p_table, "sum" : sum, "r_table": r_table, "sum_risk" : sum_risk}
-    return {"p_table": p_table, "r_table": r_table}
+    return {"p_table": p_table, "r_table": r_table, "risk": np.sum(r_table)}
 
 
 
@@ -102,7 +115,7 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
 # finds kmin for a given round that is smaller than the goal
 def next_round_risk(ballots_cast, winner, alpha, n, goal, dist, prevround_size, prvRoundKmin):
     sum = np.longdouble(0.0) #S("0")
-    ballots_half = np.longdouble(ballots_cast / 2) #S(ballots_cast) / 2
+    #ballots_half = np.longdouble(ballots_cast / 2) #S(ballots_cast) / 2
 
     # we first compute the risk that is used by the kmin computed in "regular" way -- according to Bravo stoppin rule
     #if dist == "bin":
@@ -154,11 +167,13 @@ def find_risk_bravo_bbb(ballots_cast, winner, alpha, model, round_schedule, save
 
 
     # in risk_goal[] we will store how much risk can be spent for each round
+    #print(str(risk_table))
     for round in range(max_number_of_rounds):
         upper_limit_round = round_schedule[round]
-        risk_goal[round] = sum(risk_table[0:upper_limit_round])
-        prob_stop[round] = (sum(prob_table[0:upper_limit_round]))
-        #print(str(round+1) + "\t" + str(round_schedule[round]) + "\t" + str(risk_goal[round]) + "\t" + str(upper_limit))
+        print("len: " + str(len(risk_table[0:upper_limit_round])))
+        risk_goal[round] = np.sum(risk_table[0:upper_limit_round])
+        prob_stop[round] = (np.sum(prob_table[0:upper_limit_round]))
+        print(str(round+1) + "\t" + str(round_schedule[round]) + "\t" + str(risk_goal[round]) + "\t" + str(upper_limit))
 
     bravo_kmins = map(lambda n: rla.bravo_kmin(ballots_cast, winner, alpha, n), round_schedule )
     kmins = []
