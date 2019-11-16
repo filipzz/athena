@@ -220,28 +220,29 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
 
 
 
-def find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal):
+def find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal, verbosity):
     aurror = find_new_kmins(ballots_cast, winner, alpha,  round_schedule, risk_goal)
 
     kmin_new = aurror["kmin_new"]
     risk_spent = aurror["risk_spent"]
     prob_stop = aurror["prob_stop"]
 
-    #risk_spent_arlo = aurror["risk_spent_arlo"]
-    #prob_stop_arlo = aurror["prob_stop_arlo"]
+    risk_spent_arlo = aurror["risk_spent_arlo"]
+    prob_stop_arlo = aurror["prob_stop_arlo"]
 
 
-    risk.estimate_rbr_risk(ballots_cast, winner,  round_schedule, kmins_goal_real)
-    print("\n\tARLO risk " + str(risk_spent_arlo))
-    print("\tARLO pstop: " + str(prob_stop_arlo))
+    #risk.estimate_rbr_risk(ballots_cast, winner,  round_schedule, kmins_goal_real)
+    if verbosity > 0:
+        print("\n\tARLO risk " + str(risk_spent_arlo))
+        print("\tARLO pstop: " + str(prob_stop_arlo))
 
-    print("\n\tAURROR kmins:\t\t" + str(kmin_new))
+        print("\n\tAURROR kmins:\t\t" + str(kmin_new))
 
-    print("\tAURROR risk: " + str(risk_spent))
+        print("\tAURROR risk: " + str(risk_spent))
 
-    print("\tAURROR pstop: " + str(prob_stop))
-    print("\t\tAVG:\t" + str(aurror["avg"]))
-    print("\t\tAVG*:\t" + str(aurror["avg_star"]))
+        print("\tAURROR pstop: " + str(prob_stop))
+        print("\t\tAVG:\t" + str(aurror["avg"]))
+        print("\t\tAVG*:\t" + str(aurror["avg_star"]))
 
     return {"kmin_new" : kmin_new, "risk_spent": risk_spent, "prob_stop": prob_stop, "avg" : aurror["avg"], "avg_star": aurror["avg_star"]}
 
@@ -351,4 +352,4 @@ if __name__ == '__main__':
     risk_goal = bravo_params["risk_goal"]
     risk_goal[len(risk_goal) - 1] = alpha
     print("New risk goal: " + str(risk_goal))
-    find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal)
+    find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal, )

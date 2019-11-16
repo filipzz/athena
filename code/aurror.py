@@ -196,27 +196,53 @@ if (__name__ == '__main__'):
                 #now we design theoretical autit that:
                 #- has one more round that is long
                 #- tries to use all the risk
-                #bravo_params = designed_audit["bravo"]
-                #risk_goal = bravo_params["risk_goal"]
-                #risk_goal.append(alpha)
-                #round_schedule.append(2*max(round_schedule))
-                #risk_audit = schedule.find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal)
+                bravo_params = designed_audit["bravo"]
+                risk_goal = bravo_params["risk_goal"]
+                #remaining_risk = alpha - max(designed_audit["risk_spent"])
+                audit_kmins = designed_audit["kmin_new"]
+                aurror_risk_rounds = designed_audit["risk_spent"]
+                #print(str(remaining_risk))
+                #new_risk_goal = np.append(risk_goal, alpha)
+                #round_schedule.append(4*max(round_schedule))
+                #print(str(new_risk_goal))
+                #print(str(round_schedule))
+                #risk_audit = schedule.find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, new_risk_goal,0)
                 #print(str(risk_audit))
 
-                audit_kmins = designed_audit['kmin_new']
+                #audit_kmins = risk_audit['kmin_new']
                 #print(str(audit_kmins))
-                kmins_goal_real = risk.find_kmins_for_risk(audit_kmins, actual_kmins)
-                #print(str(kmins_goal_real))
-                w = risk.estimate_rbr_risk(ballots_cast, winner,  round_schedule, kmins_goal_real)
-                #w = schedule.find_risk_from_kmins(ballots_cast, winner, alpha, round_schedule, kmins_goal_real)
 
-                actual_risk_spent = w["risk_spent"]
+                #print("\n\nmax(Kmins, observed) risk: ")
+                test_info = risk.find_kmins_for_risk(audit_kmins, actual_kmins)
+                w = risk.estimate_rbr_risk(ballots_cast, winner, round_schedule, test_info["kmins"])
+                #print(str(w))
+                #print(str(kmins_goal_real))
+
+                #print("\n\n3 rounds")
+                #risks_evaluated = []
+                #for i in range(len(round_schedule)):
+                #    kmins_goal_real = audit_kmins
+                #    if i < len(actual_kmins):
+                #        kmins_goal_real[i] = actual_kmins[i]
+                #    w = risk.estimate_rbr_risk(ballots_cast, winner,  round_schedule, kmins_goal_real)
+                #    print("\t" + str(kmins_goal_real) + "\t" + str(w["risk_spent"]))
+                #    risks_evaluated.append(max(w["risk_spent"]))
+                ##w = schedule.find_risk_from_kmins(ballots_cast, winner, alpha, round_schedule, kmins_goal_real)
+
+                if test_info["passed"] == 0:
+                    #this means that the audit is not passed
+                    #so we should perform another round
+                    rounds_done = len(actual_kmins)
+                    risk_left = aurror_risk_rounds[rounds_done - 1]
+                    actual_risk_spent = max(w["risk_spent"]) + (alpha - risk_left)
+                else:
+                    actual_risk_spent = max(w["risk_spent"])
                 actual_prob_stop = w["prob_stop"]
 
                 print("\n\tAUDIT result:")
                 print("\t\tobserved:\t" + str(actual_kmins))
-                print("\t\tevaluated:\t" + str(kmins_goal_real))
-                print("\t\trisk:\t\t" + str(max(actual_risk_spent)) + "\n")
+                print("\t\tevaluated:\t" + str(test_info["kmins"]))
+                print("\t\trisk:\t\t" + str((actual_risk_spent)) + "\n")
                 #print(str(w))
             # for one-round better results are acheived by:
             #schedule.find_aurror_params_from_schedule_and_risk(bc, winner, alpha, model, rs, [alpha])

@@ -363,7 +363,13 @@ def find_kmins_for_risk(audit_kmins, actual_kmins):
 
     kmins_goal_real = []
     rewrite_on = 1
-    for i in range(min(len(audit_kmins), len(actual_kmins))-1):
+    test_passed = 0
+
+    for audit_k, actual_k in zip(audit_kmins, actual_kmins):
+        if audit_k <= actual_k:
+            test_passed = 1
+
+    for i in range(len(actual_kmins)-1):
         if rewrite_on == 1:
             if audit_kmins[i] <= actual_kmins[i]:
                 kmins_goal_real.append(actual_kmins[i])
@@ -374,4 +380,9 @@ def find_kmins_for_risk(audit_kmins, actual_kmins):
     if rewrite_on == 1:
         kmins_goal_real.append(actual_kmins[len(actual_kmins)-1])
 
-    return kmins_goal_real
+    #print(str(kmins_goal_real))
+
+    #print(str(test_passed))
+
+
+    return {"kmins" : kmins_goal_real, "passed": test_passed}
