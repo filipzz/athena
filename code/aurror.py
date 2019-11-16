@@ -1,9 +1,11 @@
 import json
 import math
+import numpy as np
 import os, sys, argparse
 import string
 
 import schedule as schedule
+import risk as risk
 import tools as tools
 
 if (__name__ == '__main__'):
@@ -19,7 +21,8 @@ if (__name__ == '__main__'):
     parser.add_argument("-r", "-rs", "--rounds", "--round_schedule", help="set the round schedule", nargs="+", type=int)
     parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
-    parser.add_argument("-e", "--election", help="set the election to read")
+    parser.add_argument("-l", "--load", help="set the election to read")
+    parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+", type=int)
     args = parser.parse_args()
 
     if args.version:
@@ -79,7 +82,16 @@ if (__name__ == '__main__'):
                 print("There is nothing to audit - every candidate is a winner.")
                 sys.exit(2)
 
-    elif args.election:
+        eval_risk = ""
+        if args.risk:
+            if len(args.risk) <= len(args.ballots):
+                eval_risk = "true"
+                actual_kmins = args.risk
+            else:
+                print("Number of results is larger than the number of rounds.")
+                sys.exit(2)
+
+    elif args.load:
         mode = "read"
     else:
         print("Call python3 aurror.py -h for help")
@@ -170,10 +182,41 @@ if (__name__ == '__main__'):
 
             #print(str(rs))
 
-            print("\tEffective round schedule: " + str(rs))
+            print("\n\tEffective round schedule: " + str(rs))
             # Calling: find_aurror_params_from_schedule(...)
             # 1. finds parameters for BRAVO
             # 2. finds parameters for Aurror
-            schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
+            designed_audit = schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
+            #print(str(designed_audit))
+
+            if eval_risk == "true":
+                #print(str(kmins_goal))
+                #print(str(len(kmins_goal)))
+
+                #now we design theoretical autit that:
+                #- has one more round that is long
+                #- tries to use all the risk
+                #bravo_params = designed_audit["bravo"]
+                #risk_goal = bravo_params["risk_goal"]
+                #risk_goal.append(alpha)
+                #round_schedule.append(2*max(round_schedule))
+                #risk_audit = schedule.find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal)
+                #print(str(risk_audit))
+
+                audit_kmins = designed_audit['kmin_new']
+                #print(str(audit_kmins))
+                kmins_goal_real = risk.find_kmins_for_risk(audit_kmins, actual_kmins)
+                #print(str(kmins_goal_real))
+                w = risk.estimate_rbr_risk(ballots_cast, winner,  round_schedule, kmins_goal_real)
+                #w = schedule.find_risk_from_kmins(ballots_cast, winner, alpha, round_schedule, kmins_goal_real)
+
+                actual_risk_spent = w["risk_spent"]
+                actual_prob_stop = w["prob_stop"]
+
+                print("\n\tAUDIT result:")
+                print("\t\tobserved:\t" + str(actual_kmins))
+                print("\t\tevaluated:\t" + str(kmins_goal_real))
+                print("\t\trisk:\t\t" + str(max(actual_risk_spent)) + "\n")
+                #print(str(w))
             # for one-round better results are acheived by:
             #schedule.find_aurror_params_from_schedule_and_risk(bc, winner, alpha, model, rs, [alpha])

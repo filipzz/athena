@@ -258,5 +258,120 @@ def calculate_bad_luck_cum_probab_table_b2(round_size, winner, ballots_cast, alp
     return  { "p_table" : p_table, "sum" : sum}
 
 
+# This function estimates risk for a given audit realization.
+# It computes how many tied elections would have better observations
+# It computes probability of stopping
+def estimate_rbr_risk(ballots_cast, winner, round_schedule, round_ks):
+
+    # check if the round_ks are correct
+    k_prev = 0
+    for k in round_ks:
+        if k - k_prev < 0:
+            raise Exception('Incorrect k' + str(round_ks))
+        k_prev = k
+
+    # initializing variables
+    max_number_of_rounds = len(round_ks)
+    upper_limit = round_schedule[max_number_of_rounds - 1]
+    max = round_ks[max_number_of_rounds - 1] #rla.bravo_kmin(ballots_cast, winner, alpha, upper_limit)
+
+    table_size = max #or upper_limit
+    p_table_c_rbr = np.zeros((table_size, max_number_of_rounds)) #[[S("0")] * (max_number_of_rounds)  for i in range(table_size)]
+    r_table_c_rbr = np.zeros((table_size, max_number_of_rounds)) #[[S("0")] * (max_number_of_rounds)  for i in range(table_size)]
+
+    # TODO: rename this variable into something that is less misleading
+    risk_spent = np.zeros(max_number_of_rounds) # [S("0")] * max_number_of_rounds
+    prob_stop = np.zeros(max_number_of_rounds) #[S("0")] * max_number_of_rounds
+
+    risk_spent_arlo = np.zeros(max_number_of_rounds)
+    prob_stop_arlo = np.zeros(max_number_of_rounds)
 
 
+    # we do it for the first round first
+    for i in range(round_ks[0]):
+        r_table_c_rbr[i][0] = binom.pmf(i, round_schedule[0], .5)  #density(Xr).dict[i]
+        p_table_c_rbr[i][0] = binom.pmf(i, round_schedule[0], winner/ballots_cast) # density(X).dict[i]
+
+    risk_spent_so_far = np.longdouble(0.0) #  S("0")
+    prob_spent_so_far = np.longdouble(0.0) #S("0")
+    for i in range(round_ks[0]):
+        risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[i][0]
+        prob_spent_so_far = prob_spent_so_far + p_table_c_rbr[i][0]
+
+    risk_spent[0] = 1 - (risk_spent_so_far)
+    prob_stop[0] = 1 - (prob_spent_so_far)
+
+    #print("risk after first round: ", str((1- risk_spent_so_far)))
+
+
+
+
+    # Now the main loop going for the following rounds
+    for i in range(1, max_number_of_rounds):
+        #print("\n\tSTARTING NEW ROUND " + str(i+1))
+
+        risk_spent_so_far = np.longdouble(0.0) # S("0")
+        for xi in range(round_ks[i-1]):
+            risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[xi][i-1]
+
+        #print("\t risk spent up to: ", str(i), " round: ", str((1- risk_spent_so_far)))
+        round_start_at = round_schedule[i-1]
+
+        # now the part that we are sure its is gonna work - starting from k =
+        #  kMin[-1] + 1
+        for j in range(round_ks[i-1]):
+            for k in range(j,round_ks[i]):
+                r_table_c_rbr[k][i] = r_table_c_rbr[k][i] + r_table_c_rbr[j][i-1] * binom.pmf(k-j, round_schedule[i] - round_start_at, .5) #density(Xr).dict[k-j]
+                p_table_c_rbr[k][i] = p_table_c_rbr[k][i] + p_table_c_rbr[j][i-1] * binom.pmf(k-j, round_schedule[i] - round_start_at, winner/ballots_cast) #density(X).dict[k-j]
+                #print(str(round_schedule[i] - round_start_at), "\t", str(j), "\t", str(k), "\t",  str((p_table_c_rbr[j][i-1])), "\t")
+                #print("\tp_table_c_rbr[", str(k), ", ", str(i), "] = ", str((p_table_c_rbr[k][i])))
+
+        #print(str(i) + "\t" + str(round_ks[i-1]) + "\t" + str(round_ks[i]))
+
+
+
+        # we compute what is the current risk spent
+        risk_spent_so_far = np.longdouble(0.0) # S("0")
+        prob_spent_so_far = np.longdouble(0) #S("0")
+        for xi in range(round_ks[i]):
+            risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[xi][i]
+            prob_spent_so_far = prob_spent_so_far + p_table_c_rbr[xi][i]
+
+        risk_spent[i] = 1 - (risk_spent_so_far)
+        prob_stop[i] = 1 - (prob_spent_so_far)
+
+
+        #print("risk spent so far: (before last while)", str(1 - (risk_spent_so_far)))
+
+
+    avg_star = 0
+    prev_prob = 0.0
+
+    for prob, round_end in zip(prob_stop, round_schedule):
+        avg_star = avg_star + (prob - prev_prob) * (round_end )
+        prev_prob = prob
+
+    avg = avg_star + (1 - prev_prob) * ballots_cast
+
+
+
+
+    return {"risk_spent" : risk_spent, "prob_stop" : prob_stop}
+
+
+def find_kmins_for_risk(audit_kmins, actual_kmins):
+
+    kmins_goal_real = []
+    rewrite_on = 1
+    for i in range(min(len(audit_kmins), len(actual_kmins))-1):
+        if rewrite_on == 1:
+            if audit_kmins[i] <= actual_kmins[i]:
+                kmins_goal_real.append(actual_kmins[i])
+                rewrite_on = 0
+            else:
+                kmins_goal_real.append(audit_kmins[i])
+
+    if rewrite_on == 1:
+        kmins_goal_real.append(actual_kmins[len(actual_kmins)-1])
+
+    return kmins_goal_real
