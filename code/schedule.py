@@ -20,6 +20,7 @@ def find_new_kmins_max_risk(ballots_cast, winner, alpha, round_schedule, risk_go
 
 def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
 
+    #print("find_new_kmins(%s, %s, %s, %s, %s)" % (ballots_cast, winner, alpha, round_schedule, risk_goal))
 
     # check if the risk goal is correct (it needs to be increasing with elements smaller than alpha)
     r_prev = 0
@@ -36,7 +37,7 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
     max = rla.bravo_kmin(ballots_cast, winner, alpha, upper_limit)
     #p_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(max)]
     #r_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(max)]
-    #TODO: table_size = max/upper_limit - for "reasobanle" risk_goal (e.g., following bravo risk schedule) table_size = max will be smaller than bravo_kmin
+    #TODO: table_size = max/upper_limit - for "reasonable" risk_goal (e.g., following bravo risk schedule) table_size = max will be smaller than bravo_kmin
     table_size = max #or upper_limit
     p_table_c_rbr = np.zeros((table_size, max_number_of_rounds)) #[[S("0")] * (max_number_of_rounds)  for i in range(table_size)]
     r_table_c_rbr = np.zeros((table_size, max_number_of_rounds)) #[[S("0")] * (max_number_of_rounds)  for i in range(table_size)]
@@ -62,23 +63,28 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
 
     kmin_prime = nrr["kmin"]
     kmin_new = [kmin_prime] * max_number_of_rounds
-
+    #for i, rsx in zip(range(len(round_schedule)), round_schedule):
+    #    print("\t" + str(i) + "\t" + str(rsx) + "\t" + str(rla.bravo_kmin(ballots_cast, winner, alpha, round_schedule[i])))
+        #kmin_new[i] = rla.bravo_kmin(ballots_cast, winner, alpha, round_schedule[i])
+        #kmin_new[i] = rla.bravo_kmin(ballots_cast, winner, alpha, round_schedule[i])
     #print(str((nrr["sum"])))
 
     #print(str(nrr["kmin"]))
+
 
     #
     #
     # arlo start
     # this is part for calculating arlo parameters only:
     bravo_kmin = rla.bravo_kmin(ballots_cast, winner, alpha, round_schedule[0])
-    for i in range(bravo_kmin):
+    #for i in range(bravo_kmin):
+    for i in range(kmin_prime):
         r_table_c_rbr[i][0] = binom.pmf(i, round_schedule[0], .5)  #density(Xr).dict[i]
         p_table_c_rbr[i][0] = binom.pmf(i, round_schedule[0], winner/ballots_cast) # density(X).dict[i]
 
     risk_spent_so_far = np.longdouble(0.0) #  S("0")
     prob_spent_so_far = np.longdouble(0.0) #S("0")
-    for i in range(bravo_kmin):
+    for i in range(kmin_prime):
         risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[i][0]
         prob_spent_so_far = prob_spent_so_far + p_table_c_rbr[i][0]
 
@@ -111,7 +117,8 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
     risk_spent[0] = 1 - (risk_spent_so_far)
     prob_stop[0] = 1 - (prob_spent_so_far)
 
-    # print("risk after first round: ", str(N(1- risk_spent_so_far)))
+    #print(str(kmin_new[0]))
+    #print("risk after first round: ", str((1- risk_spent_so_far)))
 
 
 
@@ -148,6 +155,7 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
         for xi in range(kmin_new[i-1]):
             risk_spent_so_far = risk_spent_so_far + r_table_c_rbr[xi][i]
 
+        #print(str(kmin_new[i]))
         #print("risk spent so far: (before last while)", str(1 - (risk_spent_so_far)))
 
 
@@ -162,7 +170,8 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
         #print(">>" + str(kmin_new[i-1]) + "\t" + str(round_schedule[i] - round_start_at))
         while correct_risk_level == 1:
             #for j in range(min(kmin_new[i-1], round_schedule[i] - round_start_at)):
-            for j in range(min(k + 1, round_schedule[i] - round_start_at)):
+            #print("j in range(min(" + str(k+1) + ", " + str(round_schedule[i] - round_start_at) + ")")
+            for j in range((k + 1)):#, round_schedule[i] - round_start_at)):
                 #Xr = Binomial('Xr', round_schedule[i] - round_start_at, S.Half)
                 #X = Binomial('X', round_schedule[i] - round_start_at, S(winner)/S(ballots_cast))
                 if k - j <= round_schedule[i] - round_start_at:
@@ -183,6 +192,7 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
             risk_spent[i] = 1 - (risk_spent_so_far)
             prob_stop[i] = 1 - (prob_spent_so_far)
 
+            #print("testing for: " + str(k) + " - " +  str(j) + "\t" + str((1 - risk_spent_so_far)) + " <? " + str(risk_goal[i]))
 
             if (1 - (risk_spent_so_far)) < (risk_goal[i]):
                 kmin_new[i] = k + 1
@@ -302,10 +312,11 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
 if __name__ == '__main__':
         # Setting up the parameters for the audit
     margin = .1
-    ballots_cast = 20227
+    ballots_cast = 14000 #20227
     winner = math.floor((1+margin)/2* ballots_cast)
-    winner = 14970
+    winner = 7700 #14970
     round_schedule = [41]#, 600]#, 332, 587, 974, 2155]#[301, 518, 916]#, 1520, 3366]
+    round_schedule = [ 193, 332, 587, 974, 2155]
     alpha = .1
     model = "bin"
 
@@ -316,11 +327,10 @@ if __name__ == '__main__':
     # 1. finds parameters for BRAVO
     # 2. finds parameters for Aurror
     #find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, "false")
-    #find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, "false")
-
+    find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, [], "false", 1)
     # Calling: find_aurror_params_from_schedule_and_risk(...)
     # just finds parameters for Aurror
     #risk_goal = [alpha] * len(round_schedule)#, .0999999]
     risk_goal = [.024, .0479, .0718, .0862, .0948]
     risk_goal = [alpha]#, .0862, .0948]
-    find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal)
+    #find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal)

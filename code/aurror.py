@@ -30,7 +30,7 @@ if (__name__ == '__main__'):
 
         alpha = args.alpha
         if alpha < 0.0 or alpha > 1.0:
-            print("Value of alpha is inncorect")
+            print("Value of alpha is incorrect")
             sys.exit(2)
 
         if args.ballots:
@@ -162,9 +162,13 @@ if (__name__ == '__main__'):
             bc = ballots_i + ballots_j
             winner = max(ballots_i, ballots_j)
             rs = []
+
+            #print(str(round_schedule))
             for x in round_schedule:
                 y = math.floor(x * bc / ballots_cast)
                 rs.append(y)
+
+            #print(str(rs))
 
             print("\tEffective round schedule: " + str(rs))
             # Calling: find_aurror_params_from_schedule(...)

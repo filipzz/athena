@@ -170,10 +170,10 @@ def find_risk_bravo_bbb(ballots_cast, winner, alpha, model, round_schedule, save
     #print(str(risk_table))
     for round in range(max_number_of_rounds):
         upper_limit_round = round_schedule[round]
-        print("len: " + str(len(risk_table[0:upper_limit_round])))
+        #print("len: " + str(len(risk_table[0:upper_limit_round])))
         risk_goal[round] = np.sum(risk_table[0:upper_limit_round])
         prob_stop[round] = (np.sum(prob_table[0:upper_limit_round]))
-        print(str(round+1) + "\t" + str(round_schedule[round]) + "\t" + str(risk_goal[round]) + "\t" + str(upper_limit))
+        #print(str(round+1) + "\t" + str(round_schedule[round]) + "\t" + str(risk_goal[round]) + "\t" + str(upper_limit))
 
     bravo_kmins = map(lambda n: rla.bravo_kmin(ballots_cast, winner, alpha, n), round_schedule )
     kmins = []
