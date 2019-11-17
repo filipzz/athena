@@ -1,7 +1,5 @@
 import rla as rla
 import risk as risk
-#from sympy import S, N
-from sympy.stats import Binomial, Hypergeometric, density
 import numpy as np
 from scipy.stats import binom
 import math
