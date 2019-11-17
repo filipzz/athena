@@ -232,8 +232,20 @@ if (__name__ == '__main__'):
                     print("\n\t\tTest FAILED\n")
 
                 found_risk = risk.find_audit_risk(bc, winner, alpha, model, rs, actual_kmins)
+                alpha = found_risk["alpha"]
+                risk_table = found_risk["risk_table"]
+                valid_kmins = found_risk["kmin_new"]
 
-                print("\t\testimated risk (alpha estimation):\t" + str(found_risk))
+                risk_found = 0
+                audit_risk = 1
+                for risk, valid, actual in zip(risk_table, valid_kmins, actual_kmins):
+                    #print("%s\t%s\t%s\t%s" % (risk_found, risk, valid, actual))
+                    if risk_found == 0 and valid <= actual:
+                        audit_risk = risk
+                        risk_found = 1
+
+                print("\t\testimated risk (alpha estimation):\t" + str(alpha))
+                print("\t\tcomputed risk (alpha and kmins): \t" + str(audit_risk))
                 #print("\t\testimated risk (tied elections - pure): \t" + str(actual_risk_spent))
                 #if test_info["passed"] == 0:
                 #    print("\t\testimated risk (tied elections + penalty): \t" + str(actual_risk_spent_penalty))

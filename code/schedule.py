@@ -342,9 +342,9 @@ def find_aurror_proper_params_from_schedule(ballots_cast, winner, alpha, model, 
 
     if verbosity > 0:
         print("\n\tAurror* kmins:\t" + str(kmin_new))
-        #print("\tAurror* risk:\t" + str(risk_spent))
+        print("\tAurror* risk:\t" + str(risk_spent))
         print("\tAurror* pstop:\t" + str(prob_stop))
-        #print("\t--- ratio:\t" + str(risk_spent / prob_stop))
+        print("\t--- ratio:\t" + str(risk_spent / prob_stop))
 
 
     return {"kmin_new" : kmin_new, "risk_spent": risk_spent, "prob_stop": prob_stop}

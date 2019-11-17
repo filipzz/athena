@@ -411,6 +411,8 @@ def find_audit_risk(ballots_cast, winner, alpha, model, round_schedule, audit_re
         result_max = find_kmins_for_risk(kmins_max, audit_results)
 
         if result_max["passed"] == 1:
+            audit_passed = audit_max
+            alpha_passed = alpha_max
             alpha_max = alpha_max - diff/2
             #print("\tmax updated:\t" + str(alpha_max))
         else:
@@ -423,4 +425,9 @@ def find_audit_risk(ballots_cast, winner, alpha, model, round_schedule, audit_re
 
         diff = alpha_max - alpha_min
 
-    return alpha_max
+
+    #print(str(audit_max))
+
+    #print(str(audit_min))
+
+    return {"alpha" : alpha_passed, "risk_table" : audit_passed["risk_spent"] / audit_passed["prob_stop"], "kmin_new" : audit_passed["kmin_new"] }
