@@ -280,7 +280,7 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
         print("\n\tBRAVO kmins: \t" + str(kmins_bravo))
         print("\tBRAVO risk: \t" + str(risk_goal))
         print("\tBRAVO pstop: \t" + str(prob_stop_bravo))
-        print("\t--- ratio:\t" + str(risk_goal / prob_stop_bravo))
+        #print("\t--- ratio:\t" + str(risk_goal / prob_stop_bravo))
         print("\t\tAVG:\t" + str(avg))
         print("\t\tAVG*:\t" + str(avg_star))
 
@@ -293,7 +293,7 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
         print("\n\tARLO kmins:\t" + str(kmins_bravo))
         print("\tARLO risk:\t" + str(risk_spent_arlo))
         print("\tARLO pstop:\t" + str(prob_stop_arlo))
-        print("\t--- ratio:\t" + str(risk_spent_arlo / prob_stop_arlo))
+        #print("\t--- ratio:\t" + str(risk_spent_arlo / prob_stop_arlo))
 
 
 
@@ -341,10 +341,10 @@ def find_aurror_proper_params_from_schedule(ballots_cast, winner, alpha, model, 
     prob_stop = audit["prob_stop"]
 
     if verbosity > 0:
-        print("\n\tAurror kmins:\t" + str(kmin_new))
-        print("\tAurror risk:\t" + str(risk_spent))
-        print("\tAurror pstop:\t" + str(prob_stop))
-        print("\t--- ratio:\t" + str(risk_spent / prob_stop))
+        print("\n\tAurror* kmins:\t" + str(kmin_new))
+        #print("\tAurror* risk:\t" + str(risk_spent))
+        print("\tAurror* pstop:\t" + str(prob_stop))
+        #print("\t--- ratio:\t" + str(risk_spent / prob_stop))
 
 
     return {"kmin_new" : kmin_new, "risk_spent": risk_spent, "prob_stop": prob_stop}
