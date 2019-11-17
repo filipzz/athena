@@ -247,6 +247,8 @@ def find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model
     return {"kmin_new" : kmin_new, "risk_spent": risk_spent, "prob_stop": prob_stop, "avg" : aurror["avg"], "avg_star": aurror["avg_star"]}
 
 
+
+
 def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, pstop_goal, save_to,
                                      verbosity):
 
@@ -278,6 +280,7 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
         print("\n\tBRAVO kmins: \t" + str(kmins_bravo))
         print("\tBRAVO risk: \t" + str(risk_goal))
         print("\tBRAVO pstop: \t" + str(prob_stop_bravo))
+        print("\t--- ratio:\t" + str(risk_goal / prob_stop_bravo))
         print("\t\tAVG:\t" + str(avg))
         print("\t\tAVG*:\t" + str(avg_star))
 
@@ -290,6 +293,7 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
         print("\n\tARLO kmins:\t" + str(kmins_bravo))
         print("\tARLO risk:\t" + str(risk_spent_arlo))
         print("\tARLO pstop:\t" + str(prob_stop_arlo))
+        print("\t--- ratio:\t" + str(risk_spent_arlo / prob_stop_arlo))
 
 
 
@@ -304,19 +308,46 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
     risk_spent_arlo = aurror["risk_spent_arlo"]
     prob_stop_arlo = aurror["prob_stop_arlo"]
 
-
+    '''
     if verbosity > 0:
 
 
-        print("\n\tAURROR kmins:\t" + str(kmin_new))
-        print("\tAURROR risk:\t" + str(risk_spent))
-        print("\tAURROR pstop:\t" + str(prob_stop))
+        print("\n\tR2B2 kmins:\t" + str(kmin_new))
+        print("\tR2B2 risk:\t" + str(risk_spent))
+        print("\tR2B2 pstop:\t" + str(prob_stop))
+        print("\t--- ratio:\t" + str(risk_spent / prob_stop))
         print("\t\tAVG:\t" + str(aurror["avg"]))
         print("\t\tAVG*:\t" + str(aurror["avg_star"]))
-
+    '''
     return {"kmin_new" : kmin_new, "risk_spent": risk_spent, "prob_stop": prob_stop, "avg" : aurror["avg"], "avg_star": aurror["avg_star"], "bravo": bravo_parameters}
 
+'''
+    This version of finding kmins is different:
+    - each round is treated separately, as other rounds would not exist at all (same is in Bravo)
+    We lose efficiency -- we cannot lower kmins that much
+    But we get rid of disambibuity
+'''
+def find_aurror_proper_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, pstop_goal, save_to,
+                                     verbosity):
+    kmin_new = []
+    for round_size in round_schedule:
+        result = find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, [round_size], [], save_to, 0)
+        kmin_new.append(result["kmin_new"][0])
 
+    #print(str(kmin_new))
+
+    audit = risk.estimate_rbr_risk(ballots_cast, winner, round_schedule, kmin_new)
+    risk_spent = audit["risk_spent"]
+    prob_stop = audit["prob_stop"]
+
+    if verbosity > 0:
+        print("\n\tAurror kmins:\t" + str(kmin_new))
+        print("\tAurror risk:\t" + str(risk_spent))
+        print("\tAurror pstop:\t" + str(prob_stop))
+        print("\t--- ratio:\t" + str(risk_spent / prob_stop))
+
+
+    return {"kmin_new" : kmin_new, "risk_spent": risk_spent, "prob_stop": prob_stop}
 
 
 if __name__ == '__main__':

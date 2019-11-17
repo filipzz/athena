@@ -84,12 +84,12 @@ if (__name__ == '__main__'):
 
         eval_risk = ""
         if args.risk:
-            if len(args.risk) <= len(args.ballots):
-                eval_risk = "true"
-                actual_kmins = args.risk
-            else:
-                print("Number of results is larger than the number of rounds.")
-                sys.exit(2)
+            #if len(args.risk) <= len(args.ballots):
+            eval_risk = "true"
+            actual_kmins = args.risk
+            #else:
+            #    print("Number of results is larger than the number of rounds.")
+            #    sys.exit(2)
 
     elif args.load:
         mode = "read"
@@ -186,7 +186,9 @@ if (__name__ == '__main__'):
             # Calling: find_aurror_params_from_schedule(...)
             # 1. finds parameters for BRAVO
             # 2. finds parameters for Aurror
-            designed_audit = schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
+            audit_aurror = schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
+            audit_aurror_proper = schedule.find_aurror_proper_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
+            #print(str(audit_aurror_proper))
             #print(str(designed_audit))
 
             if eval_risk == "true":
@@ -196,53 +198,60 @@ if (__name__ == '__main__'):
                 #now we design theoretical autit that:
                 #- has one more round that is long
                 #- tries to use all the risk
-                bravo_params = designed_audit["bravo"]
+                bravo_params = audit_aurror["bravo"]
                 risk_goal = bravo_params["risk_goal"]
                 #remaining_risk = alpha - max(designed_audit["risk_spent"])
-                audit_kmins = designed_audit["kmin_new"]
-                aurror_risk_rounds = designed_audit["risk_spent"]
-                #print(str(remaining_risk))
-                #new_risk_goal = np.append(risk_goal, alpha)
-                #round_schedule.append(4*max(round_schedule))
-                #print(str(new_risk_goal))
-                #print(str(round_schedule))
-                #risk_audit = schedule.find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, new_risk_goal,0)
-                #print(str(risk_audit))
+                audit_kmins = audit_aurror_proper["kmin_new"]
+                #aurror_risk_rounds = audit_aurror["risk_spent"]
 
-                #audit_kmins = risk_audit['kmin_new']
-                #print(str(audit_kmins))
-
-                #print("\n\nmax(Kmins, observed) risk: ")
                 test_info = risk.find_kmins_for_risk(audit_kmins, actual_kmins)
                 w = risk.estimate_rbr_risk(ballots_cast, winner, round_schedule, test_info["kmins"])
-                #print(str(w))
-                #print(str(kmins_goal_real))
 
-                #print("\n\n3 rounds")
-                #risks_evaluated = []
-                #for i in range(len(round_schedule)):
-                #    kmins_goal_real = audit_kmins
-                #    if i < len(actual_kmins):
-                #        kmins_goal_real[i] = actual_kmins[i]
-                #    w = risk.estimate_rbr_risk(ballots_cast, winner,  round_schedule, kmins_goal_real)
-                #    print("\t" + str(kmins_goal_real) + "\t" + str(w["risk_spent"]))
-                #    risks_evaluated.append(max(w["risk_spent"]))
-                ##w = schedule.find_risk_from_kmins(ballots_cast, winner, alpha, round_schedule, kmins_goal_real)
 
-                if test_info["passed"] == 0:
+
+                #if test_info["passed"] == 0:
                     #this means that the audit is not passed
                     #so we should perform another round
-                    rounds_done = len(actual_kmins)
-                    risk_left = aurror_risk_rounds[rounds_done - 1]
-                    actual_risk_spent = max(w["risk_spent"]) + (alpha - risk_left)
-                else:
-                    actual_risk_spent = max(w["risk_spent"])
-                actual_prob_stop = w["prob_stop"]
+                #    rounds_done = len(actual_kmins)
+                #    risk_left = aurror_risk_rounds[rounds_done - 1]
+                #    actual_risk_spent = max(w["risk_spent"])
+                #    actual_risk_spent_penalty = actual_risk_spent + (alpha - risk_left)
+                #else:
+                #    actual_risk_spent = max(w["risk_spent"])
+                #actual_prob_stop = w["prob_stop"]
 
                 print("\n\tAUDIT result:")
                 print("\t\tobserved:\t" + str(actual_kmins))
-                print("\t\tevaluated:\t" + str(test_info["kmins"]))
-                print("\t\trisk:\t\t" + str((actual_risk_spent)) + "\n")
+                print("\t\trequired:\t" + str(audit_kmins))
+                #print("\t\tevaluated:\t" + str(test_info["kmins"]))
+                #print("\t\trisk:\t\t" + str((actual_risk_spent)))
+
+                if test_info["passed"] == 1:
+                    print("\n\t\tTest passed\n")
+                else:
+                    print("\n\t\tTest FAILED\n")
+
+                found_risk = risk.find_audit_risk(bc, winner, alpha, model, rs, actual_kmins)
+
+                print("\t\testimated risk (alpha estimation):\t" + str(found_risk))
+                #print("\t\testimated risk (tied elections - pure): \t" + str(actual_risk_spent))
+                #if test_info["passed"] == 0:
+                #    print("\t\testimated risk (tied elections + penalty): \t" + str(actual_risk_spent_penalty))
+
+                print("\n")
                 #print(str(w))
             # for one-round better results are acheived by:
             #schedule.find_aurror_params_from_schedule_and_risk(bc, winner, alpha, model, rs, [alpha])
+
+                #charlie part
+                #for rs in round_schedule:
+                #    print(str(rs))
+                #    x = schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, [rs], [], "false", 0)
+                #    print(str(x))
+
+                #    w = risk.estimate_rbr_risk(ballots_cast, winner, [rs], [x["kmin_new"][0]])
+                #    print(str(w))
+
+
+                #z = risk.estimate_rbr_risk(ballots_cast, winner, round_schedule, actual_kmins)
+                #print(str(z))

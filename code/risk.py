@@ -5,6 +5,7 @@ from scipy.stats import binom
 
 import rla as rla
 import tools as tools
+import schedule as schedule
 
 
 def __init__(self):
@@ -386,3 +387,40 @@ def find_kmins_for_risk(audit_kmins, actual_kmins):
 
 
     return {"kmins" : kmins_goal_real, "passed": test_passed}
+
+
+def find_audit_risk(ballots_cast, winner, alpha, model, round_schedule, audit_results, precision = 0.0001):
+    alpha_min = 0.0001
+    alpha_max = 0.5
+
+    #audit_alpha = schedule.find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, [], "false", 0)
+    audit_alpha = schedule.find_aurror_proper_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, [], "false", 0)
+    kmins_alpha = audit_alpha["kmin_new"]
+    result_alpha = find_kmins_for_risk(kmins_alpha, audit_results)
+    if result_alpha["passed"] == 1:
+        alpha_max = alpha
+    else:
+        alpha_min = alpha
+
+    diff = alpha_max - alpha_min
+
+    while diff > precision:
+        #print(str(alpha_min) + "\t" + str(alpha_max))
+        audit_max = schedule.find_aurror_proper_params_from_schedule(ballots_cast, winner, alpha_max - diff/2, model, round_schedule, [], "false", 0)
+        kmins_max = audit_max["kmin_new"]
+        result_max = find_kmins_for_risk(kmins_max, audit_results)
+
+        if result_max["passed"] == 1:
+            alpha_max = alpha_max - diff/2
+            #print("\tmax updated:\t" + str(alpha_max))
+        else:
+            audit_min = schedule.find_aurror_proper_params_from_schedule(ballots_cast, winner, alpha_min + diff/2, model, round_schedule, [], "false", 0)
+            kmins_min = audit_min["kmin_new"]
+            result_min = find_kmins_for_risk(kmins_min, audit_results)
+            if result_min["passed"] == 0:
+                alpha_min = alpha_min + diff/2
+                #print("\tmin updated:\t" + str(alpha_min))
+
+        diff = alpha_max - alpha_min
+
+    return alpha_max
