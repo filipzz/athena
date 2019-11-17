@@ -125,6 +125,68 @@ Beatrix (3000) vs Cedric (2000)
 		AVG*:	51.73350509300488
 ```
 
+
+# Risk evaluation (first approach)
+
+To evaluate the risk of a given observation you need to add **--evaluate_risk** parameter, followed with the number
+of votes for the winner counted in each round
+
+```
+python3 aurror.py -n asd -b 15038 5274 -r 34 57  --alpha 0.1 --evaluate_risk 22 34
+```
+
+The sample output.
+
+For this version of software a modified version of Aurror (denoted by Aurror*) is used (we change the way
+we find kmins -- we treat every round to be the first round). This approach may lead to going above Bravo risk.
+
+```
+Results of: asd
+Number of valid ballots: 20312
+	1 A	15038
+	2 B	5274
+
+AURROR parameters: 
+Alpha:  0.1
+Model:  bin
+Round schedule: [34, 57]
+
+
+A (15038) vs B (5274)
+
+	Effective round schedule: [34, 57]
+
+	BRAVO kmins: 	[24, 38]
+	BRAVO risk: 	[0.0739184 0.0827711]
+	BRAVO pstop: 	[0.8566519  0.96022161]
+		AVG:	843.0083804970857
+		AVG*:	35.02963781549562
+
+	ARLO kmins:	[24, 38]
+	ARLO risk:	[0.01215326 0.0169324 ]
+	ARLO pstop:	[0.74902808 0.93046317]
+
+	Aurror kmins:	[22, 36]
+	Aurror risk:	[0.06072474 0.07293752]
+	Aurror pstop:	[0.92086788 0.98214221]
+	--- ratio:	[0.06594295 0.07426371]
+
+	Aurror* kmins:	[22, 35]
+	Aurror* risk:	[0.06072474 0.08834209]
+	Aurror* pstop:	[0.92086788 0.98996194]
+	--- ratio:	[0.06594295 0.08923786]
+
+	AUDIT result:
+		observed:	[22, 34]
+		required:	[22, 35]
+
+		Test passed
+
+		estimated risk (alpha estimation):	0.084000390625
+		computed risk (alpha and kmins): 	0.06594294739276789
+
+```
+
 # Acknowledgements
 
 We thank [NSF (1421373 TWC: TTP Option: Small: Open-Audit Voting Systems---Protocol Models and Properties)](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1421373) for funding the implementation of this project.

@@ -308,17 +308,17 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
     risk_spent_arlo = aurror["risk_spent_arlo"]
     prob_stop_arlo = aurror["prob_stop_arlo"]
 
-    '''
+
     if verbosity > 0:
 
 
-        print("\n\tR2B2 kmins:\t" + str(kmin_new))
-        print("\tR2B2 risk:\t" + str(risk_spent))
-        print("\tR2B2 pstop:\t" + str(prob_stop))
+        print("\n\tAurror kmins:\t" + str(kmin_new))
+        print("\tAurror risk:\t" + str(risk_spent))
+        print("\tAurror pstop:\t" + str(prob_stop))
         print("\t--- ratio:\t" + str(risk_spent / prob_stop))
-        print("\t\tAVG:\t" + str(aurror["avg"]))
-        print("\t\tAVG*:\t" + str(aurror["avg_star"]))
-    '''
+        #print("\t\tAVG:\t" + str(aurror["avg"]))
+        #print("\t\tAVG*:\t" + str(aurror["avg_star"]))
+
     return {"kmin_new" : kmin_new, "risk_spent": risk_spent, "prob_stop": prob_stop, "avg" : aurror["avg"], "avg_star": aurror["avg_star"], "bravo": bravo_parameters}
 
 '''
