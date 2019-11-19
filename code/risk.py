@@ -2,6 +2,7 @@ import sys
 
 import numpy as np
 from scipy.stats import binom
+import math
 
 import rla as rla
 import tools as tools
@@ -22,17 +23,17 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
 
 
     #if model == "bin":
-    max = rla.bravo_kmin(ballots_cast, winner, alpha, round_size)
+    maxx = max(rla.bravo_kmin(ballots_cast, winner, alpha, round_size), round_size)
     #else:
     #    max = rla.bravo_like_kmin(ballots_cast, winner, alpha, round_size)
 
-    if max <= round_size:
+    if maxx <= round_size:
 
         p_table = np.zeros(round_size + 1) #[S("0")] * (round_size)
         p_table_tmp = np.zeros(round_size + 1) #[S("0")] * (round_size)
 
 
-        p_table_c = np.zeros((max + 1, round_size+1)) # [[S("0")] * (round_size)  for i in range(max)]#] * round_size
+        p_table_c = np.zeros((maxx + 1, round_size+1)) # [[S("0")] * (round_size)  for i in range(max)]#] * round_size
         p_table_c[0][0] = (1-p_succ)
         p_table_c[1][0] = (p_succ)
 
@@ -40,7 +41,7 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
         r_table_tmp = np.zeros(round_size + 1) #[S("0")] * (round_size)
 
 
-        r_table_c = np.zeros((max + 1, round_size+1)) # [[S("0")] * (round_size)  for i in range(max)]#] * round_size
+        r_table_c = np.zeros((maxx + 1, round_size+1)) # [[S("0")] * (round_size)  for i in range(max)]#] * round_size
         r_table_c[0][0] = (1-p_risk)
         r_table_c[1][0] = (p_risk)
 
@@ -71,7 +72,7 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
         for i in range(round_size+1):
             sum = np.longdouble(0.0) # S("0")
             sum_risk = np.longdouble(0.0) # S("0")
-            for k in range(max):
+            for k in range(maxx):
                 sum = sum + p_table_c[k][i]
                 sum_risk = sum_risk + r_table_c[k][i]
 
@@ -390,7 +391,7 @@ def find_kmins_for_risk(audit_kmins, actual_kmins):
 
 
 def find_audit_risk(ballots_cast, winner, alpha, model, round_schedule, audit_results, precision = 0.0001):
-    alpha_min = 0.0001
+    alpha_min = 0.00001
     alpha_max = 0.5
 
     #audit_alpha = schedule.find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, [], "false", 0)

@@ -173,6 +173,7 @@ if (__name__ == '__main__'):
             print("\n\n%s (%s) vs %s (%s)" % (candidate_i, ballots_i, candidate_j, ballots_j))
             bc = ballots_i + ballots_j
             winner = max(ballots_i, ballots_j)
+            print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
             rs = []
 
             #print(str(round_schedule))

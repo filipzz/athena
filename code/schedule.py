@@ -1,7 +1,5 @@
 import rla as rla
 import risk as risk
-#from sympy import S, N
-from sympy.stats import Binomial, Hypergeometric, density
 import numpy as np
 from scipy.stats import binom
 import math
@@ -280,7 +278,7 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
         print("\n\tBRAVO kmins: \t" + str(kmins_bravo))
         print("\tBRAVO risk: \t" + str(risk_goal))
         print("\tBRAVO pstop: \t" + str(prob_stop_bravo))
-        #print("\t--- ratio:\t" + str(risk_goal / prob_stop_bravo))
+        print("\t--- ratio:\t" + str(risk_goal / prob_stop_bravo))
         print("\t\tAVG:\t" + str(avg))
         print("\t\tAVG*:\t" + str(avg_star))
 
@@ -293,7 +291,7 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
         print("\n\tARLO kmins:\t" + str(kmins_bravo))
         print("\tARLO risk:\t" + str(risk_spent_arlo))
         print("\tARLO pstop:\t" + str(prob_stop_arlo))
-        #print("\t--- ratio:\t" + str(risk_spent_arlo / prob_stop_arlo))
+        print("\t--- ratio:\t" + str(risk_spent_arlo / prob_stop_arlo))
 
 
 
@@ -329,9 +327,12 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
 '''
 def find_aurror_proper_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, pstop_goal, save_to,
                                      verbosity):
+
+    #return find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, pstop_goal, save_to, 0)
+
     kmin_new = []
     for round_size in round_schedule:
-        result = find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, [round_size], [], save_to, 0)
+        result = find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, [round_size], pstop_goal, save_to, 0)
         kmin_new.append(result["kmin_new"][0])
 
     #print(str(kmin_new))
