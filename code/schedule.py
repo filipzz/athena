@@ -17,6 +17,8 @@ def find_new_kmins_max_risk(ballots_cast, winner, alpha, round_schedule, risk_go
 
 
 def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
+    #in charlie we check not if we spent more risk than Bravo
+    #but if true likehood ratio is below alpha
 
     #print("find_new_kmins(%s, %s, %s, %s, %s)" % (ballots_cast, winner, alpha, round_schedule, risk_goal))
 
@@ -190,12 +192,19 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
             risk_spent[i] = 1 - (risk_spent_so_far)
             prob_stop[i] = 1 - (prob_spent_so_far)
 
-            #print("testing for: " + str(k) + " - " +  str(j) + "\t" + str((1 - risk_spent_so_far)) + " <? " + str(risk_goal[i]))
+            #print("\n\ttesting for: " + str(i) + "\t" + str(k) + " - " +  str(j) + "\t" + str((1 - risk_spent_so_far)) + " <? " + str(risk_goal[i]))
+            #print("\t" + str(risk_spent[i]/prob_stop[i]))
 
-            if (1 - (risk_spent_so_far)) < (risk_goal[i]):
+            #in charlie we change
+            #if (1 - (risk_spent_so_far)) < (risk_goal[i]):
+            #if (sum_risk + next_risk)/(sum_pstop + next_pstop) <= alpha:
+            if risk_spent[i]/prob_stop[i] < alpha:
+                #print("\tstop")
                 kmin_new[i] = k + 1
                 correct_risk_level = 0
                 #print("new kmin_new: " + str(kmin_new[i]))
+            #else:
+                #print("\tpass")
 
             k = k + 1
 
@@ -313,7 +322,7 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
         print("\n\tAurror kmins:\t" + str(kmin_new))
         print("\tAurror risk:\t" + str(risk_spent))
         print("\tAurror pstop:\t" + str(prob_stop))
-        print("\t--- ratio:\t" + str(risk_spent / prob_stop))
+        print("\t--- true risk:\t" + str(risk_spent / prob_stop))
         #print("\t\tAVG:\t" + str(aurror["avg"]))
         #print("\t\tAVG*:\t" + str(aurror["avg_star"]))
 

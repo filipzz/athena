@@ -116,7 +116,8 @@ def calculate_risk_and_probability_b2(round_size, winner, ballots_cast, alpha, m
 
 # finds kmin for a given round that is smaller than the goal
 def next_round_risk(ballots_cast, winner, alpha, n, goal, dist, prevround_size, prvRoundKmin):
-    sum = np.longdouble(0.0) #S("0")
+    sum_risk = np.longdouble(0.0) #S("0")
+    sum_pstop = np.longdouble(0.0)
     #ballots_half = np.longdouble(ballots_cast / 2) #S(ballots_cast) / 2
 
     # we first compute the risk that is used by the kmin computed in "regular" way -- according to Bravo stoppin rule
@@ -129,7 +130,8 @@ def next_round_risk(ballots_cast, winner, alpha, n, goal, dist, prevround_size, 
 
     #TODO: take into account hypergeometric distribution
     for i in range(kmin, n+1):
-        sum = sum +  binom.pmf(i, n, .5) #  density(X)[i]
+        sum_risk = sum_risk +  binom.pmf(i, n, .5) #  density(X)[i]
+        sum_pstop = sum_pstop + binom.pmf(i, n, winner/ballots_cast)
 
     # now we will check consecutive candidates for new kmin
     # we accept new kmin if the risk is below the upper limit/goal
@@ -137,14 +139,18 @@ def next_round_risk(ballots_cast, winner, alpha, n, goal, dist, prevround_size, 
     i = kmin - 1
     correctRisk = 1
     while correctRisk == 1:
-        nextProb = binom.pmf(i, n, .5) #density(X)[i]
-        if nextProb < goal - sum:
-            sum = sum + nextProb
+        next_risk = binom.pmf(i, n, .5) #density(X)[i]
+        next_pstop = binom.pmf(i, n, winner/ballots_cast)
+        #if nextProb < goal - sum:
+        #print(str(i+1) + "\t" + str(sum_risk) + "\t" + str(sum_pstop) + "\t" + str(sum_risk/sum_pstop))
+        if (sum_risk + next_risk)/(sum_pstop + next_pstop) <= alpha:
+            sum_risk = sum_risk + next_risk
+            sum_pstop = sum_pstop + next_pstop
             i = i - 1
         else:
             correctRisk = 0
 
-    return {"sum" : sum, "kmin" : i+1}
+    return {"sum" : sum_risk/sum_pstop, "kmin" : i+1, "sum_risk" : sum_risk, "sum_pstop" : sum_pstop}
 
 
 

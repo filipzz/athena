@@ -188,7 +188,7 @@ if (__name__ == '__main__'):
             # 1. finds parameters for BRAVO
             # 2. finds parameters for Aurror
             audit_aurror = schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
-            audit_aurror_proper = schedule.find_aurror_proper_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
+            #audit_aurror_proper = schedule.find_aurror_proper_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
             #print(str(audit_aurror_proper))
             #print(str(designed_audit))
 
@@ -202,7 +202,7 @@ if (__name__ == '__main__'):
                 bravo_params = audit_aurror["bravo"]
                 risk_goal = bravo_params["risk_goal"]
                 #remaining_risk = alpha - max(designed_audit["risk_spent"])
-                audit_kmins = audit_aurror_proper["kmin_new"]
+                audit_kmins = audit_aurror["kmin_new"]
                 #aurror_risk_rounds = audit_aurror["risk_spent"]
 
                 test_info = risk.find_kmins_for_risk(audit_kmins, actual_kmins)
