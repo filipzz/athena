@@ -1,12 +1,54 @@
-import json
-import math
-import numpy as np
-import os, sys, argparse
+import sys, argparse
 import string
+from scipy.stats import binom
+import math
+import tools
 
-import schedule as schedule
-import risk as risk
-import tools as tools
+
+def next_round_prob(margin, round_size_prev, round_size, kmin, prob_table_prev):
+    prob_table = [0] * (round_size + 1)
+    for i in range(kmin + 1):
+        for j in range(round_size + 1):
+            prob_table[j] = prob_table[j] + binom.pmf(j-i, round_size - round_size_prev, (1+margin)/2) * prob_table_prev[i]
+
+    return prob_table
+
+def aurror(margin, alpha, round_schedule):
+    round_schedule = [0] + round_schedule
+    number_of_rounds = len(round_schedule)
+    prob_table_prev = [1]
+    prob_tied_table_prev = [1]
+    kmins = [0] * number_of_rounds
+    prob_sum = [0] * number_of_rounds
+    prob_tied_sum = [0] * number_of_rounds
+
+    for round in range(1,number_of_rounds):
+        prob_table = next_round_prob(margin, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_table_prev)
+        prob_tied_table = next_round_prob(0, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_tied_table_prev)
+
+        kmin_found = False
+        kmin_candidate = math.floor(round_schedule[round]/2)
+        while kmin_found == False and kmin_candidate <= round_schedule[round]:
+            if alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]):
+                kmin_found = True
+                kmins[round] = kmin_candidate
+                prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
+                prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
+            else:
+                kmin_candidate = kmin_candidate + 1
+
+        # cleaning prob_table/prob_tied_table
+        for i in range(kmin_candidate, round_schedule[round] + 1):
+            prob_table[i] = 0
+            prob_tied_table[i] = 0
+
+        prob_table_prev = prob_table
+        prob_tied_table_prev = prob_tied_table
+
+    return {"kmins" : kmins[1:len(kmins)], "prob_sum" : prob_sum[1:len(prob_sum)], "prob_tied_sum" : prob_tied_sum[1:len(prob_tied_sum)]}
+
+
+
 
 if (__name__ == '__main__'):
 
@@ -97,36 +139,10 @@ if (__name__ == '__main__'):
         print("Call python3 aurror.py -h for help")
 
 
-    #     full_cmd_arguments = sys.argv
-    #     argument_list = full_cmd_arguments[1:]
-    #     unix_options = "n:e:ho:va:b:c:"
-    #     gnu_options = ["new=", "election=", "help", "output=", "verbose", "alpha", "ballots", "candidates"]
-    #
-    #     try:
-    #         arguments, values = getopt.getopt(argument_list, unix_options, gnu_options)
-    #     except getopt.error as err:
-    #         print(str(err))
-    #         sys.exit(2)
-    #
-    #     for current_argument, current_value in arguments:
-    #         if current_argument in ("-n", "--new"):
-    #             mode = "new"
-    #             name = current_value
-    #         elif current_argument in ("-e", "--election"):
-    #             mode = "election"
-    #             name = current_value
-    #         elif current_argument in ("-b", "--ballots"):
-    #             ballots_cast = current_value
-    #         elif current_argument in ("-a", "--alpha"):
-    #             no_of_candidates = current_value
-    #         elif
-
     model = "bin"
     election = {}
     election["ballots_cast"] = ballots_cast
-    #election["margin"] = .1
     election["alpha"] = alpha
-    #election["winner"] = math.floor((1+margin)*ballots_cast / 2)
     election["candidates"] = candidates
     election["results"] = results
     election["winners"] = winners
@@ -139,27 +155,9 @@ if (__name__ == '__main__'):
 
 
 
-#    try:
-#        os.mkdir(save_to)
-#    except OSError:
-#        sys.exit("Selected folder with election data already exists.")
-
-#    with open(save_to + "/election.json", 'w') as f:
-#        json.dump(election, f)
-
-
-#    if len(sys.argv) < 5:
- #       print("python3 aurror.py ballots_cast winner margin [round_schedule]")
-
-  #  if len(sys.argv) > 1:
-   #     ballots_cast = int(sys.argv[1])
-
-   # print(ballots_cast)
-
 
     tools.print_election(election)
 
-    #round_schedule = [100, 200, 400]
 
     print("Round schedule: " + str(round_schedule))
 
@@ -184,87 +182,14 @@ if (__name__ == '__main__'):
             #print(str(rs))
 
             print("\n\tEffective round schedule: " + str(rs))
-            # Calling: find_aurror_params_from_schedule(...)
-            # 1. finds parameters for BRAVO
-            # 2. finds parameters for Aurror
-            audit_aurror = schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
-            #audit_aurror_proper = schedule.find_aurror_proper_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
-            #print(str(audit_aurror_proper))
-            #print(str(designed_audit))
 
-            if eval_risk == "true":
-                #print(str(kmins_goal))
-                #print(str(len(kmins_goal)))
+            margin = (2 * winner - bc)/bc
 
-                #now we design theoretical autit that:
-                #- has one more round that is long
-                #- tries to use all the risk
-                bravo_params = audit_aurror["bravo"]
-                risk_goal = bravo_params["risk_goal"]
-                #remaining_risk = alpha - max(designed_audit["risk_spent"])
-                audit_kmins = audit_aurror["kmin_new"]
-                #aurror_risk_rounds = audit_aurror["risk_spent"]
+            audit_aurror = aurror(margin, alpha, rs)
+            kmins = audit_aurror["kmins"]
+            prob_sum = audit_aurror["prob_sum"]
+            prob_tied_sum = audit_aurror["prob_tied_sum"]
+            print("\tAurror kmins:\t" + str(kmins))
+            print("\tAurror risk: \t" + str(prob_tied_sum))
+            print("\tAurror pstop:\t" + str(prob_sum))
 
-                test_info = risk.find_kmins_for_risk(audit_kmins, actual_kmins)
-                w = risk.estimate_rbr_risk(ballots_cast, winner, round_schedule, test_info["kmins"])
-
-
-
-                #if test_info["passed"] == 0:
-                    #this means that the audit is not passed
-                    #so we should perform another round
-                #    rounds_done = len(actual_kmins)
-                #    risk_left = aurror_risk_rounds[rounds_done - 1]
-                #    actual_risk_spent = max(w["risk_spent"])
-                #    actual_risk_spent_penalty = actual_risk_spent + (alpha - risk_left)
-                #else:
-                #    actual_risk_spent = max(w["risk_spent"])
-                #actual_prob_stop = w["prob_stop"]
-
-                print("\n\tAUDIT result:")
-                print("\t\tobserved:\t" + str(actual_kmins))
-                print("\t\trequired:\t" + str(audit_kmins))
-                #print("\t\tevaluated:\t" + str(test_info["kmins"]))
-                #print("\t\trisk:\t\t" + str((actual_risk_spent)))
-
-                if test_info["passed"] == 1:
-                    print("\n\t\tTest passed\n")
-                else:
-                    print("\n\t\tTest FAILED\n")
-
-                found_risk = risk.find_audit_risk(bc, winner, alpha, model, rs, actual_kmins)
-                alpha = found_risk["alpha"]
-                risk_table = found_risk["risk_table"]
-                valid_kmins = found_risk["kmin_new"]
-
-                risk_found = 0
-                audit_risk = 1
-                for risk, valid, actual in zip(risk_table, valid_kmins, actual_kmins):
-                    #print("%s\t%s\t%s\t%s" % (risk_found, risk, valid, actual))
-                    if risk_found == 0 and valid <= actual:
-                        audit_risk = risk
-                        risk_found = 1
-
-                print("\t\testimated risk (alpha estimation):\t" + str(alpha))
-                print("\t\tcomputed risk (alpha and kmins): \t" + str(audit_risk))
-                #print("\t\testimated risk (tied elections - pure): \t" + str(actual_risk_spent))
-                #if test_info["passed"] == 0:
-                #    print("\t\testimated risk (tied elections + penalty): \t" + str(actual_risk_spent_penalty))
-
-                print("\n")
-                #print(str(w))
-            # for one-round better results are acheived by:
-            #schedule.find_aurror_params_from_schedule_and_risk(bc, winner, alpha, model, rs, [alpha])
-
-                #charlie part
-                #for rs in round_schedule:
-                #    print(str(rs))
-                #    x = schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, [rs], [], "false", 0)
-                #    print(str(x))
-
-                #    w = risk.estimate_rbr_risk(ballots_cast, winner, [rs], [x["kmin_new"][0]])
-                #    print(str(w))
-
-
-                #z = risk.estimate_rbr_risk(ballots_cast, winner, round_schedule, actual_kmins)
-                #print(str(z))
