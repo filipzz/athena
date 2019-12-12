@@ -107,6 +107,9 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
         p_table_c_rbr[i][0] = binom.pmf(i, round_schedule[0], winner/ballots_cast) # density(X).dict[i]
         #print(str(i) + "\t" + str(N(density(X).dict[i])))
 
+    #print(str(r_table_c_rbr))
+    #print(str(p_table_c_rbr))
+
     risk_spent_so_far = np.longdouble(0.0) #  S("0")
     prob_spent_so_far = np.longdouble(0.0) #S("0")
     for i in range(kmin_prime):
@@ -259,6 +262,7 @@ def find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model
 def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_schedule, pstop_goal, save_to,
                                      verbosity):
 
+
     # 1. we need to find Bravo risk for the schedule
 
 
@@ -317,8 +321,6 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
 
 
     if verbosity > 0:
-
-
         print("\n\tAurror kmins:\t" + str(kmin_new))
         print("\tAurror risk:\t" + str(risk_spent))
         print("\tAurror pstop:\t" + str(prob_stop))
@@ -370,7 +372,9 @@ if __name__ == '__main__':
     winner = 15038
     round_schedule = [41]#, 600]#, 332, 587, 974, 2155]#[301, 518, 916]#, 1520, 3366]
     round_schedule = [ 193, 332, 587, 974, 2155]
-    round_schedule = [34, 57]
+    round_schedule = [34, 57, 120]
+    round_schedule = [34, 68, 102, 136]
+    round_schedule = [57]
     alpha = .1
     model = "bin"
 
@@ -393,4 +397,4 @@ if __name__ == '__main__':
     risk_goal = bravo_params["risk_goal"]
     risk_goal[len(risk_goal) - 1] = alpha
     print("New risk goal: " + str(risk_goal))
-    find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal, )
+    find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model, round_schedule, risk_goal, 0)

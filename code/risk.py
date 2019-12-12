@@ -265,10 +265,11 @@ def calculate_bad_luck_cum_probab_table_b2(round_size, winner, ballots_cast, alp
 
     return  { "p_table" : p_table, "sum" : sum}
 
-
-# This function estimates risk for a given audit realization.
-# It computes how many tied elections would have better observations
-# It computes probability of stopping
+'''
+ This function estimates risk for a given audit realization.
+ It computes how many tied elections would have better observations
+ It computes probability of stopping
+'''
 def estimate_rbr_risk(ballots_cast, winner, round_schedule, round_ks):
 
     # check if the round_ks are correct
