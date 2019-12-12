@@ -188,21 +188,6 @@ if (__name__ == '__main__'):
             # 1. finds parameters for BRAVO
             # 2. finds parameters for Aurror
             audit_aurror = schedule.find_aurror_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
-            '''
-            risk_goal = [0.0] * len(round_schedule)
-            aurror =  schedule.find_new_kmins(ballots_cast, winner, alpha,  round_schedule, risk_goal)
-            kmin_new = aurror["kmin_new"]
-            risk_spent = aurror["risk_spent"]
-            prob_stop = aurror["prob_stop"]
-
-            print("\n\tAurror kmins:\t" + str(kmin_new))
-            print("\tAurror risk:\t" + str(risk_spent))
-            print("\tAurror pstop:\t" + str(prob_stop))
-            print("\t--- true risk:\t" + str(risk_spent / prob_stop))
-
-            print(str(audit_aurror))
-            '''
-
             #audit_aurror_proper = schedule.find_aurror_proper_params_from_schedule(bc, winner, alpha, model, rs, [], "false", 1)
             #print(str(audit_aurror_proper))
             #print(str(designed_audit))
