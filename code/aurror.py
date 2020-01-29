@@ -4,7 +4,7 @@ from scipy.stats import binom
 import math
 import tools
 
-class Aurror():
+class AurrorAudit():
     def next_round_prob(self, margin, round_size_prev, round_size, kmin, prob_table_prev):
         prob_table = [0] * (round_size + 1)
         for i in range(kmin + 1):
@@ -47,8 +47,80 @@ class Aurror():
 
         return {"kmins" : kmins[1:len(kmins)], "prob_sum" : prob_sum[1:len(prob_sum)], "prob_tied_sum" : prob_tied_sum[1:len(prob_tied_sum)]}
 
-    #def find_next_round_size(self, margin, alpha, round_schedule, round_results, quant):
+    '''
+        Given audit parameters: **margin**, **alpha**, and  **round_schedule** so far, for a given **quant**
+        the size of the next round will be found.
+    '''
+    def find_next_round_size(self, margin, alpha, round_schedule, quant, round_min):
 
+        if len(round_schedule) > 0:
+            round_candidate = 2 * round_schedule[-1]
+            round_min = round_schedule[-1]
+            #round_max = round_candidate
+        else:
+            round_candidate = round_min
+            #round_max = 2 * round_candidate
+
+        # TODO: make sure that round_min leads to the situation where audit with a given round schedule extended with round_min stops with probability less than quant
+
+        #print("\tfnrs:\t" + str(quant) + "\t" + str(round_min) + "\t" + str(round_candidate))
+
+        while True:
+            new_round_schedule = round_schedule + [round_candidate]
+            result = self.aurror(margin, alpha, new_round_schedule)
+            prob_table = result["prob_sum"]
+            #print("\t\tfirst loop:\t" +  str(round_min) + "\t" + str(round_candidate) + "\t" + str(prob_table[-1]))
+
+            #if prob_table[-1] >= quant:
+            if self.relative_prob(prob_table) >= quant:
+                round_max = round_candidate
+                break
+            else:
+                round_min = round_candidate
+                round_candidate = 2 * round_min
+
+        while True:
+            round_candidate = round((round_max + round_min)/2)
+            new_round_schedule = round_schedule + [round_candidate]
+            result = self.aurror(margin, alpha, new_round_schedule)
+            prob_table = result["prob_sum"]
+            #print("\t\tmain loop:\t" + str(round_min) + "\t" + str(round_candidate) + "\t" + str(round_max) + "\t" + str(prob_table[-1]))
+
+            #if prob_table[-1] <= quant:
+            if self.relative_prob(prob_table) <=  quant:
+                round_min = round_candidate
+            else:
+                round_max = round_candidate
+
+            # TODO: change "10" into something parametrized
+            #if (prob_table[-1] - quant > 0 and prob_table[-1] - quant < .01) or round_max - round_min <= 2:
+            if (self.relative_prob(prob_table) - quant > 0 and self.relative_prob(prob_table) - quant < .01) or round_max - round_min <= 2:
+                break
+
+        return {"size" : round_candidate, "prob_stop" : prob_table[-1]}
+
+    '''
+        For a given list of quants (e.g., quants = [.7, .8, .9] returns a list of
+        next round sizes  for which probability of stoping is larger than quants
+    '''
+    def find_next_round_sizes(self, margin, alpha, round_schedule, quants):
+        round_candidate = 100
+        for quant in quants:
+            results = self.find_next_round_size(margin, alpha, round_schedule, quant, round_candidate)
+            new_round = results["size"]
+            new_round_schedule = round_schedule + [new_round]
+            print("\t" + str(quant) + "\t" + str(new_round_schedule))
+            round_candidate = results["size"]
+
+    def relative_prob(self, prob_table):
+        if len(prob_table) == 1:
+            return prob_table[-1]
+        else:
+            prob_prev = prob_table[-2]
+            prob_last = prob_table[-1]
+            prob_total = 1 - prob_prev
+            prob_gain = prob_last - prob_prev
+            return prob_gain / prob_total
 
 
 
@@ -64,7 +136,7 @@ if (__name__ == '__main__'):
     parser.add_argument("-c", "--candidates", help="set the candidate list (names)", nargs="*")
     parser.add_argument("-b", "--ballots", help="set the list of ballots cast for every candidate", nargs="*", type=int)
     parser.add_argument("-t", "--total", help="set the total number of ballots in given contest", type=int)
-    parser.add_argument("-r", "-rs", "--rounds", "--round_schedule", help="set the round schedule", nargs="+", type=int)
+    parser.add_argument("-r", "--rounds", "--round_schedule", help="set the round schedule", nargs="+", type=int)
     parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
     parser.add_argument("-l", "--load", help="set the election to read")
@@ -104,17 +176,27 @@ if (__name__ == '__main__'):
             assert len(args.ballots) <= 26
             candidates = [string.ascii_uppercase[i] for i in range(len(args.ballots))]
 
-        if args.rounds:
+        if args.pstop:
+            if args.rounds:
+                round_schedule = args.rounds
+                pstop_goal = []
+                if max(round_schedule) > ballots_cast:
+                    print("Round schedule is incorrect")
+                    sys.exit(2)
+
+            mode_rounds = "pstop"
+            pstop_goal = args.pstop
+            if not args.rounds:
+                round_schedule = []
+            print(str(pstop_goal))
+
+        elif args.rounds:
             mode_rounds = "rounds"
             round_schedule = args.rounds
             pstop_goal = []
             if max(round_schedule) > ballots_cast:
                 print("Round schedule is incorrect")
                 sys.exit(2)
-        elif args.pstop:
-            mode_rounds = "goal"
-            pstop_goal = args.pstop
-            round_schedule = []
         else:
             print("Missing -r / --rounds argument")
             sys.exit(2)
@@ -165,42 +247,75 @@ if (__name__ == '__main__'):
 
     print("Round schedule: " + str(round_schedule))
 
-    for i in range(len(candidates)):
-        ballots_i = results[i]
-        candidate_i = candidates[i]
-        for j in range(i + 1, len(candidates)):
-            ballots_j = results[j]
-            candidate_j = candidates[j]
+    if mode_rounds == "rounds":
+        for i in range(len(candidates)):
+            ballots_i = results[i]
+            candidate_i = candidates[i]
+            for j in range(i + 1, len(candidates)):
+                ballots_j = results[j]
+                candidate_j = candidates[j]
 
-            print("\n\n%s (%s) vs %s (%s)" % (candidate_i, ballots_i, candidate_j, ballots_j))
-            bc = ballots_i + ballots_j
-            winner = max(ballots_i, ballots_j)
-            print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
-            rs = []
+                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, ballots_i, candidate_j, ballots_j))
+                bc = ballots_i + ballots_j
+                winner = max(ballots_i, ballots_j)
+                print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
+                rs = []
 
-            #print(str(round_schedule))
-            for x in round_schedule:
-                y = math.floor(x * bc / ballots_cast)
-                rs.append(y)
+                #print(str(round_schedule))
+                for x in round_schedule:
+                    y = math.floor(x * bc / ballots_cast)
+                    rs.append(y)
 
-            #print(str(rs))
+                #print(str(rs))
 
-            print("\n\tApprox round schedule:\t" + str(rs))
+                print("\n\tApprox round schedule:\t" + str(rs))
 
-            margin = (2 * winner - bc)/bc
+                margin = (2 * winner - bc)/bc
 
-            audit_object = Aurror()
-            audit_aurror = audit_object.aurror(margin, alpha, rs)
-            #print(str(audit_aurror))
-            kmins = audit_aurror["kmins"]
-            prob_sum = audit_aurror["prob_sum"]
-            prob_tied_sum = audit_aurror["prob_tied_sum"]
-            print("\tAurror kmins:\t\t" + str(kmins))
-            print("\tAurror pstop (tied): \t" + str(prob_tied_sum))
-            print("\tAurror pstop (audit):\t" + str(prob_sum))
+                audit_object = AurrorAudit()
+                audit_aurror = audit_object.aurror(margin, alpha, rs)
+                #print(str(audit_aurror))
+                kmins = audit_aurror["kmins"]
+                prob_sum = audit_aurror["prob_sum"]
+                prob_tied_sum = audit_aurror["prob_tied_sum"]
+                print("\tAurror kmins:\t\t" + str(kmins))
+                print("\tAurror pstop (tied): \t" + str(prob_tied_sum))
+                print("\tAurror pstop (audit):\t" + str(prob_sum))
 
-            true_risk = []
-            for p, pt in zip(prob_sum, prob_tied_sum):
-                true_risk.append(pt/p)
-            print("\tAurror true risk:\t" + str(true_risk))
+                true_risk = []
+                for p, pt in zip(prob_sum, prob_tied_sum):
+                    true_risk.append(pt/p)
+                print("\tAurror true risk:\t" + str(true_risk))
+
+                #x = audit_object.find_next_round_size(margin, alpha, rs, .7, 100)
+                #print(str(x))
+
+
+    elif mode_rounds == "pstop":
+        print("setting round schedule")
+        for i in range(len(candidates)):
+            ballots_i = results[i]
+            candidate_i = candidates[i]
+            for j in range(i + 1, len(candidates)):
+                ballots_j = results[j]
+                candidate_j = candidates[j]
+
+                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, ballots_i, candidate_j, ballots_j))
+                bc = ballots_i + ballots_j
+                winner = max(ballots_i, ballots_j)
+                print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
+                rs = []
+                for x in round_schedule:
+                    y = math.floor(x * bc / ballots_cast)
+                    rs.append(y)
+
+
+                margin = (2 * winner - bc)/bc
+
+                audit_object = AurrorAudit()
+                #audit_aurror = audit_object.aurror(margin, alpha, rs)
+
+                print("pstop goal: " + str(pstop_goal))
+                print("round schedule: " + str(rs))
+                x = audit_object.find_next_round_sizes(margin, alpha, rs, pstop_goal)
 
