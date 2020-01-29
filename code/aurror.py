@@ -27,7 +27,7 @@ if (__name__ == '__main__'):
     args = parser.parse_args()
 
     if args.version:
-        print("AURROR version 0.2")
+        print("AURROR version 0.3")
     if args.new:
         mode = "new"
         name = args.new

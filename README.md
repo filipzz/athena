@@ -20,9 +20,93 @@ and with shorter parameternames:
 python3 code/aurror.py -n raceName -b 5000 3000 2000  -r 100 200
 ```
 
-A new folder: **elections/** will be created in the current path.
+## Finding stopping probabilities
 
-Then parameter **--new raceName** will create a folder **elections/raceName** that stores election data.
+In this mode, one can (roughly) what are the expected round sizes
+for a given results:
+
+- **--ballots** (list of declared number of votes cast for each candidate)
+- **--pstop** (list of stopping probabilities for the next round)
+
+```bash
+python3 aurror.py -n asd -b 60000 40000 --pstop .7 .8 .9 
+```
+
+returns:
+
+```bash
+[0.7, 0.8, 0.9]
+Results of: asd
+Number of valid ballots: 100000
+	1 A	60000
+	2 B	40000
+
+AURROR parameters: 
+Alpha:  0.1
+Model:  bin
+Round schedule: []
+setting round schedule
+
+
+A (60000) vs B (40000)
+	margin:	0.2
+pstop goal: [0.7, 0.8, 0.9]
+round schedule: []
+	0.7	[112]
+	0.8	[132]
+	0.9	[182]
+```
+
+If one want to estimate round sizes for the next round, round_schedule parameter needs to be added
+
+```bash
+python3 aurror.py -n asd -b 60000 40000 --pstop .5 .8  --rounds 132
+[0.5, 0.8]
+Results of: asd
+Number of valid ballots: 100000
+	1 A	60000
+	2 B	40000
+
+AURROR parameters: 
+Alpha:  0.1
+Model:  bin
+Round schedule: [132]
+setting round schedule
+
+
+A (60000) vs B (40000)
+	margin:	0.2
+pstop goal: [0.5, 0.8]
+round schedule: [132]
+	0.5	[132, 192]
+	0.8	[132, 280]
+```
+
+To get obtain detailed information about a selected round schedule (e.g., [132 280])
+one needs to call it without **--pstop** parameter.
+
+```bash
+python3 aurror.py -n asd -b 60000 40000 --rounds 132 280
+Results of: asd
+Number of valid ballots: 100000
+	1 A	60000
+	2 B	40000
+
+AURROR parameters: 
+Alpha:  0.1
+Model:  bin
+Round schedule: [132, 280]
+
+
+A (60000) vs B (40000)
+	margin:	0.2
+
+	Approx round schedule:	[132, 280]
+	Aurror kmins:		[75, 155]
+	Aurror pstop (tied): 	[0.06933400321906029, 0.09040099920866383]
+	Aurror pstop (audit):	[0.798620073240586, 0.9610205970134249]
+	Aurror true risk:	[0.08681725584196939, 0.09406770207590148]
+```
 
 ## Help
 
