@@ -4,48 +4,52 @@ from scipy.stats import binom
 import math
 import tools
 
+class Aurror():
+    def next_round_prob(self, margin, round_size_prev, round_size, kmin, prob_table_prev):
+        prob_table = [0] * (round_size + 1)
+        for i in range(kmin + 1):
+            for j in range(round_size + 1):
+                prob_table[j] = prob_table[j] + binom.pmf(j-i, round_size - round_size_prev, (1+margin)/2) * prob_table_prev[i]
 
-def next_round_prob(margin, round_size_prev, round_size, kmin, prob_table_prev):
-    prob_table = [0] * (round_size + 1)
-    for i in range(kmin + 1):
-        for j in range(round_size + 1):
-            prob_table[j] = prob_table[j] + binom.pmf(j-i, round_size - round_size_prev, (1+margin)/2) * prob_table_prev[i]
+        return prob_table
 
-    return prob_table
+    def aurror(self, margin, alpha, round_schedule):
+        round_schedule = [0] + round_schedule
+        number_of_rounds = len(round_schedule)
+        prob_table_prev = [1]
+        prob_tied_table_prev = [1]
+        kmins = [0] * number_of_rounds
+        prob_sum = [0] * number_of_rounds
+        prob_tied_sum = [0] * number_of_rounds
 
-def aurror(margin, alpha, round_schedule):
-    round_schedule = [0] + round_schedule
-    number_of_rounds = len(round_schedule)
-    prob_table_prev = [1]
-    prob_tied_table_prev = [1]
-    kmins = [0] * number_of_rounds
-    prob_sum = [0] * number_of_rounds
-    prob_tied_sum = [0] * number_of_rounds
+        for round in range(1,number_of_rounds):
+            prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_table_prev)
+            prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_tied_table_prev)
 
-    for round in range(1,number_of_rounds):
-        prob_table = next_round_prob(margin, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_table_prev)
-        prob_tied_table = next_round_prob(0, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_tied_table_prev)
+            kmin_found = False
+            kmin_candidate = math.floor(round_schedule[round]/2)
+            while kmin_found == False and kmin_candidate <= round_schedule[round]:
+                if alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]):
+                    kmin_found = True
+                    kmins[round] = kmin_candidate
+                    prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
+                    prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
+                else:
+                    kmin_candidate = kmin_candidate + 1
 
-        kmin_found = False
-        kmin_candidate = math.floor(round_schedule[round]/2)
-        while kmin_found == False and kmin_candidate <= round_schedule[round]:
-            if alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]):
-                kmin_found = True
-                kmins[round] = kmin_candidate
-                prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
-                prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
-            else:
-                kmin_candidate = kmin_candidate + 1
+            # cleaning prob_table/prob_tied_table
+            for i in range(kmin_candidate, round_schedule[round] + 1):
+                prob_table[i] = 0
+                prob_tied_table[i] = 0
 
-        # cleaning prob_table/prob_tied_table
-        for i in range(kmin_candidate, round_schedule[round] + 1):
-            prob_table[i] = 0
-            prob_tied_table[i] = 0
+            prob_table_prev = prob_table
+            prob_tied_table_prev = prob_tied_table
 
-        prob_table_prev = prob_table
-        prob_tied_table_prev = prob_tied_table
+        return {"kmins" : kmins[1:len(kmins)], "prob_sum" : prob_sum[1:len(prob_sum)], "prob_tied_sum" : prob_tied_sum[1:len(prob_tied_sum)]}
 
-    return {"kmins" : kmins[1:len(kmins)], "prob_sum" : prob_sum[1:len(prob_sum)], "prob_tied_sum" : prob_tied_sum[1:len(prob_tied_sum)]}
+    #def find_next_round_size(self, margin, alpha, round_schedule, round_results, quant):
+
+
 
 
 
@@ -181,15 +185,22 @@ if (__name__ == '__main__'):
 
             #print(str(rs))
 
-            print("\n\tEffective round schedule: " + str(rs))
+            print("\n\tApprox round schedule:\t" + str(rs))
 
             margin = (2 * winner - bc)/bc
 
-            audit_aurror = aurror(margin, alpha, rs)
+            audit_object = Aurror()
+            audit_aurror = audit_object.aurror(margin, alpha, rs)
+            #print(str(audit_aurror))
             kmins = audit_aurror["kmins"]
             prob_sum = audit_aurror["prob_sum"]
             prob_tied_sum = audit_aurror["prob_tied_sum"]
-            print("\tAurror kmins:\t" + str(kmins))
-            print("\tAurror risk: \t" + str(prob_tied_sum))
-            print("\tAurror pstop:\t" + str(prob_sum))
+            print("\tAurror kmins:\t\t" + str(kmins))
+            print("\tAurror pstop (tied): \t" + str(prob_tied_sum))
+            print("\tAurror pstop (audit):\t" + str(prob_sum))
+
+            true_risk = []
+            for p, pt in zip(prob_sum, prob_tied_sum):
+                true_risk.append(pt/p)
+            print("\tAurror true risk:\t" + str(true_risk))
 
