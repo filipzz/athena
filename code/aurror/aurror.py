@@ -2,7 +2,39 @@ from scipy.stats import binom
 import math
 
 class AurrorAudit():
+    """
+    A class used to represent an AurrorAudit
+
+    ...
+
+    Methods
+    -------
+    next_round_prob(self, margin, round_size_prev, round_size, kmin, prob_table_prev)
+        Computed the distribution probability at the end of the next round
+
+    aurror(self, margin, alpha, round_schedule)
+        Computes probabilities of stopping, risk and kmins for given parameters
+
+    find_next_round_size(self, margin, alpha, round_schedule, quant, round_min)
+        Computes expected round size such that audit would end with probability quant
+
+    find_next_round_sizes(self, margin, alpha, round_schedule, quants)
+        Computes expected round sizes for a given list of stopping probabilities (quants)
+
+    """
+
     def next_round_prob(self, margin, round_size_prev, round_size, kmin, prob_table_prev):
+        """
+        Parameters
+        ----------
+        :param margin: margin of a given race (float in [0, 1])
+        :param round_size_prev: the size of the previous round
+        :param round_size: the size of the current round
+        :param kmin: the value of previous kmin
+        :param prob_table_prev: the probability distribution at the begining of the current round
+        :return: prob_table: the probability distribution at the end of the current round is returned
+        """
+
         prob_table = [0] * (round_size + 1)
         for i in range(kmin + 1):
             for j in range(round_size + 1):
@@ -10,7 +42,20 @@ class AurrorAudit():
 
         return prob_table
 
+
     def aurror(self, margin, alpha, round_schedule):
+        """
+        Parameters
+        ----------
+        :param margin: margin of a given race (float in [0, 1])
+        :param alpha: is the risk limit (float in (0, 1))
+        :param round_schedule: is a list of increasing natural numbers that correspond to number of relevant votes drawn
+        :return:
+
+            * kmins - list of kmins (corresponding to the round_schedule)
+            * prob_sum - list of stopping probabilities
+            * prob_tied_sum - list of stopping probabilities for tied elections (risk)
+        """
         round_schedule = [0] + round_schedule
         number_of_rounds = len(round_schedule)
         prob_table_prev = [1]
@@ -44,12 +89,22 @@ class AurrorAudit():
 
         return {"kmins" : kmins[1:len(kmins)], "prob_sum" : prob_sum[1:len(prob_sum)], "prob_tied_sum" : prob_tied_sum[1:len(prob_tied_sum)]}
 
-    '''
-        Given audit parameters: **margin**, **alpha**, and  **round_schedule** so far, for a given **quant**
-        the size of the next round will be found.
-    '''
     def find_next_round_size(self, margin, alpha, round_schedule, quant, round_min):
+        """
+        For given audit parameters, computes the expected size of the next round.
 
+        Parameters
+        ----------
+        :param margin: margin for that race
+        :param alpha: risk limit
+        :param round_schedule: round schedule
+        :param quant: desired probability of stopping in the next round
+        :param round_min: min size of the next round
+        :return:
+
+            * size - the size of the next round
+            * prob_stop - the probability of
+        """
         if len(round_schedule) > 0:
             round_candidate = 2 * round_schedule[-1]
             round_min = round_schedule[-1]
@@ -94,22 +149,48 @@ class AurrorAudit():
             if (self.relative_prob(prob_table) - quant > 0 and self.relative_prob(prob_table) - quant < .01) or round_max - round_min <= 2:
                 break
 
+        #print(str(self.relative_prob(prob_table)))
+        #print(str(prob_table))
+
         return {"size" : round_candidate, "prob_stop" : prob_table[-1]}
 
-    '''
-        For a given list of quants (e.g., quants = [.7, .8, .9] returns a list of
-        next round sizes  for which probability of stoping is larger than quants
-    '''
     def find_next_round_sizes(self, margin, alpha, round_schedule, quants):
-        round_candidate = 100
+        '''
+        For a given list of possible stopping probabilities (called quants e.g., quants = [.7, .8, .9]) returns a list of
+        next round sizes  for which probability of stoping is larger than quants
+
+        ...
+
+        Parameters
+        ----------
+        :param margin: margin for given race
+        :param alpha: risk limit
+        :param round_schedule: round schedule (so far)
+        :param quants: list of desired stopping probabilities
+        :return: a list of expected round sizes
+        '''
+        round_candidate = 10
+        rounds = []
         for quant in quants:
             results = self.find_next_round_size(margin, alpha, round_schedule, quant, round_candidate)
             new_round = results["size"]
             new_round_schedule = round_schedule + [new_round]
             print("\t" + str(quant) + "\t" + str(new_round_schedule))
             round_candidate = results["size"]
+            rounds.append(round_candidate)
+
+        return rounds
+
+
 
     def relative_prob(self, prob_table):
+        '''
+        Helper function, returning the conditional probability of the last round success, from a list representing
+        cumulative probability
+
+        :param prob_table: list of probabilities of stopping in consecurtive rounds
+        :return: probability of stopping in the last round conditioned by not stopping in the previous round
+        '''
         if len(prob_table) == 1:
             return prob_table[-1]
         else:
