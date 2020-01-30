@@ -161,7 +161,7 @@ class AurrorAudit():
         #print(str(prob_table))
 
         return {"size" : round_candidate, "prob_stop" : prob_table[-1]}
-    
+
 
     def find_next_round_sizes(self, margin, alpha, round_schedule, quants):
         '''
