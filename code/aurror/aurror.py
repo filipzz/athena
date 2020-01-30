@@ -117,6 +117,7 @@ class AurrorAudit():
 
         #print("\tfnrs:\t" + str(quant) + "\t" + str(round_min) + "\t" + str(round_candidate))
 
+        # first loop tries to find round size that is large enough to have the probability of stopping larger than quant
         while True:
             new_round_schedule = round_schedule + [round_candidate]
             result = self.aurror(margin, alpha, new_round_schedule)
@@ -131,6 +132,13 @@ class AurrorAudit():
                 round_min = round_candidate
                 round_candidate = 2 * round_min
 
+        # the main loop:
+        # * we have round_min (for which the probability of stopping is smaller than quant), and
+        # * we have round_max (for which the probability of stopping is larger than quant)
+        # we perform binary search to find a candidate (round_candidate) for the next round size
+        # It may happen that this value:
+        # * will not be the first round size that satisfied our requirement
+        # * it may(?)  be slightly below the quant (because of non-monotonicity)
         while True:
             round_candidate = round((round_max + round_min)/2)
             new_round_schedule = round_schedule + [round_candidate]
@@ -153,6 +161,7 @@ class AurrorAudit():
         #print(str(prob_table))
 
         return {"size" : round_candidate, "prob_stop" : prob_table[-1]}
+    
 
     def find_next_round_sizes(self, margin, alpha, round_schedule, quants):
         '''
