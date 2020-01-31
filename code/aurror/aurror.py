@@ -35,13 +35,21 @@ class AurrorAudit():
         :return: prob_table: the probability distribution at the end of the current round is returned
         """
 
+
+
         prob_table = [0] * (round_size + 1)
-        for i in range(kmin + 1):
+        #TODO: short fix for checking correctness of limit
+        #for i in range(kmin + 1):
+        for i in range(round_size_prev + 1):
             for j in range(round_size + 1):
                 prob_table[j] = prob_table[j] + binom.pmf(j-i, round_size - round_size_prev, (1+margin)/2) * prob_table_prev[i]
 
+        print("\t%s\t%s" % (margin, prob_table_prev))
+        print("\t\t%s" % (prob_table))
         return prob_table
 
+    def bravo(self, margin, alpha, round_schedule):
+        return self.aurror(margin, alpha, list(range(1, round_schedule[-1] + 1)))
 
     def aurror(self, margin, alpha, round_schedule):
         """
@@ -60,18 +68,27 @@ class AurrorAudit():
         number_of_rounds = len(round_schedule)
         prob_table_prev = [1]
         prob_tied_table_prev = [1]
+        #prob_bravo_table_prev = [1]
+        #prob_bravo_tied_table_prev = [1]
         kmins = [0] * number_of_rounds
+        #kmins_bravo = [0] * number_of_rounds
         prob_sum = [0] * number_of_rounds
         prob_tied_sum = [0] * number_of_rounds
+        #prob_bravo_sum = [0] * number_of_rounds
+        #prob_bravo_tied_sum = [0] * number_of_rounds
 
         for round in range(1,number_of_rounds):
+            print("\n%s" % (round))
             prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_table_prev)
             prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_tied_table_prev)
+            print("\n")
 
             kmin_found = False
             kmin_candidate = math.floor(round_schedule[round]/2)
             while kmin_found == False and kmin_candidate <= round_schedule[round]:
-                if alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]):
+                # the following line was fixed (in branch: limit)
+                #if alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]):
+                if alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
                     kmin_found = True
                     kmins[round] = kmin_candidate
                     prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]

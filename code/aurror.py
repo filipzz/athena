@@ -23,8 +23,11 @@ if (__name__ == '__main__'):
     parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
     parser.add_argument("-l", "--load", help="set the election to read")
+    parser.add_argument("--type", help="set the audit type (BRAVO/AURROR)")
     parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+", type=int)
     args = parser.parse_args()
+
+    audit_type = "AURROR"
 
     if args.version:
         print("AURROR version 0.3")
@@ -36,6 +39,10 @@ if (__name__ == '__main__'):
         if alpha < 0.0 or alpha > 1.0:
             print("Value of alpha is incorrect")
             sys.exit(2)
+
+        if args.type:
+            if args.type == "bravo" or args.type == "BRAVO":
+                audit_type = "BRAVO"
 
         if args.ballots:
             results = args.ballots
@@ -151,23 +158,29 @@ if (__name__ == '__main__'):
 
                 #print(str(rs))
 
-                print("\n\tApprox round schedule:\t" + str(rs))
 
                 margin = (2 * winner - bc)/bc
 
                 audit_object = AurrorAudit()
-                audit_aurror = audit_object.aurror(margin, alpha, rs)
+                if audit_type == "bravo" or audit_type == "BRAVO":
+                    audit_aurror = audit_object.bravo(margin, alpha, rs)
+                else:
+                    audit_aurror = audit_object.aurror(margin, alpha, rs)
                 #print(str(audit_aurror))
                 kmins = audit_aurror["kmins"]
                 prob_sum = audit_aurror["prob_sum"]
                 prob_tied_sum = audit_aurror["prob_tied_sum"]
-                print("\tAurror kmins:\t\t" + str(kmins))
-                print("\tAurror pstop (tied): \t" + str(prob_tied_sum))
-                print("\tAurror pstop (audit):\t" + str(prob_sum))
+                print("\n\tApprox round schedule:\t" + str(rs))
+                print("\t%s kmins:\t\t%s" % (audit_type, str(kmins)))
+                print("\t%s pstop (tied): \t%s" % (audit_type, str(prob_tied_sum)))
+                print("\t%s pstop (audit):\t%s" % (audit_type, str(prob_sum)))
 
                 true_risk = []
                 for p, pt in zip(prob_sum, prob_tied_sum):
-                    true_risk.append(pt/p)
+                    if p == 0:
+                        true_risk.append(0.0)
+                    else:
+                        true_risk.append(pt/p)
                 print("\tAurror true risk:\t" + str(true_risk))
 
                 #x = audit_object.find_next_round_size(margin, alpha, rs, .7, 100)
