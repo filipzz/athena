@@ -41,7 +41,7 @@ if (__name__ == '__main__'):
             sys.exit(2)
 
         if args.type:
-            if args.type == "bravo" or args.type == "BRAVO":
+            if (args.type).lower() == "bravo" or (args.type).lower() == "wald":
                 audit_type = "BRAVO"
 
         if args.ballots:
@@ -181,7 +181,7 @@ if (__name__ == '__main__'):
                         true_risk.append(0.0)
                     else:
                         true_risk.append(pt/p)
-                print("\tAurror true risk:\t" + str(true_risk))
+                print("\t%s true risk:\t%s" % (audit_type, str(true_risk)))
 
                 #x = audit_object.find_next_round_size(margin, alpha, rs, .7, 100)
                 #print(str(x))

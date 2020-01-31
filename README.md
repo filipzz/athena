@@ -108,6 +108,25 @@ A (60000) vs B (40000)
 	Aurror true risk:	[0.08681725584196939, 0.09406770207590148]
 ```
 
+## Wald's sequential test
+
+Wald's sequential test (BRAVO audit) can be seen as a special case of AURROR.
+AURROR with round schedule **[1, 2, 3, ..., max]** is the same as Wald's sequential
+test that stops after up to **max** ballots checked.
+
+Calling:
+
+```bash
+python3 aurror.py -n asd -b 6000 4000  --rounds 17 --type BRAVO
+```
+
+Is equivalent to calling:
+
+```bash
+python3 aurror.py -n asd -b 6000 4000  --rounds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+```
+
+
 ## Help
 
 ```

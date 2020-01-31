@@ -40,7 +40,7 @@ def print_election(election_info):
         print("\t%s %s\t%s" % (i, candidate, ballots))
     #print("(Declared) Votes for winner: " + str(winner))
     #print("Margin: " + str(margin))
-    print("\nAURROR parameters: ")
+    print("\nParameters: ")
     print("Alpha:  " + str(election_info["alpha"]))
     print("Model:  " + str(election_info["model"]))
 
