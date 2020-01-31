@@ -12,8 +12,14 @@ class AurrorAudit():
     next_round_prob(self, margin, round_size_prev, round_size, kmin, prob_table_prev)
         Computed the distribution probability at the end of the next round
 
+    audit(self, audit_type, margin, alpha, round_schedule)
+        Computes probabilities of stopping, risk and kmins for given parameters and audit_type
+
     aurror(self, margin, alpha, round_schedule)
-        Computes probabilities of stopping, risk and kmins for given parameters
+        Computes parameters for AURROR audit
+
+    arlo(self, margin, alpha, round_schedule)
+        Computes parameters for ARLO audit
 
     bravo(self, margin, alpha, round_schedule)
         Computes parameters for BRAVO audit
@@ -51,9 +57,15 @@ class AurrorAudit():
         #print("\t\t%s" % (prob_table))
         return prob_table
 
+    def aurror(self, margin, alpha, round_schedule):
+        """
+        Sets audit_type to **aurror** and calls audit(...) method
+        """
+        return self.audit("aurror", margin, alpha, round_schedule)
+
     def bravo(self, margin, alpha, round_schedule):
         """
-        Function simply calls aurror(...) audit method but as a round schedule a list of [1, 2, 3, ..., max] is given.
+        Function simply calls aurror(...) method but as a round schedule a list of [1, 2, 3, ..., max] is given.
         For more info, see aurror(...) method.
 
         Parameters
@@ -62,7 +74,14 @@ class AurrorAudit():
         """
         return self.aurror(margin, alpha, list(range(1, round_schedule[-1] + 1)))
 
-    def aurror(self, margin, alpha, round_schedule):
+
+    def arlo(self, margin, alpha, round_schedule):
+        """
+        Sets audit type to **arlo** and calls audit(...) method
+        """
+        return self.audit("arlo", margin, alpha, round_schedule)
+
+    def audit(self, audit_type, margin, alpha, round_schedule):
         """
         Parameters
         ----------
@@ -97,15 +116,22 @@ class AurrorAudit():
             kmin_found = False
             kmin_candidate = math.floor(round_schedule[round]/2)
             while kmin_found == False and kmin_candidate <= round_schedule[round]:
-                # the following line was fixed (in branch: limit)
-                #if alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]):
-                if alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
-                    kmin_found = True
-                    kmins[round] = kmin_candidate
-                    prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
-                    prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
-                else:
-                    kmin_candidate = kmin_candidate + 1
+                if audit_type == "aurror": #but this also works for bravo
+                    if alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
+                        kmin_found = True
+                        kmins[round] = kmin_candidate
+                        prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
+                        prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
+                    else:
+                        kmin_candidate = kmin_candidate + 1
+                elif audit_type == "arlo":
+                    if alpha * ((prob_table[kmin_candidate])) >= ((prob_tied_table[kmin_candidate])):
+                        kmin_found = True
+                        kmins[round] = kmin_candidate
+                        prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
+                        prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
+                    else:
+                        kmin_candidate = kmin_candidate + 1
 
             # cleaning prob_table/prob_tied_table
             for i in range(kmin_candidate, round_schedule[round] + 1):
@@ -116,6 +142,8 @@ class AurrorAudit():
             prob_tied_table_prev = prob_tied_table
 
         return {"kmins" : kmins[1:len(kmins)], "prob_sum" : prob_sum[1:len(prob_sum)], "prob_tied_sum" : prob_tied_sum[1:len(prob_tied_sum)]}
+
+
 
     def find_next_round_size(self, margin, alpha, round_schedule, quant, round_min):
         """

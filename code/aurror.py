@@ -43,6 +43,8 @@ if (__name__ == '__main__'):
         if args.type:
             if (args.type).lower() == "bravo" or (args.type).lower() == "wald":
                 audit_type = "BRAVO"
+            elif (args.type).lower() == "arlo":
+                audit_type = "ARLO"
 
         if args.ballots:
             results = args.ballots
@@ -162,8 +164,10 @@ if (__name__ == '__main__'):
                 margin = (2 * winner - bc)/bc
 
                 audit_object = AurrorAudit()
-                if audit_type == "bravo" or audit_type == "BRAVO":
+                if audit_type.lower() == "bravo" or audit_type.lower() == "wald":
                     audit_aurror = audit_object.bravo(margin, alpha, rs)
+                elif audit_type.lower() == "arlo":
+                    audit_aurror = audit_object.arlo(margin, alpha, rs)
                 else:
                     audit_aurror = audit_object.aurror(margin, alpha, rs)
                 #print(str(audit_aurror))

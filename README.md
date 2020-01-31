@@ -13,11 +13,12 @@ where:
 
 - **--ballots** is a list of votes each candidate received
 - **--round_schedule** is the round schedule for the audit
+- **--type** is an optional argument that lets one see result of different audity types Aurrror (default) | Bravo/Wald | Arlo
 
 and with shorter parameternames:
 
 ```bash
-python3 code/aurror.py -n raceName -b 5000 3000 2000  -r 100 200
+python3 code/aurror.py -n raceName -b 5000 3000 2000  -r 100 200 --type arlo
 ```
 
 ## Finding stopping probabilities
@@ -82,7 +83,7 @@ round schedule: [132]
 	0.8	[132, 280]
 ```
 
-To get obtain detailed information about a selected round schedule (e.g., [132 280])
+To get obtain detailed information about a selected round schedule (e.g., [132, 280])
 one needs to call it without **--pstop** parameter.
 
 ```bash
