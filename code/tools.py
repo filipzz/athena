@@ -1,6 +1,16 @@
 import numpy as np
 import codecs, json
 
+def find_ratio(a, b):
+    ratio = []
+    for aa, bb in zip(a, b):
+        if bb == 0:
+            ratio.append(0.0)
+        else:
+            ratio.append(aa/bb)
+    return ratio
+
+
 def read_table(file_to_read):
     with open(file_to_read, 'r') as f:
         data = json.load(f)

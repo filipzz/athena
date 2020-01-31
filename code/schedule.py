@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import binom
 import math
 
-import tools as tools
+import tools
 
 
 
@@ -34,7 +34,7 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
     max_number_of_rounds = len(round_schedule)
     upper_limit = round_schedule[max_number_of_rounds - 1]
     #pTableRbR = [S("0")] * (max_number_of_rounds)
-    max = rla.bravo_kmin(ballots_cast, winner, alpha, upper_limit)
+    max = rla.bravo_kmin(ballots_cast, winner, alpha, upper_limit) + 1
     #p_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(max)]
     #r_table_c_rbr = [[S("0")] * (max_number_of_rounds)  for i in range(max)]
     #TODO: table_size = max/upper_limit - for "reasonable" risk_goal (e.g., following bravo risk schedule) table_size = max will be smaller than bravo_kmin
@@ -201,7 +201,7 @@ def find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal):
             #in charlie we change
             #if (1 - (risk_spent_so_far)) < (risk_goal[i]):
             #if (sum_risk + next_risk)/(sum_pstop + next_pstop) <= alpha:
-            if risk_spent[i]/prob_stop[i] < alpha:
+            if risk_spent[i] < prob_stop[i] * alpha:
                 #print("\tstop")
                 kmin_new[i] = k + 1
                 correct_risk_level = 0
@@ -287,11 +287,12 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
 
     avg = avg_star + (1 - prev_prob) * ballots_cast
 
+
     if verbosity > 0:
         print("\n\tBRAVO kmins: \t" + str(kmins_bravo))
         print("\tBRAVO risk: \t" + str(risk_goal))
         print("\tBRAVO pstop: \t" + str(prob_stop_bravo))
-        print("\t--- ratio:\t" + str(risk_goal / prob_stop_bravo))
+        print("\t--- ratio:\t" + str(tools.find_ratio(risk_goal, prob_stop_bravo)))
         print("\t\tAVG:\t" + str(avg))
         print("\t\tAVG*:\t" + str(avg_star))
 
@@ -304,7 +305,7 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
         print("\n\tARLO kmins:\t" + str(kmins_bravo))
         print("\tARLO risk:\t" + str(risk_spent_arlo))
         print("\tARLO pstop:\t" + str(prob_stop_arlo))
-        print("\t--- ratio:\t" + str(risk_spent_arlo / prob_stop_arlo))
+        print("\t--- ratio:\t" + str(tools.find_ratio(risk_spent_arlo,  prob_stop_arlo)))
 
 
 
@@ -324,11 +325,14 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
         print("\n\tAurror kmins:\t" + str(kmin_new))
         print("\tAurror risk:\t" + str(risk_spent))
         print("\tAurror pstop:\t" + str(prob_stop))
-        print("\t--- true risk:\t" + str(risk_spent / prob_stop))
+        print("\t--- true risk:\t" + str(tools.find_ratio(risk_spent,  prob_stop)))
         #print("\t\tAVG:\t" + str(aurror["avg"]))
         #print("\t\tAVG*:\t" + str(aurror["avg_star"]))
 
     return {"kmin_new" : kmin_new, "risk_spent": risk_spent, "prob_stop": prob_stop, "avg" : aurror["avg"], "avg_star": aurror["avg_star"], "bravo": bravo_parameters}
+
+
+
 
 '''
     This version of finding kmins is different:
@@ -356,7 +360,7 @@ def find_aurror_proper_params_from_schedule(ballots_cast, winner, alpha, model, 
         print("\n\tAurror* kmins:\t" + str(kmin_new))
         print("\tAurror* risk:\t" + str(risk_spent))
         print("\tAurror* pstop:\t" + str(prob_stop))
-        print("\t--- ratio:\t" + str(risk_spent / prob_stop))
+        print("\t--- ratio:\t" + str(tools.find_ratio(risk_spent, prob_stop)))
 
 
     return {"kmin_new" : kmin_new, "risk_spent": risk_spent, "prob_stop": prob_stop}

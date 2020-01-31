@@ -143,14 +143,20 @@ def next_round_risk(ballots_cast, winner, alpha, n, goal, dist, prevround_size, 
         next_pstop = binom.pmf(i, n, winner/ballots_cast)
         #if nextProb < goal - sum:
         #print(str(i+1) + "\t" + str(sum_risk) + "\t" + str(sum_pstop) + "\t" + str(sum_risk/sum_pstop))
-        if (sum_risk + next_risk)/(sum_pstop + next_pstop) <= alpha:
+        #TODO: inequality wash changed from <= to <
+        if (sum_risk + next_risk) < alpha * (sum_pstop + next_pstop):
             sum_risk = sum_risk + next_risk
             sum_pstop = sum_pstop + next_pstop
             i = i - 1
         else:
             correctRisk = 0
 
-    return {"sum" : sum_risk/sum_pstop, "kmin" : i+1, "sum_risk" : sum_risk, "sum_pstop" : sum_pstop}
+    if sum_pstop == 0.0:
+        sum = 0.0
+    else:
+        sum = sum_risk/sum_pstop
+
+    return {"sum" : sum, "kmin" : i+1, "sum_risk" : sum_risk, "sum_pstop" : sum_pstop}
 
 
 
