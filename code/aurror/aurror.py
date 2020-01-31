@@ -15,6 +15,9 @@ class AurrorAudit():
     aurror(self, margin, alpha, round_schedule)
         Computes probabilities of stopping, risk and kmins for given parameters
 
+    bravo(self, margin, alpha, round_schedule)
+        Computes parameters for BRAVO audit
+
     find_next_round_size(self, margin, alpha, round_schedule, quant, round_min)
         Computes expected round size such that audit would end with probability quant
 
@@ -44,11 +47,19 @@ class AurrorAudit():
             for j in range(round_size + 1):
                 prob_table[j] = prob_table[j] + binom.pmf(j-i, round_size - round_size_prev, (1+margin)/2) * prob_table_prev[i]
 
-        print("\t%s\t%s" % (margin, prob_table_prev))
-        print("\t\t%s" % (prob_table))
+        #print("\t%s\t%s" % (margin, prob_table_prev))
+        #print("\t\t%s" % (prob_table))
         return prob_table
 
     def bravo(self, margin, alpha, round_schedule):
+        """
+        Function simply calls aurror(...) audit method but as a round schedule a list of [1, 2, 3, ..., max] is given.
+        For more info, see aurror(...) method.
+
+        Parameters
+        ----------
+        :param round_schedule: is a list of increasing natural numbers that correspond to number of relevant votes drawn
+        """
         return self.aurror(margin, alpha, list(range(1, round_schedule[-1] + 1)))
 
     def aurror(self, margin, alpha, round_schedule):
@@ -78,10 +89,10 @@ class AurrorAudit():
         #prob_bravo_tied_sum = [0] * number_of_rounds
 
         for round in range(1,number_of_rounds):
-            print("\n%s" % (round))
+            #print("\n%s" % (round))
             prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_table_prev)
             prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_tied_table_prev)
-            print("\n")
+            #print("\n")
 
             kmin_found = False
             kmin_candidate = math.floor(round_schedule[round]/2)
