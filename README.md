@@ -68,7 +68,7 @@ Number of valid ballots: 100000
 	1 A	60000
 	2 B	40000
 
-AURROR parameters: 
+Parameters: 
 Alpha:  0.1
 Model:  bin
 Round schedule: [132]
@@ -79,34 +79,60 @@ A (60000) vs B (40000)
 	margin:	0.2
 pstop goal: [0.5, 0.8]
 round schedule: [132]
-	0.5	[132, 192]
-	0.8	[132, 280]
+	0.5	[132, 224]
+	0.8	[132, 297]
 ```
 
-To get obtain detailed information about a selected round schedule (e.g., [132, 280])
+To get obtain detailed information about a selected round schedule (e.g., [132, 297])
 one needs to call it without **--pstop** parameter.
 
 ```bash
-python3 aurror.py -n asd -b 60000 40000 --rounds 132 280
+python3 aurror.py -n asd -b 60000 40000 --rounds 132 297
 Results of: asd
 Number of valid ballots: 100000
 	1 A	60000
 	2 B	40000
 
-AURROR parameters: 
+Parameters: 
 Alpha:  0.1
 Model:  bin
-Round schedule: [132, 280]
+Round schedule: [132, 297]
 
 
 A (60000) vs B (40000)
 	margin:	0.2
 
-	Approx round schedule:	[132, 280]
-	Aurror kmins:		[75, 155]
-	Aurror pstop (tied): 	[0.06933400321906029, 0.09040099920866383]
-	Aurror pstop (audit):	[0.798620073240586, 0.9610205970134249]
-	Aurror true risk:	[0.08681725584196939, 0.09406770207590148]
+	Approx round schedule:	[132, 297]
+	AURROR kmins:		[75, 165]
+	AURROR pstop (tied): 	[0.06933400321906029, 0.08488117767255854]
+	AURROR pstop (audit):	[0.798620073240586, 0.9604763404354484]
+	AURROR true risk:	[0.08681725584196939, 0.08837404327323274]
+```
+
+At the end we may want to check how, for that round schedule Arlo audit would work
+
+```bash
+python3 aurror.py -n asd -b 60000 40000 --rounds 132 297 --type arlo
+Results of: asd
+Number of valid ballots: 100000
+	1 A	60000
+	2 B	40000
+
+Parameters: 
+Alpha:  0.1
+Model:  bin
+Round schedule: [132, 297]
+
+
+A (60000) vs B (40000)
+	margin:	0.2
+
+	Approx round schedule:	[132, 297]
+	ARLO kmins:		[79, 170]
+	ARLO pstop (tied): 	[0.014585813499702633, 0.019495722498663753]
+	ARLO pstop (audit):	[0.5517707405988952, 0.8681144359578332]
+	ARLO true risk:	[0.026434554111860128, 0.022457549017893208]
+
 ```
 
 ## Wald's sequential test
@@ -137,10 +163,11 @@ python3 code/aurror.py -h
 returns:
 
 ```
-usage: aurror.py [-h] [-v] [-n NEW] [-a ALPHA] [-t TOTAL]
+usage: aurror.py [-h] [-v] [-n NEW] [-a ALPHA]
                  [-c [CANDIDATES [CANDIDATES ...]]]
-                 [-b [BALLOTS [BALLOTS ...]]] [-r ROUNDS [ROUNDS ...]]
-                 [-w WINNERS] [-e ELECTION]
+                 [-b [BALLOTS [BALLOTS ...]]] [-t TOTAL]
+                 [-r ROUNDS [ROUNDS ...]] [-p PSTOP [PSTOP ...]] [-w WINNERS]
+                 [-l LOAD] [--type TYPE] [-e RISK [RISK ...]]
 
 This program lets for computing AURROR parameters.
 
@@ -150,18 +177,23 @@ optional arguments:
   -n NEW, --new NEW     creates new election folder where all data are stored
   -a ALPHA, --alpha ALPHA
                         set alpha (risk limit) for the election
-  -t TOTAL, --total TOTAL
-                        set number of valid ballots cast
   -c [CANDIDATES [CANDIDATES ...]], --candidates [CANDIDATES [CANDIDATES ...]]
                         set the candidate list (names)
   -b [BALLOTS [BALLOTS ...]], --ballots [BALLOTS [BALLOTS ...]]
                         set the list of ballots cast for every candidate
-  -r ROUNDS [ROUNDS ...], -rs ROUNDS [ROUNDS ...], --rounds ROUNDS [ROUNDS ...], --round_schedule ROUNDS [ROUNDS ...]
+  -t TOTAL, --total TOTAL
+                        set the total number of ballots in given contest
+  -r ROUNDS [ROUNDS ...], --rounds ROUNDS [ROUNDS ...], --round_schedule ROUNDS [ROUNDS ...]
                         set the round schedule
+  -p PSTOP [PSTOP ...], --pstop PSTOP [PSTOP ...]
+                        set stopping probability goals for each round
+                        (corresponding round schedule will be found)
   -w WINNERS, --winners WINNERS
                         set number of winners for the given race
-  -e ELECTION, --election ELECTION
-                        set the election to read
+  -l LOAD, --load LOAD  set the election to read
+  --type TYPE           set the audit type (BRAVO/AURROR)
+  -e RISK [RISK ...], --risk RISK [RISK ...], --evaluate_risk RISK [RISK ...]
+                        evaluate risk for given audit results
 ```
 
 ## Sample output
