@@ -98,14 +98,9 @@ class AurrorAudit():
         number_of_rounds = len(round_schedule)
         prob_table_prev = [1]
         prob_tied_table_prev = [1]
-        #prob_bravo_table_prev = [1]
-        #prob_bravo_tied_table_prev = [1]
         kmins = [0] * number_of_rounds
-        #kmins_bravo = [0] * number_of_rounds
         prob_sum = [0] * number_of_rounds
         prob_tied_sum = [0] * number_of_rounds
-        #prob_bravo_sum = [0] * number_of_rounds
-        #prob_bravo_tied_sum = [0] * number_of_rounds
 
         for round in range(1,number_of_rounds):
             #print("\n%s" % (round))
@@ -117,7 +112,8 @@ class AurrorAudit():
             kmin_candidate = math.floor(round_schedule[round]/2)
             while kmin_found == False and kmin_candidate <= round_schedule[round]:
                 if audit_type == "aurror": #but this also works for bravo
-                    if alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
+                    # prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added
+                    if prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
                         kmin_found = True
                         kmins[round] = kmin_candidate
                         prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
