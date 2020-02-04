@@ -46,7 +46,7 @@ class AurrorAudit():
         """
 
         prob_table = [0] * (round_size + 1)
-        '# ' TODO: short fix for checking correctness of limit
+        '#  TODO: short fix for checking correctness of limit'
         for i in range(round_size_prev + 1):
             for j in range(round_size + 1):
                 prob_table[j] = prob_table[j] + binom.pmf(j-i, round_size - round_size_prev, (1+margin)/2) * prob_table_prev[i]
@@ -104,9 +104,9 @@ class AurrorAudit():
             kmin_found = False
             kmin_candidate = math.floor(round_schedule[round]/2)
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
-                '# ' but this also works for bravo
+                '# but this also works for bravo'
                 if audit_type == "aurror":
-                    '# ' prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added
+                    '# prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added'
                     if prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
                         kmin_found = True
                         kmins[round] = kmin_candidate
