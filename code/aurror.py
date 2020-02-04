@@ -1,19 +1,15 @@
-import sys, argparse
+import sys
+import argparse
 import string
 import math
 import tools
 from aurror.aurror import AurrorAudit
 
-
-
-
-
-
 if (__name__ == '__main__'):
 
     info_text = 'This program lets for computing AURROR parameters.'
     parser = argparse.ArgumentParser(description=info_text)
-    parser.add_argument("-v","-V", "--version", help="shows program version", action="store_true")
+    parser.add_argument("-v", "-V", "--version", help="shows program version", action="store_true")
     parser.add_argument("-n", "--new", help="creates new election folder where all data are stored")
     parser.add_argument("-a", "--alpha", help="set alpha (risk limit) for the election", type=float, default=0.1)
     parser.add_argument("-c", "--candidates", help="set the candidate list (names)", nargs="*")
@@ -93,9 +89,6 @@ if (__name__ == '__main__'):
             print("Missing -r / --rounds argument")
             sys.exit(2)
 
-
-
-
         if args.winners:
             winners = args.winners
             if winners >= len(candidates):
@@ -104,18 +97,13 @@ if (__name__ == '__main__'):
 
         eval_risk = ""
         if args.risk:
-            #if len(args.risk) <= len(args.ballots):
             eval_risk = "true"
             actual_kmins = args.risk
-            #else:
-            #    print("Number of results is larger than the number of rounds.")
-            #    sys.exit(2)
 
     elif args.load:
         mode = "read"
     else:
         print("Call python3 aurror.py -h for help")
-
 
     model = "bin"
     election = {}
@@ -128,14 +116,9 @@ if (__name__ == '__main__'):
     election["model"] = model
     election["pstop"] = pstop_goal
     election["round_schedule"] = round_schedule
-    #election["round_schedule_expected"] = map(round, (sum(results)/ballots_cast) * round_schedule)
     save_to = "elections/" + name
 
-
-
-
     tools.print_election(election)
-
 
     print("Round schedule: " + str(round_schedule))
 
@@ -153,13 +136,9 @@ if (__name__ == '__main__'):
                 print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
                 rs = []
 
-                #print(str(round_schedule))
                 for x in round_schedule:
                     y = math.floor(x * bc / ballots_cast)
                     rs.append(y)
-
-                #print(str(rs))
-
 
                 margin = (2 * winner - bc)/bc
 
@@ -170,7 +149,6 @@ if (__name__ == '__main__'):
                     audit_aurror = audit_object.arlo(margin, alpha, rs)
                 else:
                     audit_aurror = audit_object.aurror(margin, alpha, rs)
-                #print(str(audit_aurror))
                 kmins = audit_aurror["kmins"]
                 prob_sum = audit_aurror["prob_sum"]
                 prob_tied_sum = audit_aurror["prob_tied_sum"]
@@ -186,10 +164,6 @@ if (__name__ == '__main__'):
                     else:
                         true_risk.append(pt/p)
                 print("\t%s true risk:\t%s" % (audit_type, str(true_risk)))
-
-                #x = audit_object.find_next_round_size(margin, alpha, rs, .7, 100)
-                #print(str(x))
-
 
     elif mode_rounds == "pstop":
         print("setting round schedule")
@@ -209,13 +183,10 @@ if (__name__ == '__main__'):
                     y = math.floor(x * bc / ballots_cast)
                     rs.append(y)
 
-
                 margin = (2 * winner - bc)/bc
 
                 audit_object = AurrorAudit()
-                #audit_aurror = audit_object.aurror(margin, alpha, rs)
 
                 print("pstop goal: " + str(pstop_goal))
                 print("round schedule: " + str(rs))
                 x = audit_object.find_next_round_sizes(margin, alpha, rs, pstop_goal)
-
