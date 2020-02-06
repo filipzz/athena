@@ -12,6 +12,7 @@ if (__name__ == '__main__'):
     parser.add_argument("-v", "-V", "--version", help="shows program version", action="store_true")
     parser.add_argument("-n", "--new", help="creates new election folder where all data are stored")
     parser.add_argument("-a", "--alpha", help="set alpha (risk limit) for the election", type=float, default=0.1)
+    parser.add_argument("-g", "--gamma", help="set gamma (upset limit) for the audit", type=float, default=1.0)
     parser.add_argument("-c", "--candidates", help="set the candidate list (names)", nargs="*")
     parser.add_argument("-b", "--ballots", help="set the list of ballots cast for every candidate", nargs="*", type=int)
     parser.add_argument("-t", "--total", help="set the total number of ballots in given contest", type=int)
@@ -36,6 +37,11 @@ if (__name__ == '__main__'):
             print("Value of alpha is incorrect")
             sys.exit(2)
 
+        gamma = args.gamma
+        if gamma < 0.0:
+            print("Value of camma is not correct")
+            sys.exit(2)
+
         if args.type:
             if (args.type).lower() == "bravo" or (args.type).lower() == "wald":
                 audit_type = "BRAVO"
@@ -54,6 +60,7 @@ if (__name__ == '__main__'):
         else:
             print("Missing -b / --ballots argument")
             sys.exit(2)
+
 
         if args.candidates:
             candidates = args.candidates
@@ -109,6 +116,7 @@ if (__name__ == '__main__'):
     election = {}
     election["ballots_cast"] = ballots_cast
     election["alpha"] = alpha
+    election["gamma"] = gamma
     election["candidates"] = candidates
     election["results"] = results
     election["winners"] = winners
@@ -148,7 +156,7 @@ if (__name__ == '__main__'):
                 elif audit_type.lower() == "arlo":
                     audit_aurror = audit_object.arlo(margin, alpha, rs)
                 else:
-                    audit_aurror = audit_object.aurror(margin, alpha, rs)
+                    audit_aurror = audit_object.aurror(margin, alpha, gamma, rs)
                 kmins = audit_aurror["kmins"]
                 prob_sum = audit_aurror["prob_sum"]
                 prob_tied_sum = audit_aurror["prob_tied_sum"]
@@ -189,4 +197,4 @@ if (__name__ == '__main__'):
 
                 print("pstop goal: " + str(pstop_goal))
                 print("round schedule: " + str(rs))
-                x = audit_object.find_next_round_sizes(margin, alpha, rs, pstop_goal)
+                x = audit_object.find_next_round_sizes(margin, alpha, gamma, rs, pstop_goal)

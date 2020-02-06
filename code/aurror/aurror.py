@@ -53,11 +53,11 @@ class AurrorAudit():
 
         return prob_table
 
-    def aurror(self, margin, alpha, round_schedule):
+    def aurror(self, margin, alpha, gamma, round_schedule):
         """
         Sets audit_type to **aurror** and calls audit(...) method
         """
-        return self.audit("aurror", margin, alpha, round_schedule)
+        return self.audit("aurror", margin, alpha, gamma, round_schedule)
 
     def bravo(self, margin, alpha, round_schedule):
         """
@@ -68,20 +68,21 @@ class AurrorAudit():
         ----------
         :param round_schedule: is a list of increasing natural numbers that correspond to number of relevant votes drawn
         """
-        return self.aurror(margin, alpha, list(range(1, round_schedule[-1] + 1)))
+        return self.aurror(margin, alpha, alpha, list(range(1, round_schedule[-1] + 1)))
 
     def arlo(self, margin, alpha, round_schedule):
         """
         Sets audit type to **arlo** and calls audit(...) method
         """
-        return self.audit("arlo", margin, alpha, round_schedule)
+        return self.audit("arlo", margin, alpha, alpha, round_schedule)
 
-    def audit(self, audit_type, margin, alpha, round_schedule):
+    def audit(self, audit_type, margin, alpha, gamma, round_schedule):
         """
         Parameters
         ----------
         :param margin: margin of a given race (float in [0, 1])
         :param alpha: is the risk limit (float in (0, 1))
+        :param gamma: is the
         :param round_schedule: is a list of increasing natural numbers that correspond to number of relevant votes drawn
         :return:
 
@@ -104,10 +105,9 @@ class AurrorAudit():
             kmin_found = False
             kmin_candidate = math.floor(round_schedule[round]/2)
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
-                '# but this also works for bravo'
                 if audit_type == "aurror":
                     '# prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added'
-                    if prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
+                    if gamma * prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
                         kmin_found = True
                         kmins[round] = kmin_candidate
                         prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
@@ -133,7 +133,7 @@ class AurrorAudit():
 
         return {"kmins": kmins[1:len(kmins)], "prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)]}
 
-    def find_next_round_size(self, margin, alpha, round_schedule, quant, round_min):
+    def find_next_round_size(self, margin, alpha, gamma, round_schedule, quant, round_min):
         """
         For given audit parameters, computes the expected size of the next round.
 
@@ -141,6 +141,7 @@ class AurrorAudit():
         ----------
         :param margin: margin for that race
         :param alpha: risk limit
+        :param gamma: gamma parameter
         :param round_schedule: round schedule
         :param quant: desired probability of stopping in the next round
         :param round_min: min size of the next round
@@ -160,7 +161,7 @@ class AurrorAudit():
         # first loop tries to find round size that is large enough to have the probability of stopping larger than quant
         while True:
             new_round_schedule = round_schedule + [round_candidate]
-            result = self.aurror(margin, alpha, new_round_schedule)
+            result = self.aurror(margin, alpha, gamma, new_round_schedule)
             prob_table = result["prob_sum"]
 
             if self.relative_prob(prob_table) >= quant:
@@ -180,7 +181,7 @@ class AurrorAudit():
         while True:
             round_candidate = round((round_max + round_min)/2)
             new_round_schedule = round_schedule + [round_candidate]
-            result = self.aurror(margin, alpha, new_round_schedule)
+            result = self.aurror(margin, alpha, gamma, new_round_schedule)
             prob_table = result["prob_sum"]
 
             if self.relative_prob(prob_table) <= quant:
@@ -194,7 +195,7 @@ class AurrorAudit():
 
         return {"size": round_candidate, "prob_stop": prob_table[-1]}
 
-    def find_next_round_sizes(self, margin, alpha, round_schedule, quants):
+    def find_next_round_sizes(self, margin, alpha, gamma, round_schedule, quants):
         '''
         For a given list of possible stopping probabilities (called quants e.g., quants = [.7, .8, .9]) returns a list of
         next round sizes  for which probability of stoping is larger than quants
@@ -212,7 +213,7 @@ class AurrorAudit():
         round_candidate = 10
         rounds = []
         for quant in quants:
-            results = self.find_next_round_size(margin, alpha, round_schedule, quant, round_candidate)
+            results = self.find_next_round_size(margin, alpha, gamma, round_schedule, quant, round_candidate)
             new_round = results["size"]
             new_round_schedule = round_schedule + [new_round]
             print("\t" + str(quant) + "\t" + str(new_round_schedule))
