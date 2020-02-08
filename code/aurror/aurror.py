@@ -33,21 +33,36 @@ class AurrorAudit():
 
     """
 
-    def next_round_prob(self, margin, round_size_prev, round_size, kmin, prob_table_prev):
+    def next_round_prob(self, margin, round_size_prev, round_size, kmin_first, kmin, prob_table_prev):
         """
         Parameters
         ----------
         :param margin: margin of a given race (float in [0, 1])
         :param round_size_prev: the size of the previous round
         :param round_size: the size of the current round
+        :param kmin_first: the kmin for the first round
         :param kmin: the value of previous kmin
         :param prob_table_prev: the probability distribution at the begining of the current round
         :return: prob_table: the probability distribution at the end of the current round is returned
         """
 
+
         prob_table = [0] * (round_size + 1)
+        """
+        The following simple code:        
         for i in range(kmin + 1):
             for j in range(min(round_size + 1, round_size - round_size_prev + kmin + 1)):
+                prob_table[j] = prob_table[j] + binom.pmf(j-i, round_size - round_size_prev, (1+margin)/2) * prob_table_prev[i]
+        is optimized in the following way:
+        """
+
+        '# Part I: only j that are smaller than first round kmin'
+        for j in range(kmin_first):
+            prob_table[j] = binom.pmf(j, round_size, (1+margin)/2)
+
+        '# Part II: j that are greater than'
+        for j in range(kmin_first, min(round_size + 1, round_size - round_size_prev + kmin + 1)):
+            for i in range(max(0, j - round_size + round_size_prev), min(j+1, kmin + 1)):
                 prob_table[j] = prob_table[j] + binom.pmf(j-i, round_size - round_size_prev, (1+margin)/2) * prob_table_prev[i]
 
         return prob_table
@@ -103,8 +118,8 @@ class AurrorAudit():
         kmin_tries_total = 0
 
         for round in range(1, number_of_rounds):
-            prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_table_prev)
-            prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], kmins[round - 1], prob_tied_table_prev)
+            prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], kmins[0], kmins[round - 1], prob_table_prev)
+            prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], kmins[0], kmins[round - 1], prob_tied_table_prev)
 
             kmin_found = False
             ' # a different approach to looking for kmin'
@@ -145,7 +160,7 @@ class AurrorAudit():
             prob_tied_table_prev = prob_tied_table
 
         print("Kmin tries total %s" % (kmin_tries_total))
-        return {"kmins": kmins[1:len(kmins)], "prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "gammas": gammas}
+        return {"kmins": kmins[1:len(kmins)], "prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "gammas": gammas[1:len(kmins)]}
 
     def find_next_round_size(self, margin, alpha, gamma, round_schedule, quant, round_min):
         """
