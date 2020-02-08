@@ -160,10 +160,13 @@ if (__name__ == '__main__'):
                 kmins = audit_aurror["kmins"]
                 prob_sum = audit_aurror["prob_sum"]
                 prob_tied_sum = audit_aurror["prob_tied_sum"]
+                gammas = audit_aurror["gammas"]
                 print("\n\tApprox round schedule:\t" + str(rs))
                 print("\t%s kmins:\t\t%s" % (audit_type, str(kmins)))
-                print("\t%s pstop (tied): \t%s" % (audit_type, str(prob_tied_sum)))
                 print("\t%s pstop (audit):\t%s" % (audit_type, str(prob_sum)))
+                print("\t%s pstop (tied): \t%s" % (audit_type, str(prob_tied_sum)))
+                print("\t%s gammas ():\t%s" % (audit_type, str(gammas)))
+
 
                 true_risk = []
                 for p, pt in zip(prob_sum, prob_tied_sum):

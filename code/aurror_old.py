@@ -15,6 +15,7 @@ if (__name__ == '__main__'):
     parser.add_argument("-v","-V", "--version", help="shows program version", action="store_true")
     parser.add_argument("-n", "--new", help="creates new election folder where all data are stored")
     parser.add_argument("-a", "--alpha", help="set alpha (risk limit) for the election", type=float, default=0.1)
+    parser.add_argument("-g", "--gamma", help="set gamma (upset limit) for the audit", type=float, default=1.0)
     parser.add_argument("-c", "--candidates", help="set the candidate list (names)", nargs="*")
     parser.add_argument("-b", "--ballots", help="set the list of ballots cast for every candidate", nargs="*", type=int)
     parser.add_argument("-t", "--total", help="set the total number of ballots in given contest", type=int)
@@ -34,6 +35,11 @@ if (__name__ == '__main__'):
         alpha = args.alpha
         if alpha < 0.0 or alpha > 1.0:
             print("Value of alpha is incorrect")
+            sys.exit(2)
+
+        gamma = args.gamma
+        if gamma < 0.0:
+            print("Value of camma is not correct")
             sys.exit(2)
 
         if args.ballots:
@@ -126,6 +132,7 @@ if (__name__ == '__main__'):
     election["ballots_cast"] = ballots_cast
     #election["margin"] = .1
     election["alpha"] = alpha
+    election["gamma"] = gamma
     #election["winner"] = math.floor((1+margin)*ballots_cast / 2)
     election["candidates"] = candidates
     election["results"] = results
