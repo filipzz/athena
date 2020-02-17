@@ -246,13 +246,13 @@ def find_aurror_params_from_schedule_and_risk(ballots_cast, winner, alpha, model
         print("\n\tARLO risk " + str(risk_spent_arlo))
         print("\tARLO pstop: " + str(prob_stop_arlo))
 
-        print("\n\tAURROR kmins:\t\t" + str(kmin_new))
+        print("\n\tAthena kmins:\t\t" + str(kmin_new))
 
-        print("\tAURROR risk: " + str(risk_spent))
+        print("\tAthena risk: " + str(risk_spent))
 
-        print("\tAURROR pstop: " + str(prob_stop))
-        print("\t\tAVG:\t" + str(aurror["avg"]))
-        print("\t\tAVG*:\t" + str(aurror["avg_star"]))
+        print("\tAthena pstop: " + str(prob_stop))
+        #print("\t\tAVG:\t" + str(aurror["avg"]))
+        #print("\t\tAVG*:\t" + str(aurror["avg_star"]))
 
     return {"kmin_new" : kmin_new, "risk_spent": risk_spent, "prob_stop": prob_stop, "avg" : aurror["avg"], "avg_star": aurror["avg_star"]}
 
@@ -293,8 +293,8 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
         print("\tBRAVO risk: \t" + str(risk_goal))
         print("\tBRAVO pstop: \t" + str(prob_stop_bravo))
         print("\t--- ratio:\t" + str(tools.find_ratio(risk_goal, prob_stop_bravo)))
-        print("\t\tAVG:\t" + str(avg))
-        print("\t\tAVG*:\t" + str(avg_star))
+        #print("\t\tAVG:\t" + str(avg))
+        #print("\t\tAVG*:\t" + str(avg_star))
 
 
     arlo = risk.estimate_rbr_risk(ballots_cast, winner, round_schedule, kmins_bravo)
@@ -322,10 +322,10 @@ def find_aurror_params_from_schedule(ballots_cast, winner, alpha, model, round_s
 
 
     if verbosity > 0:
-        print("\n\tAurror kmins:\t" + str(kmin_new))
-        print("\tAurror risk:\t" + str(risk_spent))
-        print("\tAurror pstop:\t" + str(prob_stop))
-        print("\t--- true risk:\t" + str(tools.find_ratio(risk_spent,  prob_stop)))
+        print("\n\tAthena kmins:\t" + str(kmin_new))
+        print("\tAthena risk:\t" + str(risk_spent))
+        print("\tAthena pstop:\t" + str(prob_stop))
+        print("\t--- ratio:\t" + str(tools.find_ratio(risk_spent,  prob_stop)))
         #print("\t\tAVG:\t" + str(aurror["avg"]))
         #print("\t\tAVG*:\t" + str(aurror["avg_star"]))
 

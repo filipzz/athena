@@ -100,7 +100,7 @@ if (__name__ == '__main__'):
     elif args.load:
         mode = "read"
     else:
-        print("Call python3 aurror.py -h for help")
+        print("Call python3 aurror_old.py -h for help")
 
 
     #     full_cmd_arguments = sys.argv
