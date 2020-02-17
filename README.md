@@ -1,4 +1,4 @@
-# Aurror - AUdit: Risk-limiting and ROund-by-Round
+# Athena - Risk Limiting Audit (Round-by-Round)
 
 
 
