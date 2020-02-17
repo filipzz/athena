@@ -7,7 +7,7 @@
 Typical use:
 
 ```bash
-python3 code/aurror.py --new raceName --ballots 5000 3000 2000 --round_schedule 100 200
+python3 code/athena.py --new raceName --ballots 5000 3000 2000 --round_schedule 100 200
 ```
 where:
 
@@ -18,7 +18,7 @@ where:
 and with shorter parameternames:
 
 ```bash
-python3 code/aurror.py -n raceName -b 5000 3000 2000  -r 100 200 --type arlo
+python3 code/athena.py -n raceName -b 5000 3000 2000  -r 100 200 --type arlo
 ```
 
 ## Finding stopping probabilities
@@ -30,7 +30,7 @@ for a given results:
 - **--pstop** (list of stopping probabilities for the next round)
 
 ```bash
-python3 aurror.py -n asd -b 60000 40000 --pstop .7 .8 .9 
+python3 athena.py -n asd -b 60000 40000 --pstop .7 .8 .9 
 ```
 
 returns:
@@ -61,7 +61,7 @@ round schedule: []
 If one want to estimate round sizes for the next round, round_schedule parameter needs to be added
 
 ```bash
-python3 aurror.py -n asd -b 60000 40000 --pstop .5 .8  --rounds 132
+python3 code/athena.py -n asd -b 60000 40000 --pstop .5 .8  --rounds 132
 [0.5, 0.8]
 Results of: asd
 Number of valid ballots: 100000
@@ -70,6 +70,7 @@ Number of valid ballots: 100000
 
 Parameters: 
 Alpha:  0.1
+Gamma:  1.0
 Model:  bin
 Round schedule: [132]
 setting round schedule
@@ -87,7 +88,7 @@ To get obtain detailed information about a selected round schedule (e.g., [132, 
 one needs to call it without **--pstop** parameter.
 
 ```bash
-python3 aurror.py -n asd -b 60000 40000 --rounds 132 297
+python3 code/athena.py -n asd -b 60000 40000 --rounds 132 297
 Results of: asd
 Number of valid ballots: 100000
 	1 A	60000
@@ -95,6 +96,7 @@ Number of valid ballots: 100000
 
 Parameters: 
 Alpha:  0.1
+Gamma:  1.0
 Model:  bin
 Round schedule: [132, 297]
 
@@ -103,16 +105,17 @@ A (60000) vs B (40000)
 	margin:	0.2
 
 	Approx round schedule:	[132, 297]
-	AURROR kmins:		[75, 165]
-	AURROR pstop (tied): 	[0.06933400321906029, 0.08488117767255854]
-	AURROR pstop (audit):	[0.798620073240586, 0.9604763404354484]
-	AURROR true risk:	[0.08681725584196939, 0.08837404327323274]
+	ATHENA kmins:		[75, 165]
+	ATHENA pstop (audit):	[0.798620073240586, 0.9604763404354486]
+	ATHENA pstop (tied): 	[0.06933400321906039, 0.08488117767255865]
+	ATHENA gammas ():	[0.3848374142119376, 0.5336003665053669]
+	ATHENA true risk:	[0.0868172558419695, 0.08837404327323284]
 ```
 
 At the end we may want to check how, for that round schedule Arlo audit would work
 
 ```bash
-python3 aurror.py -n asd -b 60000 40000 --rounds 132 297 --type arlo
+python3 code/athena.py -n asd -b 60000 40000 --rounds 132 297 --type arlo
 Results of: asd
 Number of valid ballots: 100000
 	1 A	60000
@@ -120,6 +123,7 @@ Number of valid ballots: 100000
 
 Parameters: 
 Alpha:  0.1
+Gamma:  1.0
 Model:  bin
 Round schedule: [132, 297]
 
@@ -129,10 +133,10 @@ A (60000) vs B (40000)
 
 	Approx round schedule:	[132, 297]
 	ARLO kmins:		[79, 170]
-	ARLO pstop (tied): 	[0.014585813499702633, 0.019495722498663753]
-	ARLO pstop (audit):	[0.5517707405988952, 0.8681144359578332]
-	ARLO true risk:	[0.026434554111860128, 0.022457549017893208]
-
+	ARLO pstop (audit):	[0.5517707405988953, 0.8681144359578333]
+	ARLO pstop (tied): 	[0.014585813499702702, 0.019495722498663794]
+	ARLO gammas ():	[0.07601726700482742, 0.07026836102128296]
+	ARLO true risk:	[0.02643455411186025, 0.022457549017893253]
 ```
 
 ## Wald's sequential test
@@ -144,26 +148,33 @@ test that stops after up to **max** ballots checked.
 Calling:
 
 ```bash
-python3 aurror.py -n asd -b 6000 4000  --rounds 17 --type BRAVO
+python3 code/athena.py -n asd -b 6000 4000  --rounds 17 --type BRAVO
 ```
 
 Is equivalent to calling:
 
 ```bash
-python3 aurror.py -n asd -b 6000 4000  --rounds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+python3 code/athena.py -n asd -b 6000 4000  --rounds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
 ```
 
+Note that **athena** uses the code that is optimized for a few rounds of (potentially) large sizes
+while BRAVO test has each round of size 1. Therefore you may prefere to run a previous version
+of the code:
+
+```
+python3 code/aurror_old.py -n asd -b 6000 4000  --rounds 17
+```
 
 ## Help
 
 ```
-python3 code/aurror.py -h
+python3 code/athena.py -h
 ```
 
 returns:
 
 ```
-usage: aurror.py [-h] [-v] [-n NEW] [-a ALPHA]
+usage: athena.py [-h] [-v] [-n NEW] [-a ALPHA]
                  [-c [CANDIDATES [CANDIDATES ...]]]
                  [-b [BALLOTS [BALLOTS ...]]] [-t TOTAL]
                  [-r ROUNDS [ROUNDS ...]] [-p PSTOP [PSTOP ...]] [-w WINNERS]
@@ -196,132 +207,87 @@ optional arguments:
                         evaluate risk for given audit results
 ```
 
-## Sample output
+## Old version BRAVO/ARLO/ATHENA
+
 
 ```
-python3 code/aurror.py --new raceName --alpha .1 --candidates "Albus D." Bob Cedric --ballots 5000 3000 2000 --round_schedule 100 200
-```
-
-```
+python3 aurror_old.py --new raceName --alpha .1 --candidates "Albus D." Bob Cedric --ballots 5000 3000 2000 --round_schedule 100 200
 Results of: raceName
-
 Number of valid ballots: 10000
 	1 Albus D.	5000
-	2 Beatrix	3000
+	2 Bob	3000
 	3 Cedric	2000
 
-AURROR parameters: 
+Parameters: 
 Alpha:  0.1
+Gamma:  1.0
 Model:  bin
 Round schedule: [100, 200]
 
 
-Albus D. (5000) vs Beatrix (3000)
-	Effective round schedule: [80, 160]
-	BRAVO risk: [0.06235051 0.08189835]
-	BRAVO pstop: [0.6862955 0.9031591]
-	BRAVO kmins: [50, 95]
-		AVG:	864.3289922821481
-		AVG*:	89.6018163070731
+Albus D. (5000) vs Bob (3000)
+	margin:	0.25
 
-	AURROR kmins:		[48, 91]
-	AURROR risk: [0.04645594 0.07607745]
-	AURROR pstop: [0.72018903 0.94721429]
-		AVG:	516.2248341824325
-		AVG*:	93.93916383508287
+	Effective round schedule: [80, 160]
+
+	BRAVO kmins: 	[50, 95]
+	BRAVO risk: 	[0.06235051 0.08209004]
+	BRAVO pstop: 	[0.6862955 0.9054928]
+	--- ratio:	[0.09085082782119536, 0.09065786273502807]
+
+	ARLO kmins:	[50, 95]
+	ARLO risk:	[0.01649631 0.0234236 ]
+	ARLO pstop:	[0.54969483 0.83843797]
+	--- ratio:	[0.030009940780989588, 0.027937185688492874]
+
+	Athena kmins:	[47, 92]
+	Athena risk:	[0.07281773 0.08800107]
+	Athena pstop:	[0.79143613 0.93830014]
+	--- ratio:	[0.092007080402985, 0.09378776507297898]
 
 
 Albus D. (5000) vs Cedric (2000)
+	margin:	0.42857142857142855
+
 	Effective round schedule: [70, 140]
-	BRAVO risk: [0.07876542 0.08264516]
-	BRAVO pstop: [0.95085346 0.99592736]
-	BRAVO kmins: [46, 89]
-		AVG:	101.37853526706321
-		AVG*:	72.8700886770959
 
-	AURROR kmins:		[42, 81]
-	AURROR risk: [0.05980467 0.07910063]
-	AURROR pstop: [0.9856999  0.99984057]
-		AVG:	72.09470846760281
-		AVG*:	70.97868682907473
+	BRAVO kmins: 	[46, 89]
+	BRAVO risk: 	[0.07876542 0.08264516]
+	BRAVO pstop: 	[0.95085346 0.99592736]
+	--- ratio:	[0.08283654763927709, 0.08298311619828014]
+
+	ARLO kmins:	[46, 89]
+	ARLO risk:	[0.0057632  0.00623018]
+	ARLO pstop:	[0.88184075 0.98651178]
+	--- ratio:	[0.006535425834876662, 0.006315362816084122]
+
+	Athena kmins:	[41, 83]
+	Athena risk:	[0.0941081  0.09882721]
+	Athena pstop:	[0.99258982 0.99961812]
+	--- ratio:	[0.0948106654177994, 0.09886496664859996]
 
 
-Beatrix (3000) vs Cedric (2000)
+Bob (3000) vs Cedric (2000)
+	margin:	0.2
+
 	Effective round schedule: [50, 100]
-	BRAVO risk: [0.02323915 0.05283925]
-	BRAVO pstop: [0.25028037 0.57330717]
-	BRAVO kmins: [34, 61]
-		AVG:	2178.280825342702
-		AVG*:	44.81669892560588
 
-	AURROR kmins:		[33, 59]
-	AURROR risk: [0.01641957 0.05205361]
-	AURROR pstop: [0.2368758  0.63577295]
-		AVG:	1872.868747440554
-		AVG*:	51.73350509300488
+	BRAVO kmins: 	[34, 61]
+	BRAVO risk: 	[0.02323915 0.05373822]
+	BRAVO pstop: 	[0.25028037 0.5834069 ]
+	--- ratio:	[0.0928524486015076, 0.09211103820218584]
+
+	ARLO kmins:	[34, 61]
+	ARLO risk:	[0.00767334 0.02212395]
+	ARLO pstop:	[0.1560906  0.47770637]
+	--- ratio:	[0.04915951815417218, 0.04631285308993794]
+
+	Athena kmins:	[32, 59]
+	Athena risk:	[0.03245432 0.0627022 ]
+	Athena pstop:	[0.33561326 0.65119262]
+	--- ratio:	[0.09670155223011023, 0.0962882608728027]
 ```
 
-
-# Risk evaluation (first approach)
-
-To evaluate the risk of a given observation you need to add **--evaluate_risk** parameter, followed with the number
-of votes for the winner counted in each round
-
-```
-python3 aurror.py -n asd -b 15038 5274 -r 34 57  --alpha 0.1 --evaluate_risk 22 34
-```
-
-The sample output.
-
-For this version of software a modified version of Aurror (denoted by Aurror*) is used (we change the way
-we find kmins -- we treat every round to be the first round). This approach may lead to going above Bravo risk.
-
-```
-Results of: asd
-Number of valid ballots: 20312
-	1 A	15038
-	2 B	5274
-
-AURROR parameters: 
-Alpha:  0.1
-Model:  bin
-Round schedule: [34, 57]
-
-
-A (15038) vs B (5274)
-
-	Effective round schedule: [34, 57]
-
-	BRAVO kmins: 	[24, 38]
-	BRAVO risk: 	[0.0739184 0.0827711]
-	BRAVO pstop: 	[0.8566519  0.96022161]
-		AVG:	843.0083804970857
-		AVG*:	35.02963781549562
-
-	ARLO kmins:	[24, 38]
-	ARLO risk:	[0.01215326 0.0169324 ]
-	ARLO pstop:	[0.74902808 0.93046317]
-
-	Aurror kmins:	[22, 36]
-	Aurror risk:	[0.06072474 0.07293752]
-	Aurror pstop:	[0.92086788 0.98214221]
-	--- ratio:	[0.06594295 0.07426371]
-
-	Aurror* kmins:	[22, 35]
-	Aurror* risk:	[0.06072474 0.08834209]
-	Aurror* pstop:	[0.92086788 0.98996194]
-	--- ratio:	[0.06594295 0.08923786]
-
-	AUDIT result:
-		observed:	[22, 34]
-		required:	[22, 35]
-
-		Test passed
-
-		estimated risk (alpha estimation):	0.084000390625
-		computed risk (alpha and kmins): 	0.06594294739276789
-
-```
 
 # Acknowledgements
 
