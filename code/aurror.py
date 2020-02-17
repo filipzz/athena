@@ -20,7 +20,7 @@ if (__name__ == '__main__'):
     parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
     parser.add_argument("-l", "--load", help="set the election to read")
-    parser.add_argument("--type", help="set the audit type (BRAVO/AURROR)", default="AURROR")
+    parser.add_argument("--type", help="set the audit type (BRAVO/ARLO/AURROR)", default="AURROR")
     parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+", type=int)
     args = parser.parse_args()
 

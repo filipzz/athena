@@ -34,7 +34,40 @@ class AthenaAudit():
 
     """
 
-    def next_round_prob(self, margin, round_size_prev, round_size, kmin_first, kmin, prob_table_prev):
+
+    def next_round_prob(self, margin, round_size_prev, round_size, prob_table_prev):
+        """
+        Parameters
+        ----------
+        :param margin: margin of a given race (float in [0, 1])
+        :param round_size_prev: the size of the previous round
+        :param round_size: the size of the current round
+        :param prob_table_prev: the probability distribution at the begining of the current round
+        :return: prob_table: the probability distribution at the end of the current round is returned
+        """
+        '''# This approach comes from GrantMcClearn: 
+        https://github.com/gwexploratoryaudits/brla_explore/blob/grant/src/athena.py
+        For the following paramters:
+            *time python3 athena.py -n 2016_Minnesota -c Clinton Trump -b 1367825 1323232 --rounds 10000 20000*
+            runs in:
+            - real	0m0,377s
+            - user	0m0,787s
+            - sys	0m0,317s
+            while            
+             *time python3 aurror.py -n 2016_Minnesota -c Clinton Trump -b 1367825 1323232 --rounds 10000 20000*
+            runs in:
+            - real	133m57,646s
+            - user	133m29,192s
+            - sys	0m2,683s
+            (on a machine with: Ubuntu 18.04 / i7-8850H / 32GB)
+        '''
+
+        p = (1+margin)/2
+        draws_dist = binom.pmf(range(0, (round_size - round_size_prev) + 1), (round_size - round_size_prev), p)
+        return fftconvolve(prob_table_prev, draws_dist)
+
+
+    def next_round_prob_bravo(self, margin, round_size_prev, round_size, kmin_first, kmin, prob_table_prev):
         """
         Parameters
         ----------
@@ -105,13 +138,13 @@ class AthenaAudit():
         gammas = [0] * number_of_rounds
 
         for round in range(1, number_of_rounds):
-            prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], kmins[0], kmins[round - 1], prob_table_prev)
-            prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], kmins[0], kmins[round - 1], prob_tied_table_prev)
+            #prob_table = self.next_round_prob_bravo(margin, round_schedule[round - 1], round_schedule[round], kmins[0], kmins[round - 1], prob_table_prev)
+            prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], prob_table_prev)
+            #prob_tied_table = self.next_round_prob_bravo(0, round_schedule[round - 1], round_schedule[round], kmins[0], kmins[round - 1], prob_tied_table_prev)
+            prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], prob_tied_table_prev)
 
 
             kmin_found = False
-            ' # a different approach to looking for kmin'
-            ' # previously: '
             kmin_candidate = math.floor(round_schedule[round]/2)
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
                 if audit_type == "athena":
