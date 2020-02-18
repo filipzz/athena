@@ -35,9 +35,9 @@ class NumpyEncoder(json.JSONEncoder):
 
 def print_election(election_info):
     print("Results of: " + election_info["name"])
-    print("Number of valid ballots: " + str(election_info["ballots_cast"]))
+    print("Number of valid ballots: " + str(print_number(election_info["ballots_cast"])))
     for i, candidate, ballots in zip(range(1,len(election_info["candidates"])+1), election_info["candidates"], election_info["results"]):
-        print("\t%s %s\t%s" % (i, candidate, ballots))
+        print("\t%s %s\t%s" % (i, candidate, print_number(ballots)))
     #print("(Declared) Votes for winner: " + str(winner))
     #print("Margin: " + str(margin))
     print("\nParameters: ")
@@ -52,3 +52,6 @@ def print_election_info(ballots_cast, winner, margin, alpha, model):
     print("Margin: " + str(margin))
     print("Alpha:  " + str(alpha))
     print("Model:  " + str(model))
+
+def print_number(val):
+    return "{:,}".format(val).replace(","," ")
