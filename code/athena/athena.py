@@ -295,3 +295,68 @@ class AthenaAudit():
             prob_total = 1 - prob_prev
             prob_gain = prob_last - prob_prev
             return prob_gain / prob_total
+
+    def find_kmins_for_risk(self, audit_kmins, actual_kmins):
+
+        kmins_goal_real = []
+        rewrite_on = 1
+        test_passed = 0
+
+        for audit_k, actual_k in zip(audit_kmins, actual_kmins):
+            if audit_k <= actual_k:
+                test_passed = 1
+
+        for i in range(len(actual_kmins)-1):
+            if rewrite_on == 1:
+                if audit_kmins[i] <= actual_kmins[i]:
+                    kmins_goal_real.append(actual_kmins[i])
+                    rewrite_on = 0
+                else:
+                    kmins_goal_real.append(audit_kmins[i])
+
+        if rewrite_on == 1:
+            kmins_goal_real.append(actual_kmins[len(actual_kmins)-1])
+
+        return {"kmins" : kmins_goal_real, "passed": test_passed}
+
+
+    def estimate_risk(self, margin, kmins, round_schedule):
+        """
+        Parameters
+        ----------
+        :param kmins: list of kmins
+        :param round_schedule: is a list of increasing natural numbers that correspond to number of relevant votes drawn
+        :return:
+            * prob_tied_sum - list of stopping probabilities for tied elections (risk)
+        """
+        round_schedule = [0] + round_schedule
+        kmins = [0] + kmins
+        number_of_rounds = min(len(kmins), len(round_schedule))
+        prob_table_prev = [1]
+        prob_sum = [0] * number_of_rounds
+        prob_tied_table_prev = [1]
+        prob_tied_sum = [0] * number_of_rounds
+
+        for round in range(1, number_of_rounds):
+            prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], prob_table_prev)
+            prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], prob_tied_table_prev)
+
+            prob_sum[round] = sum(prob_table[kmins[round]:len(prob_table)]) + prob_sum[round - 1]
+            prob_tied_sum[round] = sum(prob_tied_table[kmins[round]:len(prob_tied_table)]) + prob_tied_sum[round - 1]
+
+            # cleaning prob_table/prob_tied_table
+            for i in range(kmins[round], round_schedule[round] + 1):
+                prob_table[i] = 0
+                prob_tied_table[i] = 0
+
+            prob_table_prev = prob_table
+            prob_tied_table_prev = prob_tied_table
+
+        ratio = []
+        for p, pt in zip(prob_sum[1:len(prob_sum)], prob_tied_sum[1:len(prob_tied_sum)]):
+            if p > 0:
+                ratio.append(pt / p)
+            else:
+                ratio.append(0)
+
+        return {"prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "ratio": ratio}

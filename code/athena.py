@@ -102,9 +102,8 @@ if (__name__ == '__main__'):
                 print("There is nothing to audit - every candidate is a winner.")
                 sys.exit(2)
 
-        eval_risk = ""
         if args.risk:
-            eval_risk = "true"
+            mode_rounds = "risk"
             actual_kmins = args.risk
 
     elif args.load:
@@ -174,7 +173,7 @@ if (__name__ == '__main__'):
                         true_risk.append(0.0)
                     else:
                         true_risk.append(pt/p)
-                print("\t%s true risk:\t%s" % (audit_type, str(true_risk)))
+                print("\t%s ratio:\t%s" % (audit_type, str(true_risk)))
 
     elif mode_rounds == "pstop":
         print("setting round schedule")
@@ -201,3 +200,52 @@ if (__name__ == '__main__'):
                 print("pstop goal: " + str(pstop_goal))
                 print("round schedule: " + str(rs))
                 x = audit_object.find_next_round_sizes(audit_type, margin, alpha, gamma, rs, pstop_goal, bc)
+
+    if mode_rounds == "risk":
+        for i in range(len(candidates)):
+            ballots_i = results[i]
+            candidate_i = candidates[i]
+            for j in range(i + 1, len(candidates)):
+                ballots_j = results[j]
+                candidate_j = candidates[j]
+
+                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, tools.print_number(ballots_i), candidate_j, tools.print_number(ballots_j)))
+                bc = ballots_i + ballots_j
+                winner = max(ballots_i, ballots_j)
+                print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
+                rs = []
+
+                for x in round_schedule:
+                    y = math.floor(x * bc / ballots_cast)
+                    rs.append(y)
+
+                margin = (2 * winner - bc)/bc
+
+                audit_object = AthenaAudit()
+                if audit_type.lower() == "bravo" or audit_type.lower() == "wald":
+                    audit_athena = audit_object.bravo(margin, alpha, rs)
+                elif audit_type.lower() == "arlo":
+                    audit_athena = audit_object.arlo(margin, alpha, rs)
+                else:
+                    audit_athena = audit_object.athena(margin, alpha, gamma, rs)
+
+                risk_goal = audit_athena["prob_tied_sum"]
+                audit_kmins = audit_athena["kmins"]
+
+
+                test_info = audit_object.find_kmins_for_risk(audit_kmins, actual_kmins)
+
+
+                print("\n\tAUDIT result:")
+                print("\t\tobserved:\t" + str(actual_kmins))
+                print("\t\trequired:\t" + str(audit_kmins))
+
+                if test_info["passed"] == 1:
+                    print("\n\t\tTest passed\n")
+                else:
+                    print("\n\t\tTest FAILED\n")
+
+                #w = audit_object.estimate_risk(margin, actual_kmins, round_schedule)
+                w = audit_object.estimate_risk(margin, test_info["kmins"], round_schedule)
+                ratio = w["ratio"]
+                print("Risk:\t%s" % (ratio[-1]))
