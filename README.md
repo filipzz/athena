@@ -38,24 +38,26 @@ returns:
 ```bash
 [0.7, 0.8, 0.9]
 Results of: asd
-Number of valid ballots: 100000
-	1 A	60000
-	2 B	40000
+Number of valid ballots: 100 000
+	1 A	60 000
+	2 B	40 000
 
-AURROR parameters: 
+Parameters: 
 Alpha:  0.1
+Gamma:  1.0
 Model:  bin
 Round schedule: []
 setting round schedule
 
 
-A (60000) vs B (40000)
+A (60 000) vs B (40 000)
 	margin:	0.2
 pstop goal: [0.7, 0.8, 0.9]
 round schedule: []
 	0.7	[112]
 	0.8	[132]
-	0.9	[182]
+	0.9	[180]
+
 ```
 
 If one want to estimate round sizes for the next round, round_schedule parameter needs to be added
@@ -64,9 +66,9 @@ If one want to estimate round sizes for the next round, round_schedule parameter
 python3 code/athena.py -n asd -b 60000 40000 --pstop .5 .8  --rounds 132
 [0.5, 0.8]
 Results of: asd
-Number of valid ballots: 100000
-	1 A	60000
-	2 B	40000
+Number of valid ballots: 100 000
+	1 A	60 000
+	2 B	40 000
 
 Parameters: 
 Alpha:  0.1
@@ -76,12 +78,12 @@ Round schedule: [132]
 setting round schedule
 
 
-A (60000) vs B (40000)
+A (60 000) vs B (40 000)
 	margin:	0.2
 pstop goal: [0.5, 0.8]
 round schedule: [132]
-	0.5	[132, 224]
-	0.8	[132, 297]
+	0.5	[132, 226]
+	0.8	[132, 302]
 ```
 
 To get obtain detailed information about a selected round schedule (e.g., [132, 297])
