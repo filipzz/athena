@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='Aurror',
-    version='0.1',
-    packages=['code', 'code.rla_math'],
+    name='Athena',
+    version='0.5',
+    packages=['athena'],
     url='',
     license='',
     author='Filip Zagorski',
