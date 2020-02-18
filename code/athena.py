@@ -44,9 +44,9 @@ if (__name__ == '__main__'):
 
         if args.type:
             if (args.type).lower() == "bravo" or (args.type).lower() == "wald":
-                audit_type = "BRAVO"
+                audit_type = "bravo"
             elif (args.type).lower() == "arlo":
-                audit_type = "ARLO"
+                audit_type = "arlo"
 
         if args.ballots:
             results = args.ballots
@@ -138,7 +138,7 @@ if (__name__ == '__main__'):
                 ballots_j = results[j]
                 candidate_j = candidates[j]
 
-                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, ballots_i, candidate_j, ballots_j))
+                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, tools.print_number(ballots_i), candidate_j, tools.print_number(ballots_j)))
                 bc = ballots_i + ballots_j
                 winner = max(ballots_i, ballots_j)
                 print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
@@ -185,7 +185,7 @@ if (__name__ == '__main__'):
                 ballots_j = results[j]
                 candidate_j = candidates[j]
 
-                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, ballots_i, candidate_j, ballots_j))
+                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, tools.print_number(ballots_i), candidate_j, tools.print_number(ballots_j)))
                 bc = ballots_i + ballots_j
                 winner = max(ballots_i, ballots_j)
                 print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
@@ -200,4 +200,4 @@ if (__name__ == '__main__'):
 
                 print("pstop goal: " + str(pstop_goal))
                 print("round schedule: " + str(rs))
-                x = audit_object.find_next_round_sizes(margin, alpha, gamma, rs, pstop_goal)
+                x = audit_object.find_next_round_sizes(audit_type, margin, alpha, gamma, rs, pstop_goal, bc)
