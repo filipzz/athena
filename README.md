@@ -165,6 +165,35 @@ of the code:
 python3 code/aurror_old.py -n asd -b 6000 4000  --rounds 17
 ```
 
+
+## Estimating true audit risk
+
+```
+python3 athena.py -n 2016_Minnesota -c Clinton Trump -b 1367825 1323232  --rounds 14880 32138   --risk 7530
+Results of: 2016_Minnesota
+Number of valid ballots: 2 691 057
+	1 Clinton	1 367 825
+	2 Trump	1 323 232
+
+Parameters: 
+Alpha:  0.1
+Gamma:  1.0
+Model:  bin
+Round schedule: [14880, 32138]
+
+
+Clinton (1 367 825) vs Trump (1 323 232)
+	margin:	0.01657081213813011
+
+	AUDIT result:
+		observed:	[7530]
+		required:	[7531, 16226]
+
+		Test FAILED
+
+Risk:	0.10015171727863798
+```
+
 ## Help
 
 ```
