@@ -3,7 +3,7 @@ import argparse
 import string
 import math
 import tools
-from athena.athena import AthenaAudit
+from athena_audit.athena import AthenaAudit
 
 if (__name__ == '__main__'):
 
@@ -109,7 +109,7 @@ if (__name__ == '__main__'):
     elif args.load:
         mode = "read"
     else:
-        print("Call python3 athena.py -h for help")
+        print("Call python3 athena_audit.py -h for help")
 
     model = "bin"
     election = {}
