@@ -186,6 +186,7 @@ if (__name__ == '__main__'):
 
                 print("\n\n%s (%s) vs %s (%s)" % (candidate_i, tools.print_number(ballots_i), candidate_j, tools.print_number(ballots_j)))
                 bc = ballots_i + ballots_j
+                scalling_ratio = ballots_cast / bc
                 winner = max(ballots_i, ballots_j)
                 print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
                 rs = []
@@ -197,9 +198,14 @@ if (__name__ == '__main__'):
 
                 audit_object = AthenaAudit()
 
-                print("pstop goal: " + str(pstop_goal))
-                print("round schedule: " + str(rs))
-                x = audit_object.find_next_round_sizes(audit_type, margin, alpha, gamma, rs, pstop_goal, bc)
+                print("\tpstop goals: " + str(pstop_goal))
+                print("\tscaled round schedule: " + str(rs))
+                next_round_sizes = audit_object.find_next_round_sizes(audit_type, margin, alpha, gamma, rs, pstop_goal, bc)
+                for pstop_goal, next_round, prob_stop in zip(pstop_goal, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
+                    rs = [] + round_schedule
+                    next_round_rescaled = math.ceil(next_round * scalling_ratio)
+                    rs.append(next_round_rescaled)
+                    print("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
 
     if mode_rounds == "risk":
         for i in range(len(candidates)):
