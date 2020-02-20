@@ -196,7 +196,7 @@ class AthenaAudit():
             * size - the size of the next round
             * prob_stop - the probability of
         """
-        round_max = ballots_cast
+        round_max = 8 * ballots_cast
         new_round_schedule = round_schedule + [round_max]
         result = self.audit(audit_type, margin, alpha, gamma, new_round_schedule)
         prob_table = result["prob_sum"]
@@ -204,7 +204,7 @@ class AthenaAudit():
         if stopping_probability_max < quant:
             print("FULL RECOUNT is suggested!")
             print("Probability of stopping at: %s is %s" % (new_round_schedule, stopping_probability_max))
-            exit(0)
+            return {"size": round_max, "prob_stop": stopping_probability_max}
 
 
         if len(round_schedule) > 0:
