@@ -3,7 +3,7 @@ import argparse
 import string
 import math
 import tools
-from athena_audit.athena import AthenaAudit
+from athena.athena import AthenaAudit
 
 if (__name__ == '__main__'):
 

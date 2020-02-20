@@ -1,5 +1,5 @@
 {
-    "bin" : {
+    "find_kmins" : {
         "test1": {
             "audit_type": "athena",
             "nn": 14000,

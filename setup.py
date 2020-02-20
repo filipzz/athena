@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='Athena',
     version='0.5',
-    packages=['athena'],
+    packages=['athena.athena'],
     url='',
     license='',
     author='Filip Zagorski',

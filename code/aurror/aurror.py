@@ -105,7 +105,7 @@ class AurrorAudit():
         """
         Sets audit_type to **aurror** and calls audit(...) method
         """
-        return self.audit("athena", margin, alpha, gamma, round_schedule)
+        return self.audit("athena_audit", margin, alpha, gamma, round_schedule)
 
     def bravo(self, margin, alpha, round_schedule):
         """
