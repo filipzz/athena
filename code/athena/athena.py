@@ -283,7 +283,7 @@ class AthenaAudit():
         rounds = []
         prob_stop = []
         for quant in quants:
-            results = self.find_next_round_size(audit_type, margin, alpha, gamma, round_schedule, quant, 5, ballots_cast)
+            results = self.find_next_round_size(audit_type, margin, alpha, gamma, round_schedule, quant, 1, ballots_cast)
             new_round = results["size"]
             new_round_schedule = round_schedule + [new_round]
             print("\t" + str(quant) + "\t" + str(new_round_schedule))
