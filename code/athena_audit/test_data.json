@@ -1,0 +1,26 @@
+{
+    "bin" : {
+        "test1": {
+            "audit_type": "athena",
+            "nn": 14000,
+            "wd": 7700,
+            "alpha": 0.1,
+            "round_schedule": [193, 332, 587],
+            "expected": {
+                "kmins": [110, 183, 315],
+                "risk_expended": [0.0304, 0.0519, 0.0752]
+            }
+        },
+        "test2": {
+            "audit_type": "arlo",
+            "nn": 14000,
+            "wd": 7700,
+            "alpha": 0.1,
+            "round_schedule": [193, 332, 587],
+            "expected": {
+                "kmins": [113, 186, 320],
+                "risk_expended": [0.0105, 0.02212, 0.03187]
+            }
+        }
+    }
+}

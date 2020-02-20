@@ -17,7 +17,7 @@ class AthenaAudit():
     audit(self, audit_type, margin, alpha, round_schedule)
         Computes probabilities of stopping, risk and kmins for given parameters and audit_type
 
-    athena(self, margin, alpha, round_schedule)
+    athena_audit(self, margin, alpha, round_schedule)
         Computes parameters for ATHENA audit
 
     arlo(self, margin, alpha, round_schedule)
@@ -48,7 +48,7 @@ class AthenaAudit():
         '''# This approach comes from GrantMcClearn: 
         https://github.com/gwexploratoryaudits/brla_explore/blob/grant/src/athena.py
         For the following paramters:
-            *time python3 athena.py -n 2016_Minnesota -c Clinton Trump -b 1367825 1323232 --rounds 10000 20000*
+            *time python3 athena_audit.py -n 2016_Minnesota -c Clinton Trump -b 1367825 1323232 --rounds 10000 20000*
             runs in:
             - real	0m0,377s
             - user	0m0,787s
@@ -93,14 +93,14 @@ class AthenaAudit():
 
     def athena(self, margin, alpha, gamma, round_schedule):
         """
-        Sets audit_type to **athena** and calls audit(...) method
+        Sets audit_type to **athena_audit** and calls audit(...) method
         """
-        return self.audit("athena", margin, alpha, gamma, round_schedule)
+        return self.audit("athena_audit", margin, alpha, gamma, round_schedule)
 
     def bravo(self, margin, alpha, round_schedule):
         """
-        Function simply calls athena(...) method but as a round schedule a list of [1, 2, 3, ..., max] is given.
-        For more info, see athena(...) method.
+        Function simply calls athena_audit(...) method but as a round schedule a list of [1, 2, 3, ..., max] is given.
+        For more info, see athena_audit(...) method.
 
         Parameters
         ----------
@@ -147,7 +147,7 @@ class AthenaAudit():
             kmin_found = False
             kmin_candidate = math.floor(round_schedule[round]/2)
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
-                if audit_type.lower() == "athena":
+                if audit_type.lower() == "athena_audit":
                     '# prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added'
                     if gamma * prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
                         kmin_found = True
