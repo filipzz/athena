@@ -42,7 +42,7 @@ def print_election(election_info):
     #print("Margin: " + str(margin))
     print("\nParameters: ")
     print("Alpha:  " + str(election_info["alpha"]))
-    print("Gamma:  " + str(election_info["gamma"]))
+    print("Delta:  " + str(election_info["delta"]))
     print("Model:  " + str(election_info["model"]))
 
 
