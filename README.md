@@ -238,8 +238,20 @@ optional arguments:
                         evaluate risk for given audit results
 ```
 
+## Unit tests
+
+Outside the **code** directory: **pytest-3 code** (or **python -m pytest code**).
+
+Inside the **code** directory: **pytest-3** (or **python -m pytest**)
+
 ## Old version BRAVO/ARLO/ATHENA
 
+Previous implementations:
+
+- code/aurror_old.py
+- code/aurror.py
+
+were here up to the [following commit](https://github.com/filipzz/athena/commit/ffa135d5f7f9ce842d1fc8ec905e7252797f10b7).
 
 ```
 python3 aurror_old.py --new raceName --alpha .1 --candidates "Albus D." Bob Cedric --ballots 5000 3000 2000 --round_schedule 100 200

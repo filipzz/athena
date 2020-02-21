@@ -10,6 +10,7 @@ def test_find_kmins():
     error_level = 0.0001
 
     with open(os.path.join(os.path.dirname(__file__),'test_data.json'), 'r') as f:
+    #with open('athena/test_data.json', 'r') as f:
         tests = json.load(f)
 
     type_of_test = "find_kmins"

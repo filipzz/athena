@@ -27,7 +27,7 @@ if (__name__ == '__main__'):
     audit_type = "ATHENA"
 
     if args.version:
-        print("ATHENA version 0.4")
+        print("ATHENA version 0.5")
     if args.new:
         mode = "new"
         name = args.new
@@ -109,7 +109,7 @@ if (__name__ == '__main__'):
     elif args.load:
         mode = "read"
     else:
-        print("Call python3 athena_audit.py -h for help")
+        print("Call python3 athena.py -h for help")
 
     model = "bin"
     election = {}
