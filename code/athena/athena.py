@@ -89,13 +89,18 @@ class AthenaAudit():
         return prob_table
 
 
-
-
     def athena(self, margin, alpha, delta, round_schedule):
         """
         Sets audit_type to **athena** and calls audit(...) method
         """
         return self.audit("athena", margin, alpha, delta, round_schedule)
+
+
+    def minerva(self, margin, alpha, delta, round_schedule):
+        """
+        Sets audit_type to **athena** and calls audit(...) method
+        """
+        return self.audit("minerva", margin, alpha, delta, round_schedule)
 
     def bravo(self, margin, alpha, round_schedule):
         """
@@ -151,6 +156,16 @@ class AthenaAudit():
                 if audit_type.lower() == "athena":
                     '# prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added'
                     if delta * prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
+                        kmin_found = True
+                        kmins[round] = kmin_candidate
+                        prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
+                        prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
+                        if prob_table[kmin_candidate] > 0:
+                            deltas[round] = prob_tied_table[kmin_candidate] /  prob_table[kmin_candidate]
+                    else:
+                        kmin_candidate = kmin_candidate + 1
+                elif audit_type.lower() == "minerva":
+                    if alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
                         kmin_found = True
                         kmins[round] = kmin_candidate
                         prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
@@ -339,7 +354,7 @@ class AthenaAudit():
         return {"kmins" : kmins_goal_real, "passed": test_passed}
 
 
-    def estimate_risk(self, margin, kmins, round_schedule):
+    def estimate_risk(self, margin, kmins, round_schedule, audit_observations):
         """
         Parameters
         ----------
@@ -350,11 +365,14 @@ class AthenaAudit():
         """
         round_schedule = [0] + round_schedule
         kmins = [0] + kmins
+        audit_observations = [0] + audit_observations
         number_of_rounds = min(len(kmins), len(round_schedule))
         prob_table_prev = [1]
         prob_sum = [0] * number_of_rounds
         prob_tied_table_prev = [1]
         prob_tied_sum = [0] * number_of_rounds
+
+        deltas = []#0] * (number_of_rounds + 1)
 
         for round in range(1, number_of_rounds):
             prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], prob_table_prev)
@@ -362,6 +380,9 @@ class AthenaAudit():
 
             prob_sum[round] = sum(prob_table[kmins[round]:len(prob_table)]) + prob_sum[round - 1]
             prob_tied_sum[round] = sum(prob_tied_table[kmins[round]:len(prob_tied_table)]) + prob_tied_sum[round - 1]
+
+            if prob_table[kmins[round]] is not 0 and round < len(audit_observations):
+                deltas.append(abs(prob_tied_table[audit_observations[round]] / prob_table[audit_observations[round]]))
 
             # cleaning prob_table/prob_tied_table
             for i in range(kmins[round], round_schedule[round] + 1):
@@ -371,11 +392,13 @@ class AthenaAudit():
             prob_table_prev = prob_table
             prob_tied_table_prev = prob_tied_table
 
+
         ratio = []
-        for p, pt in zip(prob_sum[1:len(prob_sum)], prob_tied_sum[1:len(prob_tied_sum)]):
+        for i, p, pt in zip(range(len(prob_sum)), prob_sum[1:len(prob_sum)], prob_tied_sum[1:len(prob_tied_sum)]):
             if p > 0:
                 ratio.append(pt / p)
             else:
                 ratio.append(0)
 
-        return {"prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "ratio": ratio}
+
+        return {"prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "ratio": ratio, "deltas": deltas}

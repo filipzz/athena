@@ -1,5 +1,5 @@
 import numpy as np
-import codecs, json
+import json
 
 def find_ratio(a, b):
     ratio = []

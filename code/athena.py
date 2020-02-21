@@ -2,8 +2,10 @@ import sys
 import argparse
 import string
 import math
-import tools
+#import athena.tools
 from athena.athena import AthenaAudit
+from athena.election import Election
+from athena.audit import Audit
 
 if (__name__ == '__main__'):
 
@@ -43,10 +45,12 @@ if (__name__ == '__main__'):
             sys.exit(2)
 
         if args.type:
-            if (args.type).lower() == "bravo" or (args.type).lower() == "wald":
+            if (args.type).lower() in {"bravo", "wald"}:
                 audit_type = "bravo"
             elif (args.type).lower() == "arlo":
                 audit_type = "arlo"
+            elif (args.type).lower() in {"minerva", "anat", "neith", "sulis"}:
+                audit_type = "minerva"
 
         if args.ballots:
             results = args.ballots
@@ -105,6 +109,9 @@ if (__name__ == '__main__'):
         if args.risk:
             mode_rounds = "risk"
             actual_kmins = args.risk
+            if len(candidates) > 2:
+                print("Current version supports only 2-candidate race for risk estimation")
+                sys.exit(2)
 
     elif args.load:
         mode = "read"
@@ -118,6 +125,7 @@ if (__name__ == '__main__'):
     election["delta"] = delta
     election["candidates"] = candidates
     election["results"] = results
+    election["ballots_cast"] = ballots_cast
     election["winners"] = winners
     election["name"] = name
     election["model"] = model
@@ -125,7 +133,9 @@ if (__name__ == '__main__'):
     election["round_schedule"] = round_schedule
     save_to = "elections/" + name
 
-    tools.print_election(election)
+    election_object = Election(election)
+    #tools.print_election(election)
+    election_object.print_election()
 
     print("Round schedule: " + str(round_schedule))
 
@@ -137,7 +147,7 @@ if (__name__ == '__main__'):
                 ballots_j = results[j]
                 candidate_j = candidates[j]
 
-                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, tools.print_number(ballots_i), candidate_j, tools.print_number(ballots_j)))
+                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
                 bc = ballots_i + ballots_j
                 winner = max(ballots_i, ballots_j)
                 print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
@@ -176,6 +186,22 @@ if (__name__ == '__main__'):
                 print("\t%s ratio:\t%s" % (audit_type, str(true_risk)))
 
     elif mode_rounds == "pstop":
+        w = Audit(audit_type)
+        w.add_election(election)
+        x = w.find_next_round_size(pstop_goal)
+
+        '''
+        print(str(x))
+
+        possible_round_extensions = x["future_round_sizes"]
+
+        next_round = possible_round_extensions[-1]
+
+        w.extend_round_schedule(next_round)
+        '''
+
+        '''
+
         print("setting round schedule")
         for i in range(len(candidates)):
             ballots_i = results[i]
@@ -184,7 +210,7 @@ if (__name__ == '__main__'):
                 ballots_j = results[j]
                 candidate_j = candidates[j]
 
-                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, tools.print_number(ballots_i), candidate_j, tools.print_number(ballots_j)))
+                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
                 bc = ballots_i + ballots_j
                 scalling_ratio = ballots_cast / bc
                 winner = max(ballots_i, ballots_j)
@@ -206,8 +232,15 @@ if (__name__ == '__main__'):
                     next_round_rescaled = math.ceil(next_round * scalling_ratio)
                     rs.append(next_round_rescaled)
                     print("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
+        '''
 
     if mode_rounds == "risk":
+        w = Audit(audit_type)
+        w.add_election(election)
+        x = w.find_risk(actual_kmins)
+        print(str(x))
+
+        '''
         for i in range(len(candidates)):
             ballots_i = results[i]
             candidate_i = candidates[i]
@@ -215,7 +248,7 @@ if (__name__ == '__main__'):
                 ballots_j = results[j]
                 candidate_j = candidates[j]
 
-                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, tools.print_number(ballots_i), candidate_j, tools.print_number(ballots_j)))
+                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
                 bc = ballots_i + ballots_j
                 winner = max(ballots_i, ballots_j)
                 print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
@@ -255,3 +288,4 @@ if (__name__ == '__main__'):
                 w = audit_object.estimate_risk(margin, test_info["kmins"], round_schedule)
                 ratio = w["ratio"]
                 print("Risk:\t%s" % (ratio[-1]))
+        '''

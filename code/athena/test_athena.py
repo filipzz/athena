@@ -27,7 +27,7 @@ def test_find_kmins():
         expected_risk_expended = expected['risk_expended']
 
         margin = (2 * wd - nn)/nn
-        gamma = 1
+        delta = 1
 
         print("\n" + test + "\t" + str(nn) + "\t" + str(wd) + "\t" + str(round_schedule))
 
@@ -38,12 +38,12 @@ def test_find_kmins():
         elif audit_type.lower() == "arlo":
             computed = audit_object.arlo(margin, alpha, round_schedule)
         else:
-            computed = audit_object.athena(margin, alpha, gamma, round_schedule)
+            computed = audit_object.athena(margin, alpha, delta, round_schedule)
 
         kmins = computed["kmins"]
         prob_sum = computed["prob_sum"]
         prob_tied_sum = computed["prob_tied_sum"]
-        gammas = computed["gammas"]
+        deltas = computed["deltas"]
 
         print(computed)
         #kmins = computed['kmin_new']
