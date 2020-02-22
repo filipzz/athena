@@ -18,25 +18,27 @@ def test_find_kmins():
     print("test type: " + type_of_test)
     for test in tests[type_of_test]:
         expected = tests[type_of_test][test]['expected']
-        nn = tests[type_of_test][test]['nn']
-        wd = tests[type_of_test][test]['wd']
+        ballots_cast = tests[type_of_test][test]['ballots_cast']
+        winner = tests[type_of_test][test]['winner']
         alpha = tests[type_of_test][test]['alpha']
         round_schedule = tests[type_of_test][test]['round_schedule']
         audit_type = tests[type_of_test][test]['audit_type']
         expected_kmins = expected['kmins']
         expected_risk_expended = expected['risk_expended']
 
-        margin = (2 * wd - nn)/nn
+        margin = (2 * winner - ballots_cast)/ballots_cast
         delta = 1
 
-        print("\n" + test + "\t" + str(nn) + "\t" + str(wd) + "\t" + str(round_schedule))
+        print("\n" + test + "\t" + str(ballots_cast) + "\t" + str(winner) + "\t" + str(round_schedule))
 
-        #computed = schedule.find_new_kmins(nn, wd, alpha, round_schedule, risk_goal)
+        #computed = schedule.find_new_kmins(ballots_cast, winner, alpha, round_schedule, risk_goal)
         audit_object = AthenaAudit()
-        if audit_type.lower() == "bravo" or audit_type.lower() == "wald":
+        if audit_type.lower() in {"bravo", "wald"}:
             computed = audit_object.bravo(margin, alpha, round_schedule)
         elif audit_type.lower() == "arlo":
             computed = audit_object.arlo(margin, alpha, round_schedule)
+        elif audit_type.lower() == "minerva":
+            computed = audit_object.minerva(margin, alpha, round_schedule)
         else:
             computed = audit_object.athena(margin, alpha, delta, round_schedule)
 

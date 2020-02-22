@@ -2,8 +2,8 @@
     "find_kmins" : {
         "test1": {
             "audit_type": "athena",
-            "nn": 14000,
-            "wd": 7700,
+            "ballots_cast": 14000,
+            "winner": 7700,
             "alpha": 0.1,
             "round_schedule": [193, 332, 587],
             "expected": {
@@ -13,13 +13,57 @@
         },
         "test2": {
             "audit_type": "arlo",
-            "nn": 14000,
-            "wd": 7700,
+            "ballots_cast": 14000,
+            "winner": 7700,
             "alpha": 0.1,
             "round_schedule": [193, 332, 587],
             "expected": {
                 "kmins": [113, 186, 320],
                 "risk_expended": [0.0105, 0.02212, 0.03187]
+            }
+        },
+        "test3": {
+            "audit_type": "minerva",
+            "ballots_cast": 14000,
+            "winner": 7700,
+            "alpha": 0.1,
+            "round_schedule": [193, 332, 587],
+            "expected": {
+                "kmins": [110, 183, 315],
+                "risk_expended": [0.0304, 0.0519, 0.0752]
+            }
+        },
+        "test1a": {
+            "audit_type": "athena",
+            "ballots_cast": 21700,
+            "winner": 14000,
+            "alpha": 0.1,
+            "round_schedule": [193, 332, 587],
+            "expected": {
+                "kmins": [111, 191, 337],
+                "risk_expended": [0.021787039242779648, 0.023064183295994765, 0.023066667858117923]
+            }
+        },
+        "test2a": {
+            "audit_type": "arlo",
+            "ballots_cast": 21700,
+            "winner": 14000,
+            "alpha": 0.1,
+            "round_schedule": [193, 332, 587],
+            "expected": {
+                "kmins": [115, 195, 341],
+                "risk_expended": [0.00469103685742314, 0.005120918197115071, 0.005142354972558473]
+            }
+        },
+        "test3a": {
+            "audit_type": "minerva",
+            "ballots_cast": 21700,
+            "winner": 14000,
+            "alpha": 0.1,
+            "round_schedule": [193, 332, 587],
+            "expected": {
+                "kmins": [106, 192, 334],
+                "risk_expended": [0.09747986766182191, 0.09761730188280397, 0.09769509728870938]
             }
         }
     }
