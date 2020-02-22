@@ -160,10 +160,12 @@ if (__name__ == '__main__'):
                 margin = (2 * winner - bc)/bc
 
                 audit_object = AthenaAudit()
-                if audit_type.lower() == "bravo" or audit_type.lower() == "wald":
+                if audit_type.lower() in {"bravo", "wald"}:
                     audit_athena = audit_object.bravo(margin, alpha, rs)
                 elif audit_type.lower() == "arlo":
                     audit_athena = audit_object.arlo(margin, alpha, rs)
+                elif audit_type.lower() == "minerva":
+                    audit_athena = audit_object.minerva(margin, alpha, rs)
                 else:
                     audit_athena = audit_object.athena(margin, alpha, delta, rs)
                 kmins = audit_athena["kmins"]
@@ -238,7 +240,7 @@ if (__name__ == '__main__'):
         w = Audit(audit_type)
         w.add_election(election)
         x = w.find_risk(actual_kmins)
-        print(str(x))
+        #print(str(x))
 
         '''
         for i in range(len(candidates)):

@@ -96,11 +96,11 @@ class AthenaAudit():
         return self.audit("athena", margin, alpha, delta, round_schedule)
 
 
-    def minerva(self, margin, alpha, delta, round_schedule):
+    def minerva(self, margin, alpha, round_schedule):
         """
         Sets audit_type to **athena** and calls audit(...) method
         """
-        return self.audit("minerva", margin, alpha, delta, round_schedule)
+        return self.audit("minerva", margin, alpha, alpha, round_schedule)
 
     def bravo(self, margin, alpha, round_schedule):
         """
@@ -156,6 +156,7 @@ class AthenaAudit():
                 if audit_type.lower() == "athena":
                     '# prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added'
                     if delta * prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
+                    #if delta * prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (prob_sum[round - 1] + sum(prob_table[kmin_candidate:len(prob_table)])) >= (prob_tied_sum[round - 1] + sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
                         kmin_found = True
                         kmins[round] = kmin_candidate
                         prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
@@ -171,7 +172,7 @@ class AthenaAudit():
                         prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
                         prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
                         if prob_table[kmin_candidate] > 0:
-                            deltas[round] = prob_tied_table[kmin_candidate] /  prob_table[kmin_candidate]
+                            deltas[round] = prob_tied_table[kmin_candidate] / prob_table[kmin_candidate]
                     else:
                         kmin_candidate = kmin_candidate + 1
                 elif audit_type.lower() == "arlo":
@@ -181,7 +182,7 @@ class AthenaAudit():
                         prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
                         prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
                         if prob_table[kmin_candidate] > 0:
-                            deltas[round] = prob_tied_table[kmin_candidate] /  prob_table[kmin_candidate]
+                            deltas[round] = prob_tied_table[kmin_candidate] / prob_table[kmin_candidate]
                     else:
                         kmin_candidate = kmin_candidate + 1
 
@@ -366,11 +367,14 @@ class AthenaAudit():
         round_schedule = [0] + round_schedule
         kmins = [0] + kmins
         audit_observations = [0] + audit_observations
-        number_of_rounds = min(len(kmins), len(round_schedule))
+        number_of_rounds = min(len(audit_observations), len(round_schedule))
         prob_table_prev = [1]
         prob_sum = [0] * number_of_rounds
         prob_tied_table_prev = [1]
         prob_tied_sum = [0] * number_of_rounds
+        audit_round_pstop = [0] * number_of_rounds
+        audit_round_risk = [0] * number_of_rounds
+        audit_ratio = [0] * number_of_rounds
 
         deltas = []#0] * (number_of_rounds + 1)
 
@@ -380,6 +384,14 @@ class AthenaAudit():
 
             prob_sum[round] = sum(prob_table[kmins[round]:len(prob_table)]) + prob_sum[round - 1]
             prob_tied_sum[round] = sum(prob_tied_table[kmins[round]:len(prob_tied_table)]) + prob_tied_sum[round - 1]
+
+            audit_round_pstop[round] = sum(prob_table[audit_observations[round]:len(prob_table)])
+            audit_round_risk[round] = sum(prob_tied_table[audit_observations[round]:len(prob_tied_table)])
+            if audit_round_pstop[round] > 0:
+                audit_ratio[round] = audit_round_risk[round] / audit_round_pstop[round]
+
+
+
 
             if prob_table[kmins[round]] is not 0 and round < len(audit_observations):
                 deltas.append(abs(prob_tied_table[audit_observations[round]] / prob_table[audit_observations[round]]))
@@ -401,4 +413,4 @@ class AthenaAudit():
                 ratio.append(0)
 
 
-        return {"prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "ratio": ratio, "deltas": deltas}
+        return {"prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "audit_ratio": audit_ratio[1:len(audit_ratio)], "ratio": ratio, "deltas": deltas}
