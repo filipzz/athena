@@ -35,7 +35,7 @@ if (__name__ == '__main__'):
         name = args.new
 
         alpha = args.alpha
-        if alpha < 0.0 or alpha > 1.0:
+        if alpha < 0.0 or alpha >= 0.5:
             print("Value of alpha is incorrect")
             sys.exit(2)
 
