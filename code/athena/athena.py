@@ -139,6 +139,8 @@ class AthenaAudit():
         prob_table_prev = [1]
         prob_tied_table_prev = [1]
         kmins = [0] * number_of_rounds
+        #for i, v in zip(range(number_of_rounds), round_schedule):
+        #    kmins[i] = v + 1
         prob_sum = [0] * number_of_rounds
         prob_tied_sum = [0] * number_of_rounds
         deltas = [0] * number_of_rounds
@@ -338,7 +340,7 @@ class AthenaAudit():
         test_passed = 0
 
         for audit_k, actual_k in zip(audit_kmins, actual_kmins):
-            if audit_k <= actual_k:
+            if audit_k <= actual_k and audit_k > 0:
                 test_passed = 1
 
         for i in range(len(actual_kmins)-1):
@@ -394,7 +396,8 @@ class AthenaAudit():
 
 
             if prob_table[kmins[round]] is not 0 and round < len(audit_observations):
-                deltas.append(abs(prob_tied_table[audit_observations[round]] / prob_table[audit_observations[round]]))
+                if prob_table[audit_observations[round]] > 0:
+                    deltas.append(abs(prob_tied_table[audit_observations[round]] / prob_table[audit_observations[round]]))
 
             # cleaning prob_table/prob_tied_table
             for i in range(kmins[round], round_schedule[round] + 1):

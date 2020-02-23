@@ -188,9 +188,11 @@ if (__name__ == '__main__'):
                 print("\t%s ratio:\t%s" % (audit_type, str(true_risk)))
 
     elif mode_rounds == "pstop":
-        w = Audit(audit_type)
+        w = Audit(audit_type, alpha, delta)
         w.add_election(election)
+        w.add_round_schedule(round_schedule)
         x = w.find_next_round_size(pstop_goal)
+        print(str(x))
 
         '''
         print(str(x))
@@ -237,8 +239,9 @@ if (__name__ == '__main__'):
         '''
 
     if mode_rounds == "risk":
-        w = Audit(audit_type)
+        w = Audit(audit_type, alpha, delta)
         w.add_election(election)
+        w.add_round_schedule(round_schedule)
         x = w.find_risk(actual_kmins)
         #print(str(x))
 

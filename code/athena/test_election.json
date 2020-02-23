@@ -1,0 +1,593 @@
+{
+  "us2016" : {
+    "contests" : {
+      "pres" : {
+        "winners" : 1,
+        "candidates" : ["Trump", "Clinton"],
+        "results" : [62984828, 65853514],
+        "ballots_cast" : 136669276
+      }
+    }
+  },
+  "Alabama2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [729547, 1318255],
+        "ballots_cast" : 2123372
+      }
+    }
+  },
+  "Alaska2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [116454, 163387],
+        "ballots_cast" : 318608
+      }
+    }
+  },
+  "Arizona2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1161167, 1252401],
+        "ballots_cast" : 2573165
+      }
+    }
+  },
+  "Arkansas2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [380494, 684872],
+        "ballots_cast" : 1130635
+      }
+    }
+  },
+  "California2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [8753788, 4483810],
+        "ballots_cast" : 14181595
+      }
+    }
+  },
+  "Colorado2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1338870, 1202484],
+        "ballots_cast" : 2780247
+      }
+    }
+  },
+  "Connecticut2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [897572, 673215],
+        "ballots_cast" : 1644920
+      }
+    }
+  },
+  "Delaware2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [235603, 185127],
+        "ballots_cast" : 443814
+      }
+    }
+  },
+  "DistrictofColumbia2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [282830, 12723],
+        "ballots_cast" : 311268
+      }
+    }
+  },
+  "Florida2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [4504975, 4617886],
+        "ballots_cast" : 9420039
+      }
+    }
+  },
+  "Georgia2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1877963, 2089104],
+        "ballots_cast" : 4114732
+      }
+    }
+  },
+  "Hawaii2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [266891, 128847],
+        "ballots_cast" : 428937
+      }
+    }
+  },
+  "Idaho2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [189765, 409055],
+        "ballots_cast" : 690255
+      }
+    }
+  },
+  "Illinois2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [3090729, 2146015],
+        "ballots_cast" : 5536424
+      }
+    }
+  },
+  "Indiana2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1033126, 1557286],
+        "ballots_cast" : 2734958
+      }
+    }
+  },
+  "Iowa2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [653669, 800983],
+        "ballots_cast" : 1566031
+      }
+    }
+  },
+  "Kansas2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [427005, 671018],
+        "ballots_cast" : 1184402
+      }
+    }
+  },
+  "Kentucky2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [628854, 1202971],
+        "ballots_cast" : 1924149
+      }
+    }
+  },
+  "Louisiana2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [780154, 1178638],
+        "ballots_cast" : 2029032
+      }
+    }
+  },
+  "Maine-at-lg-2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [357735, 335593],
+        "ballots_cast" : 747927
+      }
+    }
+  },
+  "Maine1st2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [212774, 154384],
+        "ballots_cast" : 394329
+      }
+    }
+  },
+  "Maine2nd2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [144817, 181177],
+        "ballots_cast" : 353416
+      }
+    }
+  },
+  "Maryland2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1677928, 943169],
+        "ballots_cast" : 2781446
+      }
+    }
+  },
+  "Massachusetts2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1995196, 1090893],
+        "ballots_cast" : 3325046
+      }
+    }
+  },
+  "Michigan2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [2268839, 2279543],
+        "ballots_cast" : 4799284
+      }
+    }
+  },
+  "Minnesota2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1367716, 1322951],
+        "ballots_cast" : 2944813
+      }
+    }
+  },
+  "Mississippi2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [485131, 700714],
+        "ballots_cast" : 1209357
+      }
+    }
+  },
+  "Missouri2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1071068, 1594511],
+        "ballots_cast" : 2808605
+      }
+    }
+  },
+  "Montana2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [177709, 279240],
+        "ballots_cast" : 497147
+      }
+    }
+  },
+  "Nebraska-at-lg-2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [284494, 495961],
+        "ballots_cast" : 844227
+      }
+    }
+  },
+  "Nebraska1st2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [100126, 158626],
+        "ballots_cast" : 282338
+      }
+    }
+  },
+  "Nebraska2nd2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [131030, 137564],
+        "ballots_cast" : 291680
+      }
+    }
+  },
+  "Nebraska3rd2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [53290, 199657],
+        "ballots_cast" : 270109
+      }
+    }
+  },
+  "Nevada2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [539260, 512058],
+        "ballots_cast" : 1125385
+      }
+    }
+  },
+  "NewHampshire2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [348526, 345790],
+        "ballots_cast" : 744296
+      }
+    }
+  },
+  "NewJersey2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [2148278, 1601933],
+        "ballots_cast" : 3874046
+      }
+    }
+  },
+  "NewMexico2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [385234, 319667],
+        "ballots_cast" : 798319
+      }
+    }
+  },
+  "NewYork2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [4556124, 2819534],
+        "ballots_cast" : 7721453
+      }
+    }
+  },
+  "NorthCarolina2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [2189316, 2362631],
+        "ballots_cast" : 4741564
+      }
+    }
+  },
+  "NorthDakota2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [93758, 216794],
+        "ballots_cast" : 344360
+      }
+    }
+  },
+  "Ohio2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [2394164, 2841005],
+        "ballots_cast" : 5496487
+      }
+    }
+  },
+  "Oklahoma2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [420375, 949136],
+        "ballots_cast" : 1452992
+      }
+    }
+  },
+  "Oregon2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1002106, 782403],
+        "ballots_cast" : 2001336
+      }
+    }
+  },
+  "Pennsylvania2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [2926441, 2970733],
+        "ballots_cast" : 6165478
+      }
+    }
+  },
+  "RhodeIsland2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [252525, 180543],
+        "ballots_cast" : 464144
+      }
+    }
+  },
+  "SouthCarolina2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [855373, 1155389],
+        "ballots_cast" : 2103027
+      }
+    }
+  },
+  "SouthDakota2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [117458, 227721],
+        "ballots_cast" : 370093
+      }
+    }
+  },
+  "Tennessee2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [870695, 1522925],
+        "ballots_cast" : 2508027
+      }
+    }
+  },
+  "Texas2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [3877868, 4685047],
+        "ballots_cast" : 8969226
+      }
+    }
+  },
+  "Utah2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [310676, 515231],
+        "ballots_cast" : 1131430
+      }
+    }
+  },
+  "Vermont2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [178573, 95369],
+        "ballots_cast" : 315067
+      }
+    }
+  },
+  "Virginia2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1981473, 1769443],
+        "ballots_cast" : 3984631
+      }
+    }
+  },
+  "Washington2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1742718, 1221747],
+        "ballots_cast" : 3317019
+      }
+    }
+  },
+  "WestVirginia2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [188794, 489371],
+        "ballots_cast" : 714423
+      }
+    }
+  },
+  "Wisconsin2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [1382536, 1405284],
+        "ballots_cast" : 2976150
+      }
+    }
+  },
+  "Wyoming2016" : {
+    "contests" : {
+      "presidential" : {
+        "winners" : 1,
+        "candidates" : ["Clinton", "Trump"],
+        "results" : [55973, 174419],
+        "ballots_cast" : 255849
+      }
+    }
+  },
+  "mercer2019" : {
+    "contests" : {
+      "contest1": {
+        "winners": 1,
+        "candidates": ["yes", "no"],
+        "results": [15038, 5274],
+        "ballots_cast": 23662
+      }
+    }
+  },
+  "mercer2019a" : {
+    "contests" : {
+      "contestNoScalling": {
+        "winners": 1,
+        "candidates": ["yes", "no"],
+        "results": [15038, 5274],
+        "ballots_cast": 20312
+      }
+    }
+  }
+
+}
