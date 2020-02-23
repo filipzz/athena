@@ -73,5 +73,20 @@
                 "round_candidates" : [45, 53, 67]
             }
         }
+    },
+    "evaluate_risk" : {
+        "test1": {
+            "audit_type": "athena",
+            "election": "Arkansas2016",
+            "contest": "presidential",
+            "alpha": 0.1,
+            "round_schedule" : [100],
+            "audit_observations" : [58],
+            "expected": {
+                "passed" : 1,
+                "pvalue": 0.07236663990215242,
+                "delta" : 0.6411058176484344
+            }
+        }
     }
 }
