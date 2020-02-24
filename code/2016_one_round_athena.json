@@ -1,540 +1,540 @@
 {
-"test1": {
-"audit_type": "athena",
- "election": "Alabama",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [90]
-}
-},
- 
-"test2": {
-"audit_type": "athena",
- "election": "Alaska",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [301]
-}
-},
- 
-"test3": {
-"audit_type": "athena",
- "election": "Arizona",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [5340]
-}
-},
- 
-"test4": {
-"audit_type": "athena",
- "election": "Arkansas",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [92]
-}
-},
- 
-"test5": {
-"audit_type": "athena",
- "election": "California",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [71]
-}
-},
- 
-"test6": {
-"audit_type": "athena",
- "election": "Colorado",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [2672]
-}
-},
- 
-"test7": {
-"audit_type": "athena",
- "election": "Connecticut",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [370]
-}
-},
- 
-"test8": {
-"audit_type": "athena",
- "election": "Delaware",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [542]
-}
-},
- 
-"test9": {
-"audit_type": "athena",
- "election": "District of Columbia",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [8]
-}
-},
- 
-"test10": {
-"audit_type": "athena",
- "election": "Florida",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [48296]
-}
-},
- 
-"test11": {
-"audit_type": "athena",
- "election": "Georgia",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [2638]
-}
-},
- 
-"test12": {
-"audit_type": "athena",
- "election": "Hawaii",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [63]
-}
-},
- 
-"test13": {
-"audit_type": "athena",
- "election": "Idaho",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [69]
-}
-},
- 
-"test14": {
-"audit_type": "athena",
- "election": "Illinois",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [232]
-}
-},
- 
-"test15": {
-"audit_type": "athena",
- "election": "Indiana",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [188]
-}
-},
- 
-"test16": {
-"audit_type": "athena",
- "election": "Iowa",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [753]
-}
-},
- 
-"test17": {
-"audit_type": "athena",
- "election": "Kansas",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [163]
-}
-},
- 
-"test18": {
-"audit_type": "athena",
- "election": "Kentucky",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [80]
-}
-},
- 
-"test19": {
-"audit_type": "athena",
- "election": "Louisiana",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [183]
-}
-},
- 
-"test20": {
-"audit_type": "athena",
- "election": "Maryland",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [96]
-}
-},
- 
-"test21": {
-"audit_type": "athena",
- "election": "Massachusetts",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [93]
-}
-},
- 
-"test22": {
-"audit_type": "athena",
- "election": "Michigan",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [1349799]
-}
-},
- 
-"test23": {
-"audit_type": "athena",
- "election": "Minnesota",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [28038]
-}
-},
- 
-"test24": {
-"audit_type": "athena",
- "election": "Mississippi",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [225]
-}
-},
- 
-"test25": {
-"audit_type": "athena",
- "election": "Missouri",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [199]
-}
-},
- 
-"test26": {
-"audit_type": "athena",
- "election": "Montana",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [152]
-}
-},
- 
-"test27": {
-"audit_type": "athena",
- "election": "Nevada",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [11265]
-}
-},
- 
-"test28": {
-"audit_type": "athena",
- "election": "New Hampshire",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [488445]
-}
-},
- 
-"test29": {
-"audit_type": "athena",
- "election": "New Jersey",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [350]
-}
-},
- 
-"test30": {
-"audit_type": "athena",
- "election": "New Mexico",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [974]
-}
-},
- 
-"test31": {
-"audit_type": "athena",
- "election": "New York",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [132]
-}
-},
- 
-"test32": {
-"audit_type": "athena",
- "election": "North Carolina",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [5064]
-}
-},
- 
-"test33": {
-"audit_type": "athena",
- "election": "North Dakota",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [49]
-}
-},
- 
-"test34": {
-"audit_type": "athena",
- "election": "Ohio",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [1048]
-}
-},
- 
-"test35": {
-"audit_type": "athena",
- "election": "Oklahoma",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [52]
-}
-},
- 
-"test36": {
-"audit_type": "athena",
- "election": "Oregon",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [550]
-}
-},
- 
-"test37": {
-"audit_type": "athena",
- "election": "Pennsylvania",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [132461]
-}
-},
- 
-"test38": {
-"audit_type": "athena",
- "election": "Rhode Island",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [283]
-}
-},
- 
-"test39": {
-"audit_type": "athena",
- "election": "South Carolina",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [353]
-}
-},
- 
-"test40": {
-"audit_type": "athena",
- "election": "South Dakota",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [80]
-}
-},
- 
-"test41": {
-"audit_type": "athena",
- "election": "Tennessee",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [97]
-}
-},
- 
-"test42": {
-"audit_type": "athena",
- "election": "Texas",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [855]
-}
-},
- 
-"test43": {
-"audit_type": "athena",
- "election": "Utah",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [159]
-}
-},
- 
-"test44": {
-"audit_type": "athena",
- "election": "Vermont",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [96]
-}
-},
- 
-"test45": {
-"audit_type": "athena",
- "election": "Virginia",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [2310]
-}
-},
- 
-"test46": {
-"audit_type": "athena",
- "election": "Washington",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [258]
-}
-},
- 
-"test47": {
-"audit_type": "athena",
- "election": "West Virginia",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [41]
-}
-},
- 
-"test48": {
-"audit_type": "athena",
- "election": "Wisconsin",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [113349]
-}
-},
- 
-"test49": {
-"audit_type": "athena",
- "election": "Wyoming",
- "contest": "presidential",
- "alpha": 0.1,
- "quants": [0.9],
- "expected": {
-"round_candidates": [29]}},
+ "test1": {
+  "audit_type": "athena",
+  "election": "Alabama",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [90]
+  }
+ },
+
+ "test2": {
+  "audit_type": "athena",
+  "election": "Alaska",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [301]
+  }
+ },
+
+ "test3": {
+  "audit_type": "athena",
+  "election": "Arizona",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [5340]
+  }
+ },
+
+ "test4": {
+  "audit_type": "athena",
+  "election": "Arkansas",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [92]
+  }
+ },
+
+ "test5": {
+  "audit_type": "athena",
+  "election": "California",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [71]
+  }
+ },
+
+ "test6": {
+  "audit_type": "athena",
+  "election": "Colorado",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [2672]
+  }
+ },
+
+ "test7": {
+  "audit_type": "athena",
+  "election": "Connecticut",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [370]
+  }
+ },
+
+ "test8": {
+  "audit_type": "athena",
+  "election": "Delaware",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [542]
+  }
+ },
+
+ "test9": {
+  "audit_type": "athena",
+  "election": "District of Columbia",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [8]
+  }
+ },
+
+ "test10": {
+  "audit_type": "athena",
+  "election": "Florida",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [48296]
+  }
+ },
+
+ "test11": {
+  "audit_type": "athena",
+  "election": "Georgia",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [2638]
+  }
+ },
+
+ "test12": {
+  "audit_type": "athena",
+  "election": "Hawaii",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [63]
+  }
+ },
+
+ "test13": {
+  "audit_type": "athena",
+  "election": "Idaho",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [69]
+  }
+ },
+
+ "test14": {
+  "audit_type": "athena",
+  "election": "Illinois",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [232]
+  }
+ },
+
+ "test15": {
+  "audit_type": "athena",
+  "election": "Indiana",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [188]
+  }
+ },
+
+ "test16": {
+  "audit_type": "athena",
+  "election": "Iowa",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [753]
+  }
+ },
+
+ "test17": {
+  "audit_type": "athena",
+  "election": "Kansas",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [163]
+  }
+ },
+
+ "test18": {
+  "audit_type": "athena",
+  "election": "Kentucky",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [80]
+  }
+ },
+
+ "test19": {
+  "audit_type": "athena",
+  "election": "Louisiana",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [183]
+  }
+ },
+
+ "test20": {
+  "audit_type": "athena",
+  "election": "Maryland",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [96]
+  }
+ },
+
+ "test21": {
+  "audit_type": "athena",
+  "election": "Massachusetts",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [93]
+  }
+ },
+
+ "test22": {
+  "audit_type": "athena",
+  "election": "Michigan",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [1349799]
+  }
+ },
+
+ "test23": {
+  "audit_type": "athena",
+  "election": "Minnesota",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [28038]
+  }
+ },
+
+ "test24": {
+  "audit_type": "athena",
+  "election": "Mississippi",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [225]
+  }
+ },
+
+ "test25": {
+  "audit_type": "athena",
+  "election": "Missouri",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [199]
+  }
+ },
+
+ "test26": {
+  "audit_type": "athena",
+  "election": "Montana",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [152]
+  }
+ },
+
+ "test27": {
+  "audit_type": "athena",
+  "election": "Nevada",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [11265]
+  }
+ },
+
+ "test28": {
+  "audit_type": "athena",
+  "election": "New Hampshire",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [488445]
+  }
+ },
+
+ "test29": {
+  "audit_type": "athena",
+  "election": "New Jersey",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [350]
+  }
+ },
+
+ "test30": {
+  "audit_type": "athena",
+  "election": "New Mexico",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [974]
+  }
+ },
+
+ "test31": {
+  "audit_type": "athena",
+  "election": "New York",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [132]
+  }
+ },
+
+ "test32": {
+  "audit_type": "athena",
+  "election": "North Carolina",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [5064]
+  }
+ },
+
+ "test33": {
+  "audit_type": "athena",
+  "election": "North Dakota",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [49]
+  }
+ },
+
+ "test34": {
+  "audit_type": "athena",
+  "election": "Ohio",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [1048]
+  }
+ },
+
+ "test35": {
+  "audit_type": "athena",
+  "election": "Oklahoma",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [52]
+  }
+ },
+
+ "test36": {
+  "audit_type": "athena",
+  "election": "Oregon",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [550]
+  }
+ },
+
+ "test37": {
+  "audit_type": "athena",
+  "election": "Pennsylvania",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [132461]
+  }
+ },
+
+ "test38": {
+  "audit_type": "athena",
+  "election": "Rhode Island",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [283]
+  }
+ },
+
+ "test39": {
+  "audit_type": "athena",
+  "election": "South Carolina",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [353]
+  }
+ },
+
+ "test40": {
+  "audit_type": "athena",
+  "election": "South Dakota",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [80]
+  }
+ },
+
+ "test41": {
+  "audit_type": "athena",
+  "election": "Tennessee",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [97]
+  }
+ },
+
+ "test42": {
+  "audit_type": "athena",
+  "election": "Texas",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [855]
+  }
+ },
+
+ "test43": {
+  "audit_type": "athena",
+  "election": "Utah",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [159]
+  }
+ },
+
+ "test44": {
+  "audit_type": "athena",
+  "election": "Vermont",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [96]
+  }
+ },
+
+ "test45": {
+  "audit_type": "athena",
+  "election": "Virginia",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [2310]
+  }
+ },
+
+ "test46": {
+  "audit_type": "athena",
+  "election": "Washington",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [258]
+  }
+ },
+
+ "test47": {
+  "audit_type": "athena",
+  "election": "West Virginia",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [41]
+  }
+ },
+
+ "test48": {
+  "audit_type": "athena",
+  "election": "Wisconsin",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [113349]
+  }
+ },
+
+ "test49": {
+  "audit_type": "athena",
+  "election": "Wyoming",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [29]}},
  "test51": {
   "audit_type": "athena",
   "election": "Maine",

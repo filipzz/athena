@@ -1,10 +1,510 @@
-{"test1": {"audit_type": "arlo", "election": "Alabama2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [179]}}, "test2": {"audit_type": "arlo", "election": "Alaska2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [583]}}, "test3": {"audit_type": "arlo", "election": "Arizona2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [10680]}}, "test4": {"audit_type": "arlo", "election": "Arkansas2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [185]}}, "test5": {"audit_type": "arlo", "election": "California2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [146]}}, "test6": {"audit_type": "arlo", "election": "Colorado2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [5409]}}, "test7": {"audit_type": "arlo", "election": "Connecticut2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [752]}}, "test8": {"audit_type": "arlo", "election": "Delaware2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [1083]}}, "test9": {"audit_type": "arlo", "election": "District of Columbia2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [10]}}, "test10": {"audit_type": "arlo", "election": "Florida2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [96592]}}, "test11": {"audit_type": "arlo", "election": "Georgia2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [5274]}}, "test12": {"audit_type": "arlo", "election": "Hawaii2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [118]}}, "test13": {"audit_type": "arlo", "election": "Idaho2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [111]}}, "test14": {"audit_type": "arlo", "election": "Illinois2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [465]}}, "test15": {"audit_type": "arlo", "election": "Indiana2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [370]}}, "test16": {"audit_type": "arlo", "election": "Iowa2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [1506]}}, "test17": {"audit_type": "arlo", "election": "Kansas2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [326]}}, "test18": {"audit_type": "arlo", "election": "Kentucky2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [156]}}, "test19": {"audit_type": "arlo", "election": "Louisiana2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [356]}}, "test20": {"audit_type": "arlo", "election": "Maryland2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [198]}}, "test21": {"audit_type": "arlo", "election": "Massachusetts2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [180]}}, "test22": {"audit_type": "arlo", "election": "Michigan2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [2849575]}}, "test23": {"audit_type": "arlo", "election": "Minnesota2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [57516]}}, "test24": {"audit_type": "arlo", "election": "Mississippi2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [453]}}, "test25": {"audit_type": "arlo", "election": "Missouri2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [386]}}, "test26": {"audit_type": "arlo", "election": "Montana2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [318]}}, "test27": {"audit_type": "arlo", "election": "Nevada2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [23079]}}, "test28": {"audit_type": "arlo", "election": "New Hampshire2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [1023407]}}, "test29": {"audit_type": "arlo", "election": "New Jersey2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [680]}}, "test30": {"audit_type": "arlo", "election": "New Mexico2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [1948]}}, "test31": {"audit_type": "arlo", "election": "New York2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [266]}}, "test32": {"audit_type": "arlo", "election": "North Carolina2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [10419]}}, "test33": {"audit_type": "arlo", "election": "North Dakota2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [99]}}, "test34": {"audit_type": "arlo", "election": "Ohio2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [2096]}}, "test35": {"audit_type": "arlo", "election": "Oklahoma2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [106]}}, "test36": {"audit_type": "arlo", "election": "Oregon2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [1100]}}, "test37": {"audit_type": "arlo", "election": "Pennsylvania2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [276965]}}, "test38": {"audit_type": "arlo", "election": "Rhode Island2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [539]}}, "test39": {"audit_type": "arlo", "election": "South Carolina2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [674]}}, "test40": {"audit_type": "arlo", "election": "South Dakota2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [146]}}, "test41": {"audit_type": "arlo", "election": "Tennessee2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [193]}}, "test42": {"audit_type": "arlo", "election": "Texas2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [1711]}}, "test43": {"audit_type": "arlo", "election": "Utah2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [310]}}, "test44": {"audit_type": "arlo", "election": "Vermont2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [178]}}, "test45": {"audit_type": "arlo", "election": "Virginia2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [4864]}}, "test46": {"audit_type": "arlo", "election": "Washington2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [531]}}, "test47": {"audit_type": "arlo", "election": "West Virginia2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [71]}}, "test48": {"audit_type": "arlo", "election": "Wisconsin2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [232512]}}, "test49": {"audit_type": "arlo", "election": "Wyoming2016", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [59]}},
-  "test51":
-  {"audit_type": "arlo", "election": "Maine",
-    "contest": "presidential", "alpha": 0.1,
-    "quants": [0.9],
-    "expected": {"round_candidates": [15339]}},
-  "test52": {"audit_type": "arlo", "election": "Nebraska", "contest": "presidential", "alpha": 0.1, "quants": [0.9], "expected": {"round_candidates": [213]}
+{"test1": {
+ "audit_type": "arlo",
+ "election": "Alabama2016",
+ "contest": "presidential",
+ "alpha": 0.1,
+ "quants": [0.9],
+ "expected": {
+  "round_candidates": [179]
+ }
+},
+ "test2": {
+  "audit_type": "arlo",
+  "election": "Alaska2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [583]
   }
+ },
+ "test3": {
+  "audit_type": "arlo",
+  "election": "Arizona2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [10680]
+  }
+ },
+ "test4": {
+  "audit_type": "arlo",
+  "election": "Arkansas2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [185]
+  }
+ },
+ "test5": {
+  "audit_type": "arlo",
+  "election": "California2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [146]
+  }
+ },
+ "test6": {
+  "audit_type": "arlo",
+  "election": "Colorado2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [5409]
+  }
+ },
+ "test7": {
+  "audit_type": "arlo",
+  "election": "Connecticut2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [752]
+  }
+ },
+ "test8": {
+  "audit_type": "arlo",
+  "election": "Delaware2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [1083]
+  }
+ },
+ "test9": {
+  "audit_type": "arlo",
+  "election": "District of Columbia2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [10]
+  }
+ },
+ "test10": {
+  "audit_type": "arlo",
+  "election": "Florida2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [96592]
+  }
+ },
+ "test11": {
+  "audit_type": "arlo",
+  "election": "Georgia2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [5274]
+  }
+ },
+ "test12": {
+  "audit_type": "arlo",
+  "election": "Hawaii2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [118]
+  }
+ },
+ "test13": {
+  "audit_type": "arlo",
+  "election": "Idaho2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [111]
+  }
+ },
+ "test14": {
+  "audit_type": "arlo",
+  "election": "Illinois2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [465]
+  }
+ },
+ "test15": {
+  "audit_type": "arlo",
+  "election": "Indiana2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [370]
+  }
+ },
+ "test16": {
+  "audit_type": "arlo",
+  "election": "Iowa2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [1506]
+  }
+ },
+ "test17": {
+  "audit_type": "arlo",
+  "election": "Kansas2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [326]
+  }
+ },
+ "test18": {
+  "audit_type": "arlo",
+  "election": "Kentucky2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [156]
+  }
+ },
+ "test19": {
+  "audit_type": "arlo",
+  "election": "Louisiana2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [356]
+  }
+ },
+ "test20": {
+  "audit_type": "arlo",
+  "election": "Maryland2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [198]
+  }
+ },
+ "test21": {
+  "audit_type": "arlo",
+  "election": "Massachusetts2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [180]
+  }
+ },
+ "test22": {
+  "audit_type": "arlo",
+  "election": "Michigan2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [2849575]
+  }
+ },
+ "test23": {
+  "audit_type": "arlo",
+  "election": "Minnesota2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [57516]
+  }
+ },
+ "test24": {
+  "audit_type": "arlo",
+  "election": "Mississippi2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [453]
+  }
+ },
+ "test25": {
+  "audit_type": "arlo",
+  "election": "Missouri2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [386]
+  }
+ },
+ "test26": {
+  "audit_type": "arlo",
+  "election": "Montana2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [318]
+  }
+ },
+ "test27": {
+  "audit_type": "arlo",
+  "election": "Nevada2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [23079]
+  }
+ },
+ "test28": {
+  "audit_type": "arlo",
+  "election": "New Hampshire2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [1023407]
+  }
+ },
+ "test29": {
+  "audit_type": "arlo",
+  "election": "New Jersey2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [680]
+  }
+ },
+ "test30": {
+  "audit_type": "arlo",
+  "election": "New Mexico2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [1948]
+  }
+ },
+ "test31": {
+  "audit_type": "arlo",
+  "election": "New York2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [266]
+  }
+ },
+ "test32": {
+  "audit_type": "arlo",
+  "election": "North Carolina2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [10419]
+  }
+ },
+ "test33": {
+  "audit_type": "arlo",
+  "election": "North Dakota2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [99]
+  }
+ },
+ "test34": {
+  "audit_type": "arlo",
+  "election": "Ohio2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [2096]
+  }
+ },
+ "test35": {
+  "audit_type": "arlo",
+  "election": "Oklahoma2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [106]
+  }
+ },
+ "test36": {
+  "audit_type": "arlo",
+  "election": "Oregon2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [1100]
+  }
+ },
+ "test37": {
+  "audit_type": "arlo",
+  "election": "Pennsylvania2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [276965]
+  }
+ },
+ "test38": {
+  "audit_type": "arlo",
+  "election": "Rhode Island2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [539]
+  }
+ },
+ "test39": {
+  "audit_type": "arlo",
+  "election": "South Carolina2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [674]
+  }
+ },
+ "test40": {
+  "audit_type": "arlo",
+  "election": "South Dakota2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [146]
+  }
+ },
+ "test41": {
+  "audit_type": "arlo",
+  "election": "Tennessee2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [193]
+  }
+ },
+ "test42": {
+  "audit_type": "arlo",
+  "election": "Texas2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [1711]
+  }
+ },
+ "test43": {
+  "audit_type": "arlo",
+  "election": "Utah2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [310]
+  }
+ },
+ "test44": {
+  "audit_type": "arlo",
+  "election": "Vermont2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [178]
+  }
+ },
+ "test45": {
+  "audit_type": "arlo",
+  "election": "Virginia2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [4864]
+  }
+ },
+ "test46": {
+  "audit_type": "arlo",
+  "election": "Washington2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [531]
+  }
+ },
+ "test47": {
+  "audit_type": "arlo",
+  "election": "West Virginia2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [71]
+  }
+ },
+ "test48": {
+  "audit_type": "arlo",
+  "election": "Wisconsin2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [232512]
+  }
+ },
+ "test49": {
+  "audit_type": "arlo",
+  "election": "Wyoming2016",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [59]}},
+ "test51": {
+  "audit_type": "arlo",
+  "election": "Maine",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [15339]
+  }
+ },
+ "test52": {
+  "audit_type": "arlo",
+  "election": "Nebraska",
+  "contest": "presidential",
+  "alpha": 0.1,
+  "quants": [0.9],
+  "expected": {
+   "round_candidates": [213]
+  }
+ }
 
 }
