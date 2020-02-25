@@ -14,7 +14,7 @@
     "next_round_size" : {
         "test1": {
             "audit_type": "athena",
-            "election": "Arkansas2016",
+            "election": "Arkansas",
             "contest": "presidential",
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
@@ -24,7 +24,7 @@
         },
         "test2": {
             "audit_type": "athena",
-            "election": "DistrictofColumbia2016",
+            "election": "DistrictofColumbia",
             "contest": "presidential",
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
@@ -34,7 +34,7 @@
         },
         "test3": {
             "audit_type": "athena",
-            "election": "Alaska2016",
+            "election": "Alaska",
             "contest": "presidential",
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
@@ -77,7 +77,7 @@
     "evaluate_risk" : {
         "test1": {
             "audit_type": "athena",
-            "election": "Arkansas2016",
+            "election": "Arkansas",
             "contest": "presidential",
             "alpha": 0.1,
             "round_schedule" : [100],

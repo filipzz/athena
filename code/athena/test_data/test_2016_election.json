@@ -1,5 +1,5 @@
 {
-  "us2016" : {
+  "us" : {
     "contests" : {
       "pres" : {
         "winners" : 1,
@@ -9,7 +9,7 @@
       }
     }
   },
-  "Alabama2016" : {
+  "Alabama" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -19,7 +19,7 @@
       }
     }
   },
-  "Alaska2016" : {
+  "Alaska" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -29,7 +29,7 @@
       }
     }
   },
-  "Arizona2016" : {
+  "Arizona" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -39,7 +39,7 @@
       }
     }
   },
-  "Arkansas2016" : {
+  "Arkansas" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -49,7 +49,7 @@
       }
     }
   },
-  "California2016" : {
+  "California" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -59,7 +59,7 @@
       }
     }
   },
-  "Colorado2016" : {
+  "Colorado" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -69,7 +69,7 @@
       }
     }
   },
-  "Connecticut2016" : {
+  "Connecticut" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -79,7 +79,7 @@
       }
     }
   },
-  "Delaware2016" : {
+  "Delaware" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -89,7 +89,7 @@
       }
     }
   },
-  "DistrictofColumbia2016" : {
+  "DistrictofColumbia" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -99,7 +99,7 @@
       }
     }
   },
-  "Florida2016" : {
+  "Florida" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -109,7 +109,7 @@
       }
     }
   },
-  "Georgia2016" : {
+  "Georgia" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -119,7 +119,7 @@
       }
     }
   },
-  "Hawaii2016" : {
+  "Hawaii" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -129,7 +129,7 @@
       }
     }
   },
-  "Idaho2016" : {
+  "Idaho" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -139,7 +139,7 @@
       }
     }
   },
-  "Illinois2016" : {
+  "Illinois" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -149,7 +149,7 @@
       }
     }
   },
-  "Indiana2016" : {
+  "Indiana" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -159,7 +159,7 @@
       }
     }
   },
-  "Iowa2016" : {
+  "Iowa" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -169,7 +169,7 @@
       }
     }
   },
-  "Kansas2016" : {
+  "Kansas" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -179,7 +179,7 @@
       }
     }
   },
-  "Kentucky2016" : {
+  "Kentucky" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -189,7 +189,7 @@
       }
     }
   },
-  "Louisiana2016" : {
+  "Louisiana" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -199,7 +199,7 @@
       }
     }
   },
-  "Maine-at-lg-2016" : {
+  "Maine-at-lg-" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -209,7 +209,7 @@
       }
     }
   },
-  "Maine1st2016" : {
+  "Maine1st" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -219,7 +219,7 @@
       }
     }
   },
-  "Maine2nd2016" : {
+  "Maine2nd" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -229,7 +229,7 @@
       }
     }
   },
-  "Maryland2016" : {
+  "Maryland" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -239,7 +239,7 @@
       }
     }
   },
-  "Massachusetts2016" : {
+  "Massachusetts" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -249,7 +249,7 @@
       }
     }
   },
-  "Michigan2016" : {
+  "Michigan" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -259,7 +259,7 @@
       }
     }
   },
-  "Minnesota2016" : {
+  "Minnesota" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -269,7 +269,7 @@
       }
     }
   },
-  "Mississippi2016" : {
+  "Mississippi" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -279,7 +279,7 @@
       }
     }
   },
-  "Missouri2016" : {
+  "Missouri" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -289,7 +289,7 @@
       }
     }
   },
-  "Montana2016" : {
+  "Montana" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -299,7 +299,7 @@
       }
     }
   },
-  "Nebraska-at-lg-2016" : {
+  "Nebraska-at-lg-" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -309,7 +309,7 @@
       }
     }
   },
-  "Nebraska1st2016" : {
+  "Nebraska1st" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -319,7 +319,7 @@
       }
     }
   },
-  "Nebraska2nd2016" : {
+  "Nebraska2nd" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -329,7 +329,7 @@
       }
     }
   },
-  "Nebraska3rd2016" : {
+  "Nebraska3rd" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -339,7 +339,7 @@
       }
     }
   },
-  "Nevada2016" : {
+  "Nevada" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -349,7 +349,7 @@
       }
     }
   },
-  "NewHampshire2016" : {
+  "NewHampshire" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -359,7 +359,7 @@
       }
     }
   },
-  "NewJersey2016" : {
+  "NewJersey" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -369,7 +369,7 @@
       }
     }
   },
-  "NewMexico2016" : {
+  "NewMexico" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -379,7 +379,7 @@
       }
     }
   },
-  "NewYork2016" : {
+  "NewYork" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -389,7 +389,7 @@
       }
     }
   },
-  "NorthCarolina2016" : {
+  "NorthCarolina" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -399,7 +399,7 @@
       }
     }
   },
-  "NorthDakota2016" : {
+  "NorthDakota" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -409,7 +409,7 @@
       }
     }
   },
-  "Ohio2016" : {
+  "Ohio" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -419,7 +419,7 @@
       }
     }
   },
-  "Oklahoma2016" : {
+  "Oklahoma" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -429,7 +429,7 @@
       }
     }
   },
-  "Oregon2016" : {
+  "Oregon" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -439,7 +439,7 @@
       }
     }
   },
-  "Pennsylvania2016" : {
+  "Pennsylvania" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -449,7 +449,7 @@
       }
     }
   },
-  "RhodeIsland2016" : {
+  "RhodeIsland" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -459,7 +459,7 @@
       }
     }
   },
-  "SouthCarolina2016" : {
+  "SouthCarolina" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -469,7 +469,7 @@
       }
     }
   },
-  "SouthDakota2016" : {
+  "SouthDakota" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -479,7 +479,7 @@
       }
     }
   },
-  "Tennessee2016" : {
+  "Tennessee" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -489,7 +489,7 @@
       }
     }
   },
-  "Texas2016" : {
+  "Texas" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -499,7 +499,7 @@
       }
     }
   },
-  "Utah2016" : {
+  "Utah" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -509,7 +509,7 @@
       }
     }
   },
-  "Vermont2016" : {
+  "Vermont" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -519,7 +519,7 @@
       }
     }
   },
-  "Virginia2016" : {
+  "Virginia" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -529,7 +529,7 @@
       }
     }
   },
-  "Washington2016" : {
+  "Washington" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -539,7 +539,7 @@
       }
     }
   },
-  "WestVirginia2016" : {
+  "WestVirginia" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -549,7 +549,7 @@
       }
     }
   },
-  "Wisconsin2016" : {
+  "Wisconsin" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
@@ -559,7 +559,7 @@
       }
     }
   },
-  "Wyoming2016" : {
+  "Wyoming" : {
     "contests" : {
       "presidential" : {
         "winners" : 1,
