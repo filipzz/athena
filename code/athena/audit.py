@@ -104,6 +104,8 @@ class Audit():
                     audit_athena = audit_object.arlo(margin, self.alpha, rs)
                 elif self.audit_type.lower() == "minerva":
                     audit_athena = audit_object.minerva(margin, self.alpha, rs)
+                elif self.audit_type.lower() == "metis":
+                    audit_athena = audit_object.metis(margin, self.alpha, rs)
                 else:
                     audit_athena = audit_object.athena(margin, self.alpha, self.delta, rs)
 

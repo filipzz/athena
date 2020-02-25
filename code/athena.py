@@ -172,10 +172,20 @@ if (__name__ == '__main__'):
                 prob_sum = audit_athena["prob_sum"]
                 prob_tied_sum = audit_athena["prob_tied_sum"]
                 deltas = audit_athena["deltas"]
+                #expected = list(map(lambda x: math.floor(x * winner/bc), round_schedule))
+
                 print("\n\tApprox round schedule:\t" + str(rs))
+                #print("\tExpected for winner:\t%s" % (str(expected)))
                 print("\t%s kmins:\t\t%s" % (audit_type, str(kmins)))
-                print("\t%s pstop (audit):\t%s" % (audit_type, str(prob_sum)))
-                print("\t%s pstop (tied): \t%s" % (audit_type, str(prob_tied_sum)))
+                print("\t%s pstop cumul (audit):\t%s" % (audit_type, str(prob_sum)))
+                print("\t%s pstop cumul (tied): \t%s" % (audit_type, str(prob_tied_sum)))
+
+                prob_sum_ex = [0] + prob_sum
+                prob_tied_sum_ex = [0] + prob_tied_sum
+                prob_sum_round = [(prob_sum_ex[i+1]-prob_sum_ex[i]) for i in range(len(prob_sum))]
+                prob_tied_sum_round = [(prob_tied_sum_ex[i+1]-prob_tied_sum_ex[i]) for i in range(len(prob_tied_sum))]
+                print("\t%s pstop round (audit):\t%s" % (audit_type, str(prob_sum_round)))
+                print("\t%s pstop round (tied): \t%s" % (audit_type, str(prob_tied_sum_round)))
                 print("\t%s deltas ():\t%s" % (audit_type, str(deltas)))
 
 
