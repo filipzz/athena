@@ -34,6 +34,30 @@ class AthenaAudit():
 
     """
 
+    check_delta = 0
+    check_sum = 0
+    check_memory = 0
+
+    def set_checks(self, audit_type):
+        if audit_type.lower() in {"bravo", "wald", "arlo"}:
+            self.check_delta = 1
+            self.check_sum = 0
+            self.check_memory = 0
+        elif audit_type.lower() in {"athena"}:
+            self.check_delta = 1
+            self.check_sum = 1
+            self.check_memory = 0
+        elif audit_type.lower() in {"minerva"}:
+            self.check_delta = 0
+            self.check_sum = 1
+            self.check_memory = 0
+        elif audit_type.lower() in {"metis"}:
+            self.check_delta = 0
+            self.check_sum = 1
+            self.check_memory = 1
+
+        print("delta check: %s\nsum check: %s\nmemory check: %s" % (self.check_delta, self.check_sum, self.check_memory))
+
 
     def next_round_prob(self, margin, round_size_prev, round_size, prob_table_prev):
         """
@@ -97,13 +121,13 @@ class AthenaAudit():
 
     def metis(self, margin, alpha, delta, round_schedule):
         """
-        Sets audit_type to **athena** and calls audit(...) method
+        Sets audit_type to **metis** and calls audit(...) method
         """
         return self.audit("metis", margin, alpha, delta, round_schedule)
 
     def minerva(self, margin, alpha, round_schedule):
         """
-        Sets audit_type to **athena** and calls audit(...) method
+        Sets audit_type to **minerva** and calls audit(...) method
         """
         return self.audit("minerva", margin, alpha, alpha, round_schedule)
 
@@ -139,6 +163,9 @@ class AthenaAudit():
             * prob_tied_sum - list of stopping probabilities for tied elections (risk)
         """
         #print("Starting audit for %s %s %s %s %s" % (audit_type, margin, alpha, delta, round_schedule))
+
+        self.set_checks(audit_type)
+
         round_schedule = [0] + round_schedule
         number_of_rounds = len(round_schedule)
         prob_table_prev = [1]
@@ -149,6 +176,8 @@ class AthenaAudit():
         prob_sum = [0] * number_of_rounds
         prob_tied_sum = [0] * number_of_rounds
         deltas = [0] * number_of_rounds
+
+
 
         for round in range(1, number_of_rounds):
             #prob_table = self.next_round_prob_bravo(margin, round_schedule[round - 1], round_schedule[round], kmins[0], kmins[round - 1], prob_table_prev)
@@ -163,49 +192,18 @@ class AthenaAudit():
 
 
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
-                if audit_type.lower() == "athena":
-                    '# prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added'
-                    if delta * prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
-                    #if delta * prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (prob_sum[round - 1] + sum(prob_table[kmin_candidate:len(prob_table)])) >= (prob_tied_sum[round - 1] + sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
-                        kmin_found = True
-                        kmins[round] = kmin_candidate
-                        prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
-                        prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])  + prob_tied_sum[round - 1]
-                        if prob_table[kmin_candidate] > 0:
-                            deltas[round] = prob_tied_table[kmin_candidate] /  prob_table[kmin_candidate]
-                    else:
-                        kmin_candidate = kmin_candidate + 1
-                elif audit_type.lower() == "minerva":
-                    if alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
-                        kmin_found = True
-                        kmins[round] = kmin_candidate
-                        prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
-                        prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
-                        if prob_table[kmin_candidate] > 0:
-                            deltas[round] = prob_tied_table[kmin_candidate] / prob_table[kmin_candidate]
-                    else:
-                        kmin_candidate = kmin_candidate + 1
-                if audit_type.lower() == "metis":
-                    #if delta * prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (sum(prob_table[kmin_candidate:len(prob_table)])) >= (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
-                    if delta * prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] and alpha * (prob_sum[round - 1] + sum(prob_table[kmin_candidate:len(prob_table)])) >= (prob_tied_sum[round - 1] + sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])):
-                        kmin_found = True
-                        kmins[round] = kmin_candidate
-                        prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)])  + prob_sum[round - 1]
-                        prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
-                        if prob_table[kmin_candidate] > 0:
-                            deltas[round] = prob_tied_table[kmin_candidate] /  prob_table[kmin_candidate]
-                    else:
-                        kmin_candidate = kmin_candidate + 1
-                elif audit_type.lower() == "arlo":
-                    if alpha * ((prob_table[kmin_candidate])) >= ((prob_tied_table[kmin_candidate])):
-                        kmin_found = True
-                        kmins[round] = kmin_candidate
-                        prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
-                        prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
-                        if prob_table[kmin_candidate] > 0:
-                            deltas[round] = prob_tied_table[kmin_candidate] / prob_table[kmin_candidate]
-                    else:
-                        kmin_candidate = kmin_candidate + 1
+                '# prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added'
+                if self.check_delta * delta * prob_table[kmin_candidate] >= self.check_delta * prob_tied_table[kmin_candidate] \
+                        and self.check_sum * alpha * (sum(prob_table[kmin_candidate:len(prob_table)] + self.check_memory * prob_sum[round - 1])) >= \
+                            self.check_sum * (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)] + self.check_memory * prob_tied_sum[round - 1])):
+                    kmin_found = True
+                    kmins[round] = kmin_candidate
+                    prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
+                    prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])  + prob_tied_sum[round - 1]
+                    if prob_table[kmin_candidate] > 0:
+                        deltas[round] = prob_tied_table[kmin_candidate] /  prob_table[kmin_candidate]
+                else:
+                    kmin_candidate = kmin_candidate + 1
 
             # cleaning prob_table/prob_tied_table
             for i in range(kmin_candidate, round_schedule[round] + 1):

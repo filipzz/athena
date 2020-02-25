@@ -51,6 +51,10 @@ if (__name__ == '__main__'):
                 audit_type = "arlo"
             elif (args.type).lower() in {"minerva", "anat", "neith", "sulis"}:
                 audit_type = "minerva"
+            elif (args.type).lower() in {"metis"}:
+                audit_type = "metis"
+            else:
+                audit_type = "athena"
 
         if args.ballots:
             results = args.ballots
@@ -166,6 +170,8 @@ if (__name__ == '__main__'):
                     audit_athena = audit_object.arlo(margin, alpha, rs)
                 elif audit_type.lower() == "minerva":
                     audit_athena = audit_object.minerva(margin, alpha, rs)
+                elif audit_type.lower() == "metis":
+                    audit_athena = audit_object.metis(margin, alpha, delta, rs)
                 else:
                     audit_athena = audit_object.athena(margin, alpha, delta, rs)
                 kmins = audit_athena["kmins"]

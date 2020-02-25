@@ -12,12 +12,9 @@ class Audit():
         self.audit_observations = []
         self.audit_kmins = []
         self.alpha = alpha
-        if audit_type.lower() in {"bravo", "wald", "arlo"}:
-            self.delta = alpha
-        elif audit_type.lower() in {"athena"}:
-            self.delta = 1
-        else:
-            self.delta = delta
+        self.delta = delta
+
+
 
 
     def add_election(self, election):
@@ -59,7 +56,7 @@ class Audit():
 
                 margin = (2 * winner - bc)/bc
 
-                audit_object = AthenaAudit()
+                audit_object = AthenaAudit(self.audit_type)
 
                 print("\tpstop goals: " + str(pstop_goals))
                 print("\tscaled round schedule: " + str(rs))
@@ -97,7 +94,7 @@ class Audit():
 
                 margin = (2 * winner - bc)/bc
 
-                audit_object = AthenaAudit()
+                audit_object = AthenaAudit(self.audit_type)
                 if self.audit_type.lower() == "bravo" or self.audit_type.lower() == "wald":
                     audit_athena = audit_object.bravo(margin, self.alpha, rs)
                 elif self.audit_type.lower() == "arlo":
