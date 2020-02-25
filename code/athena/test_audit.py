@@ -47,7 +47,7 @@ def test_next_rounds():
         #expected_risk_expended = expected['risk_expended']
 
 
-        assert x["future_round_sizes"] == expected_round_sizes, 's_w failed: got {}, expected {}'.format(kmins, expected_kmins)
+        assert x["future_round_sizes"] == expected_round_sizes, 's_w failed: got {}, expected {}'.format(x["future_round_sizes"], expected_round_sizes)
 
         # TODO: check values of risk_goal/prob_stop
         #for rg_com, rg_exp in zip(risk_goal, expected_risk_expended):
