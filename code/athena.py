@@ -22,7 +22,8 @@ if (__name__ == '__main__'):
     parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
     parser.add_argument("-l", "--load", help="set the election to read")
-    parser.add_argument("--type", help="set the audit type (BRAVO/ARLO/ATHENA)", default="ATHENA")
+    parser.add_argument("-i", "--interactive", help="sets mode to interactive", const=1, default=0, nargs="?")
+    parser.add_argument("--type", help="set the audit type (athena/bravo/arlo/minerva/metis)", default="athena")
     parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+", type=int)
     args = parser.parse_args()
 
@@ -92,6 +93,19 @@ if (__name__ == '__main__'):
             if not args.rounds:
                 round_schedule = []
             print(str(pstop_goal))
+
+        elif args.interactive:
+            pstop_goal = []
+            if args.rounds:
+                round_schedule = args.rounds
+                if max(round_schedule) > ballots_cast:
+                    print("Round schedule is incorrect")
+                    sys.exit(2)
+
+            mode_rounds = "interactive"
+
+            if not args.rounds:
+                round_schedule = []
 
         elif args.rounds:
             mode_rounds = "rounds"
@@ -209,6 +223,80 @@ if (__name__ == '__main__'):
         w.add_round_schedule(round_schedule)
         x = w.find_next_round_size(pstop_goal)
         print(str(x))
+
+
+    elif mode_rounds == "interactive":
+
+
+        print(election_object.print_election())
+
+        audit_completed = False
+
+        while audit_completed is False:
+            print("\n\nYour choices: ")
+            print("[1] Find next round size at 70%, 80%, 90%")
+            print("[2] Enter other goal for probability of stopping.")
+            choice = input("Enter your choice: ")
+            if choice == "1":
+                pstop_goal = [.7, .8, .9]
+            elif choice == "2":
+                pstop_choice = float(input("Enter value: "))
+                if 0 < pstop_choice < 1:
+                    pstop_goal = [pstop_choice]
+                elif 1 <= pstop_choice <= 99:
+                    pstop_goal = [pstop_choice/100]
+                else:
+                    print("Entered value is incorrect")
+                    sys.exit(1)
+            else:
+                audit_completed = True
+
+            w = Audit(audit_type, alpha, delta)
+            w.add_election(election)
+            w.add_round_schedule(round_schedule)
+            x = w.find_next_round_size(pstop_goal)
+            #print(str(x))
+
+            future_round_sizes = x["future_round_sizes"]
+
+            if len(round_schedule) > 0:
+                below_kmin = max(required) - max(observed)
+                n_future_round_sizes =  list(map(lambda x: x - max(round_schedule) + 2 * below_kmin, future_round_sizes))
+            else:
+                n_future_round_sizes = future_round_sizes
+
+            print("\nYour round sizes choices are: ")
+            for p, rs in zip(pstop_goal, n_future_round_sizes):
+                print("Probability of with %s when you sample %s more ballots." % (p, rs))
+
+
+            del w
+
+            print("\n\nEnter number of ballots drawn: ")
+            new_total = int(input("Number of ballots: "))
+            print("\nEnter number of ballots for the winner: ")
+            new_winner = int(input("Ballots for winner: "))
+
+            if len(round_schedule) > 0:
+                round_schedule = round_schedule + [new_total + max(round_schedule)]
+                actual_kmins = actual_kmins + [new_winner + max(actual_kmins)]
+            else:
+                round_schedule = [new_total]
+                actual_kmins = [new_winner]
+
+            w = Audit(audit_type, alpha, delta)
+            w.add_election(election)
+            w.add_round_schedule(round_schedule)
+            x = w.find_risk(actual_kmins)
+            observed = x["observed"]
+            required = x["required"]
+
+            if x["passed"] == 1:
+                audit_completed = True
+                print("\n\nAudit Successfully completed!")
+                print("P-value:\t%s" % (x["risk"]))
+            #print(str(x))
+            del w
 
         '''
         print(str(x))

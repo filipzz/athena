@@ -137,6 +137,6 @@ class Audit():
                 print("Delta:\t\t%s" % (deltas[-1]))
                 print("AUDIT risk:\t%s" % (audit_risk))
 
-                return {"risk": audit_risk, "delta": deltas[-1],  "passed": test_info["passed"]}
+                return {"risk": audit_risk, "delta": deltas[-1],  "passed": test_info["passed"], "observed": audit_observations, "required": self.audit_kmins}
 
 
