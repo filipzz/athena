@@ -220,39 +220,6 @@ if (__name__ == '__main__'):
         w.extend_round_schedule(next_round)
         '''
 
-        '''
-
-        print("setting round schedule")
-        for i in range(len(candidates)):
-            ballots_i = results[i]
-            candidate_i = candidates[i]
-            for j in range(i + 1, len(candidates)):
-                ballots_j = results[j]
-                candidate_j = candidates[j]
-
-                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
-                bc = ballots_i + ballots_j
-                scalling_ratio = ballots_cast / bc
-                winner = max(ballots_i, ballots_j)
-                print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
-                rs = []
-                for x in round_schedule:
-                    y = math.floor(x * bc / ballots_cast)
-                    rs.append(y)
-
-                margin = (2 * winner - bc)/bc
-
-                audit_object = AthenaAudit()
-
-                print("\tpstop goals: " + str(pstop_goal))
-                print("\tscaled round schedule: " + str(rs))
-                next_round_sizes = audit_object.find_next_round_sizes(audit_type, margin, alpha, delta, rs, pstop_goal, bc)
-                for pstop_goal, next_round, prob_stop in zip(pstop_goal, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
-                    rs = [] + round_schedule
-                    next_round_rescaled = math.ceil(next_round * scalling_ratio)
-                    rs.append(next_round_rescaled)
-                    print("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
-        '''
 
     if mode_rounds == "risk":
         w = Audit(audit_type, alpha, delta)
@@ -261,52 +228,3 @@ if (__name__ == '__main__'):
         x = w.find_risk(actual_kmins)
         #print(str(x))
 
-        '''
-        for i in range(len(candidates)):
-            ballots_i = results[i]
-            candidate_i = candidates[i]
-            for j in range(i + 1, len(candidates)):
-                ballots_j = results[j]
-                candidate_j = candidates[j]
-
-                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
-                bc = ballots_i + ballots_j
-                winner = max(ballots_i, ballots_j)
-                print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
-                rs = []
-
-                for x in round_schedule:
-                    y = math.floor(x * bc / ballots_cast)
-                    rs.append(y)
-
-                margin = (2 * winner - bc)/bc
-
-                audit_object = AthenaAudit()
-                if audit_type.lower() == "bravo" or audit_type.lower() == "wald":
-                    audit_athena = audit_object.bravo(margin, alpha, rs)
-                elif audit_type.lower() == "arlo":
-                    audit_athena = audit_object.arlo(margin, alpha, rs)
-                else:
-                    audit_athena = audit_object.athena(margin, alpha, delta, rs)
-
-                risk_goal = audit_athena["prob_tied_sum"]
-                audit_kmins = audit_athena["kmins"]
-
-
-                test_info = audit_object.find_kmins_for_risk(audit_kmins, actual_kmins)
-
-
-                print("\n\tAUDIT result:")
-                print("\t\tobserved:\t" + str(actual_kmins))
-                print("\t\trequired:\t" + str(audit_kmins))
-
-                if test_info["passed"] == 1:
-                    print("\n\t\tTest passed\n")
-                else:
-                    print("\n\t\tTest FAILED\n")
-
-                #w = audit_object.estimate_risk(margin, actual_kmins, round_schedule)
-                w = audit_object.estimate_risk(margin, test_info["kmins"], round_schedule)
-                ratio = w["ratio"]
-                print("Risk:\t%s" % (ratio[-1]))
-        '''
