@@ -39,6 +39,8 @@ def test_find_kmins():
             computed = audit_object.arlo(margin, alpha, round_schedule)
         elif audit_type.lower() == "minerva":
             computed = audit_object.minerva(margin, alpha, round_schedule)
+        elif audit_type.lower() == "matis":
+            computed = audit_object.minerva(margin, alpha, delta, round_schedule)
         else:
             computed = audit_object.athena(margin, alpha, delta, round_schedule)
 

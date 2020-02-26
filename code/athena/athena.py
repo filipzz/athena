@@ -56,7 +56,7 @@ class AthenaAudit():
             self.check_sum = 1
             self.check_memory = 1
 
-        print("delta check: %s\nsum check: %s\nmemory check: %s" % (self.check_delta, self.check_sum, self.check_memory))
+        #print("delta check: %s\nsum check: %s\nmemory check: %s" % (self.check_delta, self.check_sum, self.check_memory))
 
 
     def next_round_prob(self, margin, round_size_prev, round_size, prob_table_prev):
@@ -148,6 +148,9 @@ class AthenaAudit():
         """
         return self.audit("arlo", margin, alpha, alpha, round_schedule)
 
+    def wald_k_min(self, m, x, alpha):
+        return math.ceil((1+x/2)*m/2 + math.log(alpha)/(math.log(1-x)-math.log(1+x)) + 2)
+
     def audit(self, audit_type, margin, alpha, delta, round_schedule):
         """
         Parameters
@@ -171,8 +174,6 @@ class AthenaAudit():
         prob_table_prev = [1]
         prob_tied_table_prev = [1]
         kmins = [0] * number_of_rounds
-        #for i, v in zip(range(number_of_rounds), round_schedule):
-        #    kmins[i] = v + 1
         prob_sum = [0] * number_of_rounds
         prob_tied_sum = [0] * number_of_rounds
         deltas = [0] * number_of_rounds
@@ -180,30 +181,25 @@ class AthenaAudit():
 
 
         for round in range(1, number_of_rounds):
-            #prob_table = self.next_round_prob_bravo(margin, round_schedule[round - 1], round_schedule[round], kmins[0], kmins[round - 1], prob_table_prev)
             prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], prob_table_prev)
-            #prob_tied_table = self.next_round_prob_bravo(0, round_schedule[round - 1], round_schedule[round], kmins[0], kmins[round - 1], prob_tied_table_prev)
             prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], prob_tied_table_prev)
 
-
             kmin_found = False
-            kmin_candidate = math.floor(round_schedule[round]/2)
-
-
+            kmin_candidate = self.wald_k_min(round_schedule[round], margin, alpha)
 
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
-                '# prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added'
                 if self.check_delta * delta * prob_table[kmin_candidate] >= self.check_delta * prob_tied_table[kmin_candidate] \
                         and self.check_sum * alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + self.check_memory * prob_sum[round - 1]) >= \
                             self.check_sum * (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + self.check_memory * prob_tied_sum[round - 1]):
+                    kmin_candidate = kmin_candidate - 1
+                else:
+                    kmin_candidate = kmin_candidate + 1
                     kmin_found = True
                     kmins[round] = kmin_candidate
                     prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
                     prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
                     if prob_table[kmin_candidate] > 0:
                         deltas[round] = prob_tied_table[kmin_candidate] /  prob_table[kmin_candidate]
-                else:
-                    kmin_candidate = kmin_candidate + 1
 
             # cleaning prob_table/prob_tied_table
             for i in range(kmin_candidate, round_schedule[round] + 1):
@@ -234,7 +230,7 @@ class AthenaAudit():
         """
         #print("find_next_round_size")
         if quant <= .9:
-            round_max = math.ceil((12 * math.log(alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
+            round_max = math.ceil((18 * math.log(alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
         else:
             round_max = 8 * ballots_cast
         new_round_schedule = round_schedule + [round_max]

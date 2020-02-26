@@ -19,7 +19,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [56, 66, 94]
+                "round_candidates": [56, 75, 92]
             }
         },
         "test2": {
@@ -29,7 +29,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [5, 5, 8]
+                "round_candidates": [12, 12, 12]
             }
         },
         "test3": {
@@ -39,7 +39,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [174, 208, 299]
+                "round_candidates": [182, 205, 286]
             }
         },
         "testx1" : {
@@ -70,7 +70,7 @@
             "quants" : [0.7, 0.8, 0.9],
             "round_schedule" : [20],
             "expected": {
-                "round_candidates" : [48, 53, 61]
+                "round_candidates" : [48, 53, 67]
             }
         }
     },
