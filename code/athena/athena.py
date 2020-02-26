@@ -194,12 +194,12 @@ class AthenaAudit():
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
                 '# prob_table[kmin_candidate] >= prob_tied_table[kmin_candidate] condition added'
                 if self.check_delta * delta * prob_table[kmin_candidate] >= self.check_delta * prob_tied_table[kmin_candidate] \
-                        and self.check_sum * alpha * (sum(prob_table[kmin_candidate:len(prob_table)] + self.check_memory * prob_sum[round - 1])) >= \
-                            self.check_sum * (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)] + self.check_memory * prob_tied_sum[round - 1])):
+                        and self.check_sum * alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + self.check_memory * prob_sum[round - 1]) >= \
+                            self.check_sum * (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + self.check_memory * prob_tied_sum[round - 1]):
                     kmin_found = True
                     kmins[round] = kmin_candidate
                     prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
-                    prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)])  + prob_tied_sum[round - 1]
+                    prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
                     if prob_table[kmin_candidate] > 0:
                         deltas[round] = prob_tied_table[kmin_candidate] /  prob_table[kmin_candidate]
                 else:
