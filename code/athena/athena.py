@@ -157,11 +157,11 @@ class AthenaAudit():
         :param delta: (float 0<delta<1) risk limit for Wald's test
         :return:
         """
-        bkm = math.ceil(math.log(delta * pow(1 - margin, sample_size), (1-margin)/(1+margin)))
-        if bkm > sample_size:
-            return 0
-        else:
-            return bkm
+        bkm = min(math.ceil(math.log(delta * pow(1 - margin, sample_size), (1-margin)/(1+margin))), sample_size + 1)
+        #if bkm > sample_size:
+        #    return 0
+        #else:
+        return bkm
 
 
     def audit(self, audit_type, margin, alpha, delta, round_schedule):
@@ -198,14 +198,12 @@ class AthenaAudit():
             prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], prob_tied_table_prev)
 
             kmin_found = False
-            #kmin_candidate = self.wald_k_min(round_schedule[round], margin, alpha)
             kmin_candidate = math.floor(round_schedule[round]/2)
 
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
                 if self.check_delta * delta * prob_table[kmin_candidate] >= self.check_delta * prob_tied_table[kmin_candidate] \
                         and self.check_sum * alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + self.check_memory * prob_sum[round - 1]) >= \
                             self.check_sum * (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + self.check_memory * prob_tied_sum[round - 1]):
-                    #kmin_candidate = kmin_candidate - 1
                     kmin_found = True
                     kmins[round] = kmin_candidate
                     prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
@@ -215,13 +213,22 @@ class AthenaAudit():
                 else:
                     kmin_candidate = kmin_candidate + 1
 
-            # cleaning prob_table/prob_tied_table
+
+
+            # this means that there are 0 chance of stopping in the given round -- the kmin is unreachable
+            if kmin_found is False:
+                    prob_sum[round] =  prob_sum[round - 1]
+                    prob_tied_sum[round] =  prob_tied_sum[round - 1]
+
+            # cleaning prob_table/prob_tied_table - there are no walks at and above kmin
             for i in range(kmin_candidate, round_schedule[round] + 1):
                 prob_table[i] = 0
                 prob_tied_table[i] = 0
 
             prob_table_prev = prob_table
             prob_tied_table_prev = prob_tied_table
+
+
 
         return {"kmins": kmins[1:len(kmins)], "prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "deltas": deltas[1:len(kmins)]}
 
