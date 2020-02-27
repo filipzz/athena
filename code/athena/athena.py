@@ -148,8 +148,21 @@ class AthenaAudit():
         """
         return self.audit("arlo", margin, alpha, alpha, round_schedule)
 
-    def wald_k_min(self, m, x, alpha):
-        return math.ceil((1+x/2)*m/2 + math.log(alpha)/(math.log(1-x)-math.log(1+x)) + 2)
+
+    def wald_k_min(self, sample_size, margin, delta):
+        """
+        Returns Bravo/Wald's kmin for the sample size m, margin x and risk alpha
+        :param sample_size: (integer) number of ballots drawn during the audit so far
+        :param margin: (float 0<margin<1) margin of the victory
+        :param delta: (float 0<delta<1) risk limit for Wald's test
+        :return:
+        """
+        bkm = math.ceil(math.log(delta * pow(1 - margin, sample_size), (1-margin)/(1+margin)))
+        if bkm > sample_size:
+            return 0
+        else:
+            return bkm
+
 
     def audit(self, audit_type, margin, alpha, delta, round_schedule):
         """
@@ -185,21 +198,22 @@ class AthenaAudit():
             prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], prob_tied_table_prev)
 
             kmin_found = False
-            kmin_candidate = self.wald_k_min(round_schedule[round], margin, alpha)
+            #kmin_candidate = self.wald_k_min(round_schedule[round], margin, alpha)
+            kmin_candidate = math.floor(round_schedule[round]/2)
 
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
                 if self.check_delta * delta * prob_table[kmin_candidate] >= self.check_delta * prob_tied_table[kmin_candidate] \
                         and self.check_sum * alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + self.check_memory * prob_sum[round - 1]) >= \
                             self.check_sum * (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + self.check_memory * prob_tied_sum[round - 1]):
-                    kmin_candidate = kmin_candidate - 1
-                else:
-                    kmin_candidate = kmin_candidate + 1
+                    #kmin_candidate = kmin_candidate - 1
                     kmin_found = True
                     kmins[round] = kmin_candidate
                     prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
                     prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
                     if prob_table[kmin_candidate] > 0:
                         deltas[round] = prob_tied_table[kmin_candidate] /  prob_table[kmin_candidate]
+                else:
+                    kmin_candidate = kmin_candidate + 1
 
             # cleaning prob_table/prob_tied_table
             for i in range(kmin_candidate, round_schedule[round] + 1):
