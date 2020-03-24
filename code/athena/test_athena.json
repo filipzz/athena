@@ -18,7 +18,7 @@
             "alpha": 0.1,
             "round_schedule": [193, 332, 587],
             "expected": {
-                "kmins": [113, 186, 320],
+                "kmins": [113, 186, 341],
                 "risk_expended": [0.0105, 0.02212, 0.03187]
             }
         },

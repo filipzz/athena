@@ -54,6 +54,7 @@ def test_find_kmins():
         risk_goal = prob_tied_sum #computed['risk_spent']
 
         assert kmins == expected_kmins, 's_w failed: got {}, expected {}'.format(kmins, expected_kmins)
+        del audit_object
 
         # TODO: check values of risk_goal/prob_stop
         for rg_com, rg_exp in zip(risk_goal, expected_risk_expended):

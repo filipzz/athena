@@ -315,7 +315,7 @@ class AthenaAudit():
                 round_min = round_candidate
                 round_min_found = True
 
-        print("\t\t->\t" + str(round_min) + "\t" + str(round_max))
+        #print("\t\t->\t" + str(round_min) + "\t" + str(round_max))
 
         # the main loop:
         # * we have round_min (for which the probability of stopping is smaller than quant), and
@@ -343,14 +343,14 @@ class AthenaAudit():
                 new_round_schedule = round_schedule + [round_candidate]
                 result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
                 prob_table = result["prob_sum"]
-                print("----\t%s\t%s\t%s\t%s\t%s" % (round_min, round_candidate, round_max, new_round_schedule, prob_table))
+                #print("----\t%s\t%s\t%s\t%s\t%s" % (round_min, round_candidate, round_max, new_round_schedule, prob_table))
                 break
 
-        print(str(round_min))
+        #print(str(round_min))
         # we have **round_min** that is below required level, now we try to values to the right, to find the
         # last value for which test stops with probability lower than expected
         # TODO: change "+ 500" into a value that has rationale
-        for round_candidate in range(round_min, round_min + 3000):
+        for round_candidate in range(round_min, round_min + 300):
             new_round_schedule = round_schedule + [round_candidate]
             result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
             prob_table = result["prob_sum"]
@@ -361,11 +361,11 @@ class AthenaAudit():
             #    print(str(audit_type))
 
             if self.relative_prob(prob_table) < quant:
-                round_min = round_candidate
-                round_min_pstop = prob_table
-                print("\t%s\t%s\t%s\t%s\t%s" % (round_min, round_candidate, round_max, new_round_schedule, prob_table))
+                round_min_found = round_candidate
+                round_min_found_pstop = prob_table
+                #print("\t-x-%s\t%s\t%s\t%s\t%s" % (round_min_found, round_candidate, round_max, new_round_schedule, round_min_found_pstop))
 
-        run_audit = lambda round_candidate, audit_type, margin, alpha, delta, round_schedule: {round_candidate: self.audit(audit_type, margin, alpha, delta, round_schedule + [round_candidate])}
+        #run_audit = lambda round_candidate, audit_type, margin, alpha, delta, round_schedule: {round_candidate: self.audit(audit_type, margin, alpha, delta, round_schedule + [round_candidate])}
 
         #good_candidates = map(self.run_audit, range(round_min, round_min + 30), round_schedule)
         #print(str(good_candidates))
@@ -375,14 +375,15 @@ class AthenaAudit():
 
         # we found a round_min that is the largest value such pstop of the audit is < quant
         # we return round_candidate = round_min+1
-        round_candidate = round_min + 1
+        round_candidate = round_min_found + 1
         new_round_schedule = round_schedule + [round_candidate]
         result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
         prob_table = result["prob_sum"]
 
 
+        #print("%s / %s" % (round_candidate, prob_table[-1]))
 
-        return {"size": round_min, "prob_stop": prob_table[-1]}
+        return {"size": round_candidate, "prob_stop": prob_table[-1]}
 
     def find_next_round_size(self, audit_type, margin, alpha, delta, round_schedule, quant, round_min, ballots_cast):
         """
