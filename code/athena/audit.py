@@ -5,7 +5,7 @@ from athena.election import Election
 
 class Audit():
 
-    def __init__(self, audit_type, alpha, delta = 1):
+    def __init__(self, audit_type, alpha, delta):
         self.audit_type = audit_type
         self.elections = []
         self.round_schedule = []
@@ -13,6 +13,8 @@ class Audit():
         self.audit_kmins = []
         self.alpha = alpha
         self.delta = delta
+        if self.audit_type in {"bravo", "arlo", "wald"}:
+            self.delta = alpha
 
 
 
@@ -57,6 +59,7 @@ class Audit():
                 margin = (2 * winner - bc)/bc
 
                 audit_object = AthenaAudit()
+                audit_object.set_checks(self.audit_type)
 
                 print("\tpstop goals: " + str(pstop_goals))
                 print("\tscaled round schedule: " + str(rs))

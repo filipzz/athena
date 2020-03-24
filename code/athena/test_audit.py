@@ -38,7 +38,7 @@ def test_next_rounds():
             if "delta" in info:
                 w = Audit(info["audit_type"], info["alpha"], info["delta"])
             else:
-                w = Audit(info["audit_type"], info["alpha"])
+                w = Audit(info["audit_type"], info["alpha"], info["alpha"])
 
             w.add_election(elections[info["election"]]["contests"][info["contest"]])
 
@@ -96,7 +96,7 @@ def test_evaluate_risk():
             if "delta" in info:
                 w = Audit(info["audit_type"], info["alpha"], info["delta"])
             else:
-                w = Audit(info["audit_type"], info["alpha"])
+                w = Audit(info["audit_type"], info["alpha"], info["alpha"])
 
             w.add_election(elections[info["election"]]["contests"][info["contest"]])
 

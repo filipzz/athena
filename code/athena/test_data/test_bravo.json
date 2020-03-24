@@ -1,0 +1,76 @@
+{
+    "find_kmins" : {
+        "bravo70quantiles": {
+            "audit_type": "bravo",
+            "election" : "bravo70proc",
+            "alpha": 0.1,
+            "round_schedule": [12, 22, 38, 60, 131],
+            "expected": {
+                "kmins": [10, 0],
+                "risk_expended": [0.27387251882199987, 0.5598974736430447, ]
+            }
+        },
+        "bravo70beginning": {
+            "audit_type": "bravo",
+            "election" : "bravo70proc",
+            "alpha": 0.1,
+            "round_schedule": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            "expected": {
+                "kmins": [0, 0, 0, 0, 0, 0, 7, 0, 9, 9, 10, 10, 11, 0, 12],
+                "risk_expended": [0, 0, 0, 0, 0, 0, 0.0078125, 0.0078125, 0.0078125, 0.014648437500000017, 0.014648437499999998, 0.02490234375000002, 0.02490234375000001, 0.02490234375000001, 0.031097412109375108]
+            }
+        },
+        "arlo80beginning1": {
+            "audit_type": "arlo",
+            "election" : "bravo80proc",
+            "alpha": 0.1,
+            "round_schedule": [8, 10],
+            "expected": {
+                "kmins": [7, 0],
+                "risk_expended":  [0.03515625000000008, 0.0]
+            }
+        },
+        "athena0beginning1": {
+            "audit_type": "athena",
+            "election" : "bravo80proc",
+            "alpha": 0.1,
+            "round_schedule": [8, 10],
+            "expected": {
+                "kmins": [7, 0],
+                "risk_expended": [0.5033164800000002, 0.0]
+            }
+        },
+        "arlo80beginning2": {
+            "audit_type": "arlo",
+            "election" : "bravo80proc",
+            "alpha": 0.1,
+            "round_schedule": [8, 11],
+            "expected": {
+                "kmins": [7, 9],
+                "risk_expended":  [0.03515625000000008, 0.013671875000000035]
+            }
+        },
+        "athena0beginning2": {
+            "audit_type": "athena",
+            "election" : "bravo80proc",
+            "alpha": 0.1,
+            "round_schedule": [8, 11],
+            "expected": {
+                "kmins": [7, 9],
+                "risk_expended": [0.03515625000000008, 0.013671875000000035]
+            }
+        }
+
+    },
+    "next_round_size" : {
+        "bravo70proc": {
+            "audit_type": "bravo",
+            "election": "bravo70proc",
+            "contest": "pres",
+            "alpha": 0.1,
+            "quants": [0.25, 0.5, 0.75, 0.9, 0.99],
+            "expected": {
+                "round_candidates": [12, 22, 38, 60, 131]
+            }
+        }
+    }

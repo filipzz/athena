@@ -218,6 +218,7 @@ if (__name__ == '__main__'):
                 print("\t%s ratio:\t%s" % (audit_type, str(true_risk)))
 
     elif mode_rounds == "pstop":
+        print(str(delta))
         w = Audit(audit_type, alpha, delta)
         w.add_election(election)
         w.add_round_schedule(round_schedule)
