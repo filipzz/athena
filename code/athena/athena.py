@@ -1,3 +1,4 @@
+import logging
 from scipy.stats import binom
 from scipy.signal import fftconvolve
 import math
@@ -260,8 +261,8 @@ class AthenaAudit():
         prob_table = result["prob_sum"]
         stopping_probability_max = self.relative_prob(prob_table)
         if stopping_probability_max < quant:
-            print("FULL RECOUNT is suggested!")
-            print("Probability of stopping at: %s is %s" % (new_round_schedule, stopping_probability_max))
+            logging.warning("FULL RECOUNT is suggested!")
+            logging.warning("Probability of stopping at: %s is %s" % (new_round_schedule, stopping_probability_max))
             return {"size": round_max, "prob_stop": stopping_probability_max}
 
         #print("here we are")

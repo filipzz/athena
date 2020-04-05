@@ -2,6 +2,7 @@ import sys
 import argparse
 import string
 import math
+import logging
 #import athena.tools
 from athena.athena import AthenaAudit
 from athena.election import Election
@@ -25,7 +26,14 @@ if (__name__ == '__main__'):
     parser.add_argument("-i", "--interactive", help="sets mode to interactive", const=1, default=0, nargs="?")
     parser.add_argument("--type", help="set the audit type (athena/bravo/arlo/minerva/metis)", default="athena")
     parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+", type=int)
+    parser.add_argument("-d", "--debuglevel", type=int, default=logging.INFO,
+                        help="Set logging level to debuglevel, expressed as an integer: "
+                        "DEBUG=10, INFO=20, WARNING=30, ERROR=40, CRITICAL=50. "
+                        "The default is %(default)s" )
+
     args = parser.parse_args()
+
+    logging.basicConfig(level=args.debuglevel)
 
     audit_type = "ATHENA"
 

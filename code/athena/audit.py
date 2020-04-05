@@ -1,3 +1,4 @@
+import logging
 import math
 
 from athena.athena import AthenaAudit
@@ -26,12 +27,12 @@ class Audit():
 
 
     def extend_round_schedule(self, next_round):
-        print("Current round schedule:\t%s" % (self.election.round_schedule))
+        logging.info("Current round schedule:\t%s" % (self.election.round_schedule))
         self.round_schedule.append(next_round)
-        print("New round schedule:\t%s" % (self.election.round_schedule))
+        logging.info("New round schedule:\t%s" % (self.election.round_schedule))
 
     def find_next_round_size(self, pstop_goals):
-        print("setting round schedule")
+        logging.info("setting round schedule")
 
         found_solutions = {}
         future_round_sizes = [0] * len(pstop_goals)
@@ -44,11 +45,11 @@ class Audit():
                 ballots_j = self.election.results[j]
                 candidate_j = self.election.candidates[j]
 
-                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
+                logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
                 bc = ballots_i + ballots_j
                 scalling_ratio = self.election.ballots_cast / bc
                 winner = max(ballots_i, ballots_j)
-                print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
+                logging.info("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
                 rs = []
                 for x in self.round_schedule:
                     y = math.floor(x * bc / self.election.ballots_cast)
@@ -58,8 +59,8 @@ class Audit():
 
                 audit_object = AthenaAudit()
 
-                print("\tpstop goals: " + str(pstop_goals))
-                print("\tscaled round schedule: " + str(rs))
+                logging.info("\tpstop goals: " + str(pstop_goals))
+                logging.info("\tscaled round schedule: " + str(rs))
                 rescaled = []
                 next_round_sizes = audit_object.find_next_round_sizes(self.audit_type, margin, self.alpha, self.delta, rs, pstop_goals, bc)
                 for i, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
@@ -68,7 +69,7 @@ class Audit():
                     rs.append(next_round_rescaled)
                     rescaled.append(next_round_rescaled)
                     future_round_sizes[i] = max(future_round_sizes[i], next_round_rescaled)
-                    print("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
+                    logging.info("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
 
                 found_solutions[candidate_i + "-" + candidate_j] = {"pstop_goal": pstop_goals, "next_round_sizes": rescaled, "prob_stop": next_round_sizes["prob_stop"]}
 
@@ -82,10 +83,10 @@ class Audit():
                 ballots_j = self.election.results[j]
                 candidate_j = self.election.candidates[j]
 
-                print("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
+                logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
                 bc = ballots_i + ballots_j
                 winner = max(ballots_i, ballots_j)
-                print("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
+                logging.info("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
                 rs = []
 
                 for x in self.round_schedule:
@@ -109,33 +110,33 @@ class Audit():
                 risk_goal = audit_athena["prob_tied_sum"]
                 self.audit_kmins = audit_athena["kmins"]
 
-                print(str(audit_athena))
+                logging.info(str(audit_athena))
 
                 test_info = audit_object.find_kmins_for_risk(self.audit_kmins, audit_observations)
 
-                print("find_kmins_for_risk")
-                print(str(test_info))
+                logging.info("find_kmins_for_risk")
+                logging.info(str(test_info))
 
-                print("\n\tAUDIT result:")
-                print("\t\tobserved:\t" + str(audit_observations))
-                print("\t\trequired:\t" + str(self.audit_kmins))
+                logging.info("\n\tAUDIT result:")
+                logging.info("\t\tobserved:\t" + str(audit_observations))
+                logging.info("\t\trequired:\t" + str(self.audit_kmins))
 
                 if test_info["passed"] == 1:
-                    print("\n\t\tTest passed\n")
+                    logging.info("\n\t\tTest passed\n")
                 else:
-                    print("\n\t\tTest FAILED\n")
+                    logging.info("\n\t\tTest FAILED\n")
 
                 #w = audit_object.estimate_risk(margin, actual_kmins, round_schedule)
                 #w = audit_object.estimate_risk(margin, test_info["kmins"], self.round_schedule, audit_observations)
                 w = audit_object.estimate_risk(margin, self.audit_kmins, self.round_schedule, audit_observations)
-                #print(str(w))
+                #logging.info(str(w))
                 #ratio = w["ratio"]
                 deltas = w["deltas"]
                 audit_risk = min(filter(lambda x: x > 0, w["audit_ratio"]))
-                #print(str(w))
-                #print("Risk spent:\t%s" % (ratio[-1]))
-                print("Delta:\t\t%s" % (deltas[-1]))
-                print("AUDIT risk:\t%s" % (audit_risk))
+                #logging.info(str(w))
+                #logging.info("Risk spent:\t%s" % (ratio[-1]))
+                logging.info("Delta:\t\t%s" % (deltas[-1]))
+                logging.info("AUDIT risk:\t%s" % (audit_risk))
 
                 return {"risk": audit_risk, "delta": deltas[-1],  "passed": test_info["passed"], "observed": audit_observations, "required": self.audit_kmins}
 
