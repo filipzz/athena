@@ -251,7 +251,7 @@ class AthenaAudit():
             * prob_stop - the probability of
         """
         #print("find_next_round_size")
-        if quant <= .9:
+        if quant <= .9  and len(round_schedule) < 4:
             round_max = math.ceil((18 * math.log(alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
         else:
             round_max = 8 * ballots_cast
