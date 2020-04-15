@@ -115,6 +115,7 @@ def next_round(a, winner_shares, r, pstop_goals):
 @given(st.floats(0.01, 1.0))
 @settings(max_examples=10, deadline=10000) # deadline in milliseconds
 @example(0.2)
+@example(margin=0.8775250000000001)
 def test_3_round_margins(margin):
     """Sanity tests with two stopping probabilities for a variety of margins."""
 
