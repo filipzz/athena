@@ -20,7 +20,7 @@ from athena.audit import Audit
 
 # logging.debug("raw nmin test: %s" % rlacalc.nmin(0.05, 1.03905, 0.02, 0, 0, 0, 0))
 
-from hypothesis import given, settings, Verbosity, example, assume
+from hypothesis import given, settings, Verbosity, example, assume, note
 
 import hypothesis.strategies as st
 
@@ -112,7 +112,7 @@ def next_round(a, winner_shares, r, pstop_goals):
     return r
 
 # For the given limits, led by parameter examples, automate testing via hypothesis library
-@given(st.floats(0.01, 1.0))
+@given(st.floats(0.15, 1.0))
 @settings(max_examples=10, deadline=10000) # deadline in milliseconds
 @example(0.2)
 @example(margin=0.8775250000000001)
@@ -122,9 +122,13 @@ def test_3_round_margins(margin):
     assert 0.0 <= margin <= 1.0
     ballots_cast = 100000
     margin_votes = round(margin * ballots_cast)
-    b = ballots_cast//2 - margin_votes // 2
-    a = b + int(margin_votes)
+    b = (ballots_cast - margin_votes) // 2
+    a = b + margin_votes
     results = [a, b]
+
+    note(f'Arguments to set it up: athena.py -i -n hyp -b {" ".join(str(x) for x in results)}')
+
+    assert sum(results) <= ballots_cast
 
     audit_type = "ATHENA"
     alpha = 0.1
@@ -154,7 +158,7 @@ def test_3_round_margins(margin):
     nextroundsizes = detailed['next_round_sizes']
     actual_prob_stop = detailed['prob_stop']
     i = 0
-    logging.debug(f't3 stopping probability goal: {pstop_goals[i]} next round size: {nextroundsizes[i]} margin: {margin}')
+    logging.debug(f't3 stopping probability goal: {pstop_goals[i]} next round size: {nextroundsizes[i]} margin: {margin} res: {results}')
 
     assert nextroundsizes[1] >= nextroundsizes[0]
     for goal, actual in zip(pstop_goals, actual_prob_stop):

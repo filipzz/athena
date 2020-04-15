@@ -7,7 +7,8 @@ import math
 def non_decreasing(L):
     "Check that values in list L are mononotonic"
 
-    return all(x<=y for x, y in zip(L, L[1:]))
+    tol = 1e-9
+    return all(x <= (y + tol) for x, y in zip(L, L[1:]))
 
 
 class AthenaAudit():
@@ -236,9 +237,12 @@ class AthenaAudit():
             prob_tied_table_prev = prob_tied_table
 
 
+        # Define upper tolerance for probability tests to allow some fudge
+        one_tol = 1.0 + 1e-9
+
         assert non_decreasing(kmins[1:]), f'Internal error: kmin values not monotonic: {kmins[1:]}'
-        assert all(0.0 <= prob <= 1.0 for prob in prob_sum[1:]), f'Internal error: prob_sum <0 or >1'
-        assert all(0.0 <= prob <= 1.0 for prob in prob_tied_sum[1:]), f'Internal error: prob_tied_sum <0 or >1'
+        assert all(0.0 <= prob <= one_tol for prob in prob_sum[1:]), f'Internal error: prob_sum <0 or >1: {prob_sum[1:]}'
+        assert all(0.0 <= prob <= one_tol for prob in prob_tied_sum[1:]), f'Internal error: prob_tied_sum <0 or >1: {prob_tied_sum[1:]}'
         assert non_decreasing(prob_sum[1:]), f'Internal error: prob_sum values not monotonic: {prob_sum[1:]}'
         assert non_decreasing(prob_tied_sum[1:]), f'Internal error: prob_tied_sum values not monotonic: {prob_tied_sum[1:]}'
 
