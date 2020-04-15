@@ -77,7 +77,7 @@ def samplesizes(margin, pstop_goals, audit_type="ATHENA"):
 
 # For the given limits, led by parameter examples, automate testing via hypothesis library
 @given(st.floats(0.01, 1.0))
-@settings(max_examples=1000, deadline=10000) # deadline in milliseconds
+@settings(max_examples=10, deadline=10000) # deadline in milliseconds
 @example(0.1)
 def test_margins(margin):
     """Sanity tests with two stopping probabilities for a variety of margins."""
@@ -96,8 +96,6 @@ def test_margins(margin):
     for goal, actual in zip(pstop_goals, prob_stop):
         assert actual >= goal
 
-test_margins()
-
 def next_round(a, winner_shares, r, pstop_goals):
     "Do another round in a multi-round audit"
 
@@ -115,7 +113,7 @@ def next_round(a, winner_shares, r, pstop_goals):
 
 # For the given limits, led by parameter examples, automate testing via hypothesis library
 @given(st.floats(0.01, 1.0))
-@settings(max_examples=1000, deadline=None) # deadline=10000) # deadline in milliseconds
+@settings(max_examples=10, deadline=10000) # deadline in milliseconds
 @example(0.2)
 def test_3_round_margins(margin):
     """Sanity tests with two stopping probabilities for a variety of margins."""
@@ -165,6 +163,7 @@ def test_3_round_margins(margin):
     r = next_round(a, winner_shares, r, pstop_goals)
 
 test_3_round_margins()
+test_margins()
 
 def test_single_round():
     audit_type = "ATHENA"
