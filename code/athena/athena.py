@@ -225,7 +225,7 @@ class AthenaAudit():
 
             # this means that there are 0 chance of stopping in the given round -- the kmin is unreachable
             if kmin_found is False:
-                    kmins[round] = round_schedule[round]
+                    kmins[round] = round_schedule[round] + 1
                     prob_sum[round] =  prob_sum[round - 1]
                     prob_tied_sum[round] =  prob_tied_sum[round - 1]
 
