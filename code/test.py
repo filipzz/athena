@@ -106,7 +106,10 @@ def next_round(a, winner_shares, r, pstop_goals):
     a.add_round_schedule(a.round_schedule + [max(a.round_schedule) + incremental_sample_size])
     next_total_winner_share = a.round_schedule[-1] // 2
     winner_shares += [next_total_winner_share]
-    logging.debug(f' Next round: select {incremental_sample_size} more ballots, next total winner share is {next_total_winner_share}')
+    message = f' Next round: draw {incremental_sample_size} more ballots, {next_total_winner_share - winner_shares[-2]} for winner'
+    note(message)
+    logging.debug(message)
+
     r = a.find_risk(winner_shares)
     logging.debug(f'  {r}')
     return r
@@ -114,8 +117,11 @@ def next_round(a, winner_shares, r, pstop_goals):
 # For the given limits, led by parameter examples, automate testing via hypothesis library
 @given(st.floats(0.15, 1.0))
 @settings(max_examples=10, deadline=10000) # deadline in milliseconds
-@example(0.2)
+@example(margin=0.784415)
+@example(margin=0.7538450000000001)
 @example(margin=0.8775250000000001)
+@example(margin=0.9488450000000002)
+@example(0.2)
 def test_3_round_margins(margin):
     """Sanity tests with two stopping probabilities for a variety of margins."""
 
@@ -126,7 +132,7 @@ def test_3_round_margins(margin):
     a = b + margin_votes
     results = [a, b]
 
-    note(f'Arguments to set it up: athena.py -i -n hyp -b {" ".join(str(x) for x in results)}')
+    note(f'Arguments to set it up: python3 athena.py -i -n hyp -b {" ".join(str(x) for x in results)}')
 
     assert sum(results) <= ballots_cast
 
@@ -141,6 +147,9 @@ def test_3_round_margins(margin):
     pstop_goals = [.7, .9]
     round_schedule = []
 
+    i = 0
+    logging.debug(f't3 stopping probability goal: {pstop_goals[i]} margin: {margin} res: {results}')
+
     a = make_audit(audit_type, alpha, delta, candidates, results, ballots_cast, winners, name, model, round_schedule)
 
     next_round_size_results = a.find_next_round_size(pstop_goals)
@@ -153,12 +162,14 @@ def test_3_round_margins(margin):
     winner_shares = [sample_size // 2]
     r = a.find_risk(winner_shares)
 
+    message = f' draw {sample_size} ballots, {winner_shares[-1]} for winner'
+    note(message)
+    logging.debug(message)
+
     # Report and check results
     detailed = next_round_size_results['detailed']['A-B']
     nextroundsizes = detailed['next_round_sizes']
     actual_prob_stop = detailed['prob_stop']
-    i = 0
-    logging.debug(f't3 stopping probability goal: {pstop_goals[i]} next round size: {nextroundsizes[i]} margin: {margin} res: {results}')
 
     assert nextroundsizes[1] >= nextroundsizes[0]
     for goal, actual in zip(pstop_goals, actual_prob_stop):
