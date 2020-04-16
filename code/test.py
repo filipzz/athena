@@ -115,8 +115,8 @@ def next_round(a, winner_shares, r, pstop_goals):
     return r
 
 # For the given limits, led by parameter examples, automate testing via hypothesis library
-@given(st.floats(0.15, 1.0))
-@settings(max_examples=10, deadline=10000) # deadline in milliseconds
+@given(st.floats(0.01, 1.0))
+@settings(max_examples=10, deadline=100000) # deadline in milliseconds
 @example(margin=0.784415)
 @example(margin=0.7538450000000001)
 @example(margin=0.8775250000000001)
