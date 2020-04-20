@@ -4,13 +4,6 @@ from scipy.signal import fftconvolve
 import math
 
 
-def non_decreasing(L):
-    "Check that values in list L are mononotonic"
-
-    tol = 1e-9
-    return all(x <= (y + tol) for x, y in zip(L, L[1:]))
-
-
 class AthenaAudit():
     """
     A class used to represent an AthenaAudit
@@ -225,7 +218,6 @@ class AthenaAudit():
 
             # this means that there are 0 chance of stopping in the given round -- the kmin is unreachable
             if kmin_found is False:
-                    kmins[round] = round_schedule[round] + 1
                     prob_sum[round] =  prob_sum[round - 1]
                     prob_tied_sum[round] =  prob_tied_sum[round - 1]
 
@@ -241,11 +233,11 @@ class AthenaAudit():
         # Define upper tolerance for probability tests to allow some fudge
         one_tol = 1.0 + 1e-9
 
-        assert non_decreasing(kmins[1:]), f'Internal error: kmin values not monotonic: {kmins[1:]}'
+        assert self.non_decreasing(kmins[1:]), f'Internal error: kmin values not monotonic: {kmins[1:]}'
         assert all(0.0 <= prob <= one_tol for prob in prob_sum[1:]), f'Internal error: prob_sum <0 or >1: {prob_sum[1:]}'
         assert all(0.0 <= prob <= one_tol for prob in prob_tied_sum[1:]), f'Internal error: prob_tied_sum <0 or >1: {prob_tied_sum[1:]}'
-        assert non_decreasing(prob_sum[1:]), f'Internal error: prob_sum values not monotonic: {prob_sum[1:]}'
-        assert non_decreasing(prob_tied_sum[1:]), f'Internal error: prob_tied_sum values not monotonic: {prob_tied_sum[1:]}'
+        assert self.non_decreasing(prob_sum[1:]), f'Internal error: prob_sum values not monotonic: {prob_sum[1:]}'
+        assert self.non_decreasing(prob_tied_sum[1:]), f'Internal error: prob_tied_sum values not monotonic: {prob_tied_sum[1:]}'
 
         return {"kmins": kmins[1:len(kmins)], "prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "deltas": deltas[1:len(kmins)]}
 
@@ -471,3 +463,14 @@ class AthenaAudit():
 
 
         return {"prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "audit_ratio": audit_ratio[1:len(audit_ratio)], "ratio": ratio, "deltas": deltas}
+
+    def non_decreasing(self, l):
+        """Check that positive values in list l are mononotonic.
+        Ignore zero and negative sentinal values
+        Allow a tolerance of 10^-9.
+        """
+
+        tol = 1e-9
+
+        pos_l = [val for val in l if val > 0]
+        return all(x <= (y + tol) for x, y in zip(pos_l, pos_l[1:]))
