@@ -1,8 +1,8 @@
 import logging
 import math
 
-from athena.athena import AthenaAudit
-from athena.election import Election
+from .athena import AthenaAudit
+from .election import Election
 
 class Audit():
 

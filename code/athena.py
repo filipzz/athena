@@ -235,6 +235,8 @@ if (__name__ == '__main__'):
 
     elif mode_rounds == "interactive":
 
+        total_ballots_cast = election["ballots_cast"]
+
 
         print(election_object.print_election())
 
@@ -280,10 +282,12 @@ if (__name__ == '__main__'):
 
             del w
 
-            print("\n\nEnter number of ballots drawn: ")
-            new_total = int(input("Number of ballots: "))
-            print("\nEnter number of ballots for the winner: ")
+            print("\n\nEnter number of ballots drawn in that round: ")
+            new_total = int(input("Number of (all) ballots in the current round drawn: "))
+            print("\nEnter number of ballots for the winner (in this round): ")
             new_winner = int(input("Ballots for winner: "))
+            print("\nEnter number of ballots for the loser (in this round): ")
+            new_loser = int(input("Ballots for loser: "))
 
             if len(round_schedule) > 0:
                 round_schedule = round_schedule + [new_total + max(round_schedule)]
