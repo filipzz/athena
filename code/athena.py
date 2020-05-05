@@ -145,6 +145,8 @@ if (__name__ == '__main__'):
         print("Call python3 athena.py -h for help")
 
     model = "bin"
+
+    print("Candidates: ", candidates)
     election = {}
     election["ballots_cast"] = ballots_cast
     election["alpha"] = alpha
@@ -161,9 +163,9 @@ if (__name__ == '__main__'):
 
     election_object = Election(election)
     #tools.print_election(election)
-    election_object.print_election()
+    #election_object.print_election()
 
-    print("Round schedule: " + str(round_schedule))
+    #print("Round schedule: " + str(round_schedule))
 
     if mode_rounds == "rounds":
         for i in range(len(candidates)):
@@ -238,10 +240,20 @@ if (__name__ == '__main__'):
 
         print(election_object.print_election())
 
+        list_of_candidates = []
+        list_of_candidates = election_object.get_candidates()
+
         audit_completed = False
 
+        w = Audit(audit_type, alpha, delta)
+        w.add_election(election)
+        w.add_round_schedule(round_schedule)
+
+        round_number = 1
+
         while audit_completed is False:
-            print("\n\nYour choices: ")
+            print("\n\n---------------------- Round number: ", round_number, " -----------------\n")
+            print("Your choices: ")
             print("[1] Find next round size at 70%, 80%, 90%")
             print("[2] Enter other goal for probability of stopping.")
             choice = input("Enter your choice: ")
@@ -259,52 +271,91 @@ if (__name__ == '__main__'):
             else:
                 audit_completed = True
 
-            w = Audit(audit_type, alpha, delta)
-            w.add_election(election)
-            w.add_round_schedule(round_schedule)
             x = w.find_next_round_size(pstop_goal)
             #print(str(x))
 
             future_round_sizes = x["future_round_sizes"]
 
             if len(round_schedule) > 0:
-                below_kmin = max(required) - max(observed)
+                below_kmin = 0 #max(required) - max(observed)
                 n_future_round_sizes =  list(map(lambda x: x - max(round_schedule) + 2 * below_kmin, future_round_sizes))
             else:
                 n_future_round_sizes = future_round_sizes
 
-            print("\nYour round sizes choices are: ")
+            print("\nSelect round size: ")
             for p, rs in zip(pstop_goal, n_future_round_sizes):
-                print("Probability of with %s when you sample %s more ballots." % (p, rs))
+                print("Complete with prob. %s when you sample %s more ballots." % (p, rs))
 
 
-            del w
+            ###del w
 
-            print("\n\nEnter number of ballots drawn: ")
-            new_total = int(input("Number of ballots: "))
-            print("\nEnter number of ballots for the winner: ")
-            new_winner = int(input("Ballots for winner: "))
+            correct_valid_total = False
+            correct_candidates_total = False
 
-            if len(round_schedule) > 0:
-                round_schedule = round_schedule + [new_total + max(round_schedule)]
-                actual_kmins = actual_kmins + [new_winner + max(actual_kmins)]
-            else:
-                round_schedule = [new_total]
-                actual_kmins = [new_winner]
+            while correct_valid_total is False:
+                #print("\n\nEnter the number of ballots drawn in this round: ")
+                message = "\n\n\tEnter the number of (all) ballots drawn in this round: " # + str(round_number) + ": "
+                new_ballots = int(input(message))
+                new_valid_ballots = new_ballots
 
-            w = Audit(audit_type, alpha, delta)
-            w.add_election(election)
-            w.add_round_schedule(round_schedule)
-            x = w.find_risk(actual_kmins)
+                #print("\n\n\tEnter the number of relevant ballots: ")
+                new_valid_ballots = int(input("\tEnter the number of relevant ballots: "))
+
+                if new_valid_ballots <= new_ballots:
+                    correct_valid_total = True
+                else:
+                    print("Incorrect number of valid ballots entered: ", new_valid_ballots, " > ", new_ballots)
+
+
+
+            while correct_candidates_total is False:
+                print("\n\tEnter number of ballots for each candidate:")
+                round_observation = []
+                vote_in_round = 0
+                for i in range(len(list_of_candidates)):
+                    message = "\tBallots for " + list_of_candidates[i] + ": "
+                    candidate_votes = int(input(message))
+                    vote_in_round = vote_in_round + candidate_votes
+                    round_observation.append(candidate_votes)
+
+                if vote_in_round == new_valid_ballots:
+                    correct_candidates_total = True
+                else:
+                    print("\nSum of votes for candidates does not match the number of valid ballots.")
+
+
+
+            #if len(round_schedule) > 0:
+            #    round_schedule = round_schedule + [new_valid_ballots + max(round_schedule)]
+            #    #actual_kmins = actual_kmins + [new_winner + max(actual_kmins)]
+            #else:
+            #    round_schedule = [new_valid_ballots]
+            #    #actual_kmins = [new_winner]
+
+
+            ###w = Audit(audit_type, alpha, delta)
+            ###w.add_election(election)
+            #w.add_round_schedule(round_schedule)
+            #w.audit_observations(round_observation)
+            w.add_observations(new_valid_ballots, round_observation)
+            round_schedule = w.round_schedule
+            #print("round_schedule", round_schedule)
+            x = w.find_risk() #actual_kmins)
             observed = x["observed"]
             required = x["required"]
 
             if x["passed"] == 1:
                 audit_completed = True
                 print("\n\nAudit Successfully completed!")
-                print("P-value:\t%s" % (x["risk"]))
+                print("P-value:\t%s\n" % (x["risk"]))
+                print(x)
+            else:
+                print("\n\nAudit failed")
+                print("P-value:\t%s\n" % (x["risk"]))
+
+            round_number = round_number + 1
             #print(str(x))
-            del w
+            ###del w
 
         '''
         print(str(x))
@@ -320,7 +371,15 @@ if (__name__ == '__main__'):
     if mode_rounds == "risk":
         w = Audit(audit_type, alpha, delta)
         w.add_election(election)
-        w.add_round_schedule(round_schedule)
-        x = w.find_risk(actual_kmins)
+        for i, round_i, ballots_i in zip(range(len(actual_kmins)), round_schedule, actual_kmins):
+            #w.add_round_schedule(round_schedule)
+            if i == 0:
+                w.add_observations(round_i, [ballots_i, round_i - ballots_i])
+            else:
+                round_size = round_i - round_schedule[i-1]
+                ballots_now = ballots_i - actual_kmins[i-1]
+                w.add_observations(round_size, [ballots_now, round_size - ballots_now])
+        #x = w.find_risk(actual_kmins)
+        x = w.find_risk()
         #print(str(x))
 
