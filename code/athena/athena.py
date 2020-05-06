@@ -331,7 +331,24 @@ class AthenaAudit():
                 #print("\t%s\t%s\t%s\t%s\t%s" % (round_min, round_candidate, round_max, new_round_schedule, prob_table))
                 break
 
-        return {"size": round_candidate, "prob_stop": prob_table[-1]}
+        good_candidate = round_candidate
+        good_pstop = prob_table[-1]
+
+        # we found a point for which the inequalities are met
+        # but maybe we may go down a little bit... one by one:
+        while True:
+            round_candidate = round_candidate - 1
+            new_round_schedule = round_schedule + [round_candidate]
+            result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
+            prob_table = result["prob_sum"]
+            if self.relative_prob(prob_table) <= quant:
+                break
+            else:
+                good_candidate = round_candidate
+                good_pstop = prob_table[-1]
+
+
+        return {"size": good_candidate, "prob_stop": good_pstop}
 
     def find_next_round_sizes(self, audit_type, margin, alpha, delta, round_schedule, quants, ballots_cast):
         '''

@@ -60,8 +60,8 @@ class Audit():
             else:
                 self.audit_observations[i].append(observations[i])
 
-        print(self.round_observations)
-        print(self.audit_observations)
+        #print(self.round_observations)
+        #print(self.audit_observations)
 
     def find_next_round_size(self, pstop_goals):
         logging.info("setting round schedule")
@@ -152,7 +152,7 @@ class Audit():
                 for rs_i, rs_j in zip(self.audit_observations[i], self.audit_observations[j]):
                     rs.append(rs_i + rs_j)
 
-                print("round schedule", rs)
+                #print("round schedule", rs)
 
                 margin = (2 * winner - bc)/bc
 
@@ -181,16 +181,16 @@ class Audit():
                 logging.info("find_kmins_for_risk")
                 logging.info(str(test_info))
 
-                logging.info("\n\t\tAUDIT result for: " +  str(candidate_i) + " vs " + str(candidate_j))
+                print("\n\t\tAUDIT result for: " +  str(candidate_i) + " vs " + str(candidate_j))
                 logging.info("\t\trequired winner:\t" + str(pairwise_audit_kmins))
                 logging.info("\t\tobserved winner:\t" + str(self.audit_observations[winner_pos]))
                 logging.info("\t\tobserved loser: \t" + str(self.audit_observations[loser_pos]))
                 logging.info("\t\tround schedule: \t" + str(rs))
 
                 if test_info["passed"] == 1:
-                    logging.info("\n\t\tTest passed")
+                    print("\n\t\tTest passed")
                 else:
-                    logging.info("\n\t\tTest FAILED")
+                    print("\n\t\tTest FAILED")
 
                 #w = audit_object.estimate_risk(margin, actual_kmins, round_schedule)
                 #w = audit_object.estimate_risk(margin, test_info["kmins"], self.round_schedule, audit_observations)
@@ -202,8 +202,8 @@ class Audit():
                 audit_risk = min(filter(lambda x: x > 0, w["audit_ratio"]))
                 #logging.info(str(w))
                 #logging.info("Risk spent:\t%s" % (ratio[-1]))
-                logging.info("\t\tLR:\t\t\t%s" % (deltas[-1]))
-                logging.info("\t\tATHENA risk:\t%s" % (audit_risk))
+                print("\t\tLR [needs to be > %s]:\t\t\t%s" % (self.delta, 1/deltas[-1]))
+                print("\t\tATHENA risk [needs to be <= %s]:\t%s" % (self.alpha, audit_risk))
 
                 if test_info["passed"] != 1:
                     test_passed = False
