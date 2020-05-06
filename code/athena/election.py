@@ -1,12 +1,32 @@
 #import athena.tools
 import heapq
+import json
+import sys
 
 class Election():
 
     def __init__(self):
+        self.ballots_cast = []
+        self.candidates = []
+        self.results = []
+        self.winners = []
+        self.name = []
+        self.model = ""
+        self.declared_winners = []
+        self.declared_losers = []
         pass
 
-    def __init__(self, election):
+    def __init__(self, election = None):
+        #if election is None:
+        self.ballots_cast = []
+        self.candidates = []
+        self.results = []
+        self.winners = []
+        self.name = []
+        self.model = ""
+        self.declared_winners = []
+        self.declared_losers = []
+        #else:
         if "ballots_cast" in election:
             self.ballots_cast = election["ballots_cast"]
 
@@ -29,15 +49,36 @@ class Election():
         self.declared_winners = []
         self.declared_losers = []
 
-        self.winners_min = min(heapq.nlargest(self.winners, self.results)) # this is the min number of votes to get to be a winner
-        for candidate_id, candidate_name, candidate_result in zip(range(len(self.results)), self.candidates, self.results):
-            if candidate_result >= self.winners_min:
-                self.declared_winners.append(candidate_id)
-            else:
-                self.declared_losers.append(candidate_id)
+        self.find_winners()
 
-        if len(self.declared_winners) > self.winners:
-            raise ValueError("Too many winners")
+    def read_from_file(self, file_name, contest):
+        with open(file_name, 'r') as f:
+            data = json.load(f)
+
+        self.ballots_cast = data["total_ballots"]
+
+        info = data[contest]
+        self.candidates = info["candidates"]
+        self.results = info["votes"]
+        self.winners = 1
+        self.declared_winners = []
+        self.declared_losers = []
+        self.name = contest
+
+        self.find_winners()
+
+
+    def find_winners(self):
+        if len(self.results) > 0:
+            self.winners_min = min(heapq.nlargest(self.winners, self.results)) # this is the min number of votes to get to be a winner
+            for candidate_id, candidate_name, candidate_result in zip(range(len(self.results)), self.candidates, self.results):
+                if candidate_result >= self.winners_min:
+                    self.declared_winners.append(candidate_id)
+                else:
+                    self.declared_losers.append(candidate_id)
+
+            if len(self.declared_winners) > self.winners:
+                raise ValueError("Too many winners")
 
 
 
@@ -60,4 +101,5 @@ class Election():
 
     def get_candidates(self):
         return self.candidates
+
 

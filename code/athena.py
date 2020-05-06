@@ -8,7 +8,7 @@ from athena.athena import AthenaAudit
 from athena.election import Election
 from athena.audit import Audit
 
-if (__name__ == '__main__'):
+if __name__ == '__main__':
 
     info_text = 'This program lets for computing ATHENA parameters.'
     parser = argparse.ArgumentParser(description=info_text)
@@ -22,7 +22,8 @@ if (__name__ == '__main__'):
     parser.add_argument("-r", "--rounds", "--round_schedule", help="set the round schedule", nargs="+", type=int)
     parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
-    parser.add_argument("-l", "--load", help="set the election to read")
+    parser.add_argument("-f", "--file", help="read data from the file")
+    parser.add_argument("-l", "--load", help="set the contest to be read")
     parser.add_argument("-i", "--interactive", help="sets mode to interactive", const=1, default=0, nargs="?")
     parser.add_argument("--type", help="set the audit type (athena/bravo/arlo/minerva/metis)", default="athena")
     parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+", type=int)
@@ -74,6 +75,10 @@ if (__name__ == '__main__'):
                     sys.exit(2)
             else:
                 ballots_cast = sum(results)
+        elif args.file and args.load:
+            file_name = args.file
+            contest_name = args.load
+            mode = "read"
         else:
             print("Missing -b / --ballots argument")
             sys.exit(2)
@@ -84,6 +89,8 @@ if (__name__ == '__main__'):
             if len(args.candidates) != len(args.ballots):
                 print("Number of candidates does not match number of results")
                 sys.exit(2)
+        elif mode == "read":
+            pass
         else:
             assert len(args.ballots) <= 26
             candidates = [string.ascii_uppercase[i] for i in range(len(args.ballots))]
@@ -119,14 +126,16 @@ if (__name__ == '__main__'):
             mode_rounds = "rounds"
             round_schedule = args.rounds
             pstop_goal = []
-            if max(round_schedule) > ballots_cast:
-                print("Round schedule is incorrect")
-                sys.exit(2)
+            #if max(round_schedule) > ballots_cast:
+            #    print("Round schedule is incorrect")
+            #    sys.exit(2)
+        elif mode == "read":
+            pass
         else:
             print("Missing -r / --rounds argument")
             sys.exit(2)
 
-        if args.winners:
+        if mode != "read" and args.winners:
             winners = args.winners
             if winners >= len(candidates):
                 print("There is nothing to audit - every candidate is a winner.")
@@ -139,31 +148,48 @@ if (__name__ == '__main__'):
                 print("Current version supports only 2-candidate race for risk estimation")
                 sys.exit(2)
 
-    elif args.load:
-        mode = "read"
+    #elif args.load:
+    #    mode = "read"
     else:
         print("Call python3 athena.py -h for help")
 
     model = "bin"
 
-    print("Candidates: ", candidates)
+
     election = {}
-    election["ballots_cast"] = ballots_cast
     election["alpha"] = alpha
     election["delta"] = delta
-    election["candidates"] = candidates
-    election["results"] = results
-    election["ballots_cast"] = ballots_cast
-    election["winners"] = winners
     election["name"] = name
     election["model"] = model
     election["pstop"] = pstop_goal
     election["round_schedule"] = round_schedule
     save_to = "elections/" + name
 
-    election_object = Election(election)
-    #tools.print_election(election)
-    #election_object.print_election()
+    if mode == "read":
+        election_object = Election(election)
+        election_object.read_from_file(file_name, contest_name)
+        #election_object.print_election()
+        candidates = election_object.candidates
+        election["candidates"] = candidates
+        ballots_cast = election_object.ballots_cast
+        election["ballots_cast"] = ballots_cast
+        results = election_object.results
+        election["results"] = results
+        election["winners"] = 1
+    else:
+        election["ballots_cast"] = ballots_cast
+        election["candidates"] = candidates
+        election["results"] = results
+        election["winners"] = winners
+
+
+        #print("Candidates: ", candidates)
+
+        election_object = Election(election)
+        #tools.print_election(election)
+        #election_object.print_election()
+
+    #print(election)
 
     #print("Round schedule: " + str(round_schedule))
 
@@ -237,10 +263,13 @@ if (__name__ == '__main__'):
 
     elif mode_rounds == "interactive":
 
-        total_ballots_cast = election["ballots_cast"]
+        total_ballots_cast = election_object.ballots_cast # election["ballots_cast"]
 
+        print("\n")
 
-        print(election_object.print_election())
+        election_object.print_election()
+
+        #print(election)
 
         list_of_candidates = []
         list_of_candidates = election_object.get_candidates()
