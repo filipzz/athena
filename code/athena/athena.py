@@ -231,7 +231,7 @@ class AthenaAudit():
 
 
         # Define upper tolerance for probability tests to allow some fudge
-        one_tol = 1.0 + 1e-9
+        one_tol = 1.0 + 1e-8
 
         assert self.non_decreasing(kmins[1:]), f'Internal error: kmin values not monotonic: {kmins[1:]}'
         assert all(0.0 <= prob <= one_tol for prob in prob_sum[1:]), f'Internal error: prob_sum <0 or >1: {prob_sum[1:]}'
@@ -262,16 +262,16 @@ class AthenaAudit():
         if quant <= .9  and len(round_schedule) < 1:
             round_max = math.ceil((18 * math.log(alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
         else:
-            round_max = 10000000
+            round_max = 10000000 # * ballots_cast
         new_round_schedule = round_schedule + [round_max]
         result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
         #print("audit results: %s" % (result))
         prob_table = result["prob_sum"]
         stopping_probability_max = self.relative_prob(prob_table)
-        #if stopping_probability_max < quant:
-        #    logging.warning("FULL RECOUNT is suggested!")
-        #    logging.warning("Probability of stopping at: %s is %s" % (new_round_schedule, stopping_probability_max))
-        #    return {"size": round_max, "prob_stop": stopping_probability_max}
+        if stopping_probability_max < quant:
+            logging.warning("FULL RECOUNT is suggested!")
+            logging.warning("Probability of stopping at: %s is %s" % (new_round_schedule, stopping_probability_max))
+            return {"size": round_max, "prob_stop": stopping_probability_max}
 
         #print("here we are")
 
@@ -350,7 +350,7 @@ class AthenaAudit():
 
         return {"size": good_candidate, "prob_stop": good_pstop}
 
-    def find_next_round_sizes(self, audit_type, margin, alpha, delta, round_schedule, quants): #, ballots_cast):
+    def find_next_round_sizes(self, audit_type, margin, alpha, delta, round_schedule, quants):
         '''
         For a given list of possible stopping probabilities (called quants e.g., quants = [.7, .8, .9]) returns a list of
         next round sizes  for which probability of stoping is larger than quants
@@ -369,7 +369,7 @@ class AthenaAudit():
         prob_stop = []
         for quant in quants:
             #print("starting for: " + str(quant))
-            results = self.find_next_round_size(audit_type, margin, alpha, delta, round_schedule, quant, 1) #, ballots_cast)
+            results = self.find_next_round_size(audit_type, margin, alpha, delta, round_schedule, quant, 1)
             new_round = results["size"]
             new_round_schedule = round_schedule + [new_round]
             #print("\t" + str(quant) + "\t" + str(new_round_schedule))

@@ -370,7 +370,8 @@ if __name__ == '__main__':
             ###w.add_election(election)
             #w.add_round_schedule(round_schedule)
             #w.audit_observations(round_observation)
-            w.add_observations(new_valid_ballots, round_observation)
+            #w.add_observations(new_valid_ballots, round_observation)
+            w.add_observations(round_observation)
             round_schedule = w.round_schedule
             #print("round_schedule", round_schedule)
             x = w.find_risk() #actual_kmins)
@@ -407,11 +408,13 @@ if __name__ == '__main__':
         for i, round_i, ballots_i in zip(range(len(actual_kmins)), round_schedule, actual_kmins):
             #w.add_round_schedule(round_schedule)
             if i == 0:
-                w.add_observations(round_i, [ballots_i, round_i - ballots_i])
+                #w.add_observations(round_i, [ballots_i, round_i - ballots_i])
+                w.add_observations([ballots_i, round_i - ballots_i])
             else:
                 round_size = round_i - round_schedule[i-1]
                 ballots_now = ballots_i - actual_kmins[i-1]
-                w.add_observations(round_size, [ballots_now, round_size - ballots_now])
+                #w.add_observations(round_size, [ballots_now, round_size - ballots_now])
+                w.add_observations([ballots_now, round_size - ballots_now])
         #x = w.find_risk(actual_kmins)
         x = w.find_risk()
         #print(str(x))

@@ -44,7 +44,7 @@ def test_next_rounds():
 
             if "round_schedule" in info:
                 w.add_round_schedule(info["round_schedule"])
-
+                w.add_observations(info["round_observations"])
 
             x = w.find_next_round_size(info["quants"])
             print(str(x))
@@ -103,7 +103,9 @@ def test_evaluate_risk():
             if "round_schedule" in info:
                 w.add_round_schedule(info["round_schedule"])
 
-            x = w.find_risk(info["audit_observations"])
+            #x = w.find_risk(info["audit_observations"])
+            w.add_observations(info["audit_observations"])
+            x = w.find_risk()
             print(str(x))
 
             expected = info['expected']

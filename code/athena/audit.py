@@ -33,6 +33,7 @@ class Audit():
         self.round_schedule = round_schedule
 
 
+    # deprecated
     def extend_round_schedule(self, next_round):
         logging.info("Current round schedule:\t%s" % (self.election.round_schedule))
         self.round_schedule.append(next_round)
@@ -42,8 +43,9 @@ class Audit():
             self.audit_observations[i].append([0])
         logging.info(self.audit_observations)
 
-    def add_observations(self, new_valid_ballots, observations):
+    def add_observations(self, observations):
         logging.info("Updating round schedule")
+        new_valid_ballots = sum(observations)
         if len(self.round_schedule) > 0:
             self.round_schedule = self.round_schedule + [new_valid_ballots + max(self.round_schedule)]
             #actual_kmins = actual_kmins + [new_winner + max(actual_kmins)]
@@ -54,6 +56,8 @@ class Audit():
 
         logging.info("Current observations: " + str(self.audit_observations))
         for i in range(len(self.election.candidates)):
+            print(self.audit_observations)
+            print(observations[i])
             self.round_observations[i].append(observations[i])
             if len(self.audit_observations[i]) > 0:
                 self.audit_observations[i].append(max(self.audit_observations[i]) + observations[i])
@@ -100,7 +104,8 @@ class Audit():
                 #logging.info("\tpstop goals: " + str(pstop_goals))
                 logging.info("\tpairwise round schedule: " + str(rs))
                 rescaled = []
-                next_round_sizes = audit_object.find_next_round_sizes(self.audit_type, margin, self.alpha, self.delta, rs, pstop_goals, bc)
+                next_round_sizes = audit_object.find_next_round_sizes(self.audit_type, margin, self.alpha, self.delta,
+                                                                      rs, pstop_goals)
                 for i, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
                     rs = [] + self.round_schedule
                     next_round_rescaled = math.ceil(next_round * scalling_ratio)
@@ -120,6 +125,7 @@ class Audit():
         test_passed = True
         passed = 0
         risks = []
+        delta =[]
         smallest_margin = 1
         smallest_margin_id = ""
 
@@ -210,6 +216,7 @@ class Audit():
                     test_passed = False
 
                 risks.append(audit_risk)
+                delta.append(deltas[-1])
 
                 result[pair_id] = {"risk": audit_risk, "delta": deltas[-1],  "passed": test_info["passed"], "observed_winner": self.audit_observations[winner_pos], "observed_loser": self.audit_observations[loser_pos], "required": pairwise_audit_kmins}
 
@@ -221,4 +228,4 @@ class Audit():
         if test_passed == True:
             passed = 1
 
-        return {"risk": max(risks), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result}
+        return {"risk": max(risks), "delta": min(delta), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result}
