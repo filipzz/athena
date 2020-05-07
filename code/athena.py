@@ -380,12 +380,15 @@ if __name__ == '__main__':
 
             if x["passed"] == 1:
                 audit_completed = True
-                print("\n\nAudit Successfully completed!")
-                print("P-value:\t%s\n" % (x["risk"]))
-                print(x)
+                print("\n\n\tAudit Successfully completed!")
+                print("\tP-value:\t%s\n" % (x["risk"]))
+                #print(x)
             else:
                 print("\n\nAudit failed")
-                print("P-value:\t%s\n" % (x["risk"]))
+                print("\tLR [needs to be > %s]:\t\t\t%s" % (election["delta"], 1/x["delta"]))
+                print("\tATHENA risk [needs to be <= %s]:\t%s" % (election["alpha"], x["risk"]))
+                print("\tboth conditions are required to be satisfied.")
+                #print("P-value:\t%s\n" % (x["risk"]))
 
             round_number = round_number + 1
             #print(str(x))

@@ -33,7 +33,7 @@ class Audit():
         self.round_schedule = round_schedule
 
 
-    # deprecated
+    # deprecated - we need to know the sample size anyway
     def extend_round_schedule(self, next_round):
         logging.info("Current round schedule:\t%s" % (self.election.round_schedule))
         self.round_schedule.append(next_round)
@@ -56,8 +56,8 @@ class Audit():
 
         logging.info("Current observations: " + str(self.audit_observations))
         for i in range(len(self.election.candidates)):
-            print(self.audit_observations)
-            print(observations[i])
+            #print(self.audit_observations)
+            #print(observations[i])
             self.round_observations[i].append(observations[i])
             if len(self.audit_observations[i]) > 0:
                 self.audit_observations[i].append(max(self.audit_observations[i]) + observations[i])
