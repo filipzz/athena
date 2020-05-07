@@ -1,5 +1,6 @@
 import logging
 import math
+import sys
 from array import *
 
 from .athena import AthenaAudit
@@ -229,3 +230,120 @@ class Audit():
             passed = 1
 
         return {"risk": max(risks), "delta": min(delta), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result}
+
+
+    def run_interactive(self):
+        round_number = 1
+        audit_completed = False
+        list_of_candidates = self.election.candidates
+
+        while audit_completed is False:
+            print("\n\n---------------------- Round number: ", round_number, " -----------------\n")
+            print("Your choices: ")
+            print("[1] Find next round size at 70%, 80%, 90%")
+            print("[2] Enter other goal for probability of stopping.")
+            choice = input("Enter your choice: ")
+            if choice == "1":
+                pstop_goal = [.7, .8, .9]
+            elif choice == "2":
+                pstop_choice = float(input("Enter value: "))
+                if 0 < pstop_choice < 1:
+                    pstop_goal = [pstop_choice]
+                elif 1 <= pstop_choice <= 99:
+                    pstop_goal = [pstop_choice/100]
+                else:
+                    print("Entered value is incorrect")
+                    sys.exit(1)
+            else:
+                audit_completed = True
+
+            x = self.find_next_round_size(pstop_goal)
+            #print(str(x))
+
+            future_round_sizes = x["future_round_sizes"]
+
+            if len(self.round_schedule) > 0:
+                below_kmin = 0 #max(required) - max(observed)
+                n_future_round_sizes =  list(map(lambda x: x - max(self.round_schedule) + 2 * below_kmin, future_round_sizes))
+            else:
+                n_future_round_sizes = future_round_sizes
+
+            print("\nSelect round size: ")
+            for p, rs in zip(pstop_goal, n_future_round_sizes):
+                print("Complete with prob. %s when you sample %s more ballots." % (p, rs))
+
+
+            ###del w
+
+            correct_valid_total = False
+            correct_candidates_total = False
+
+            while correct_valid_total is False:
+                #print("\n\nEnter the number of ballots drawn in this round: ")
+                message = "\n\n\tEnter the number of (all) ballots drawn in this round: " # + str(round_number) + ": "
+                new_ballots = int(input(message))
+                new_valid_ballots = new_ballots
+
+                #print("\n\n\tEnter the number of relevant ballots: ")
+                new_valid_ballots = int(input("\tEnter the number of relevant ballots: "))
+
+                if new_valid_ballots <= new_ballots:
+                    correct_valid_total = True
+                else:
+                    print("Incorrect number of valid ballots entered: ", new_valid_ballots, " > ", new_ballots)
+
+
+
+            while correct_candidates_total is False:
+                print("\n\tEnter number of ballots for each candidate:")
+                round_observation = []
+                vote_in_round = 0
+                for i in range(len(list_of_candidates)):
+                    message = "\tBallots for " + list_of_candidates[i] + ": "
+                    candidate_votes = int(input(message))
+                    vote_in_round = vote_in_round + candidate_votes
+                    round_observation.append(candidate_votes)
+
+                if vote_in_round == new_valid_ballots:
+                    correct_candidates_total = True
+                else:
+                    print("\nSum of votes for candidates does not match the number of valid ballots.")
+
+
+
+            #if len(round_schedule) > 0:
+            #    round_schedule = round_schedule + [new_valid_ballots + max(round_schedule)]
+            #    #actual_kmins = actual_kmins + [new_winner + max(actual_kmins)]
+            #else:
+            #    round_schedule = [new_valid_ballots]
+            #    #actual_kmins = [new_winner]
+
+
+            ###w = Audit(audit_type, alpha, delta)
+            ###w.add_election(election)
+            #w.add_round_schedule(round_schedule)
+            #w.audit_observations(round_observation)
+            #w.add_observations(new_valid_ballots, round_observation)
+            self.add_observations(round_observation)
+            round_schedule = self.round_schedule
+            #print("round_schedule", round_schedule)
+            x = self.find_risk() #actual_kmins)
+            observed = x["observed"]
+            required = x["required"]
+
+            if x["passed"] == 1:
+                audit_completed = True
+                print("\n\n\tAudit Successfully completed!")
+                print("\tP-value:\t%s\n" % (x["risk"]))
+                #print(x)
+            else:
+                print("\n\nAudit failed")
+                print("\tLR [needs to be > %s]:\t\t\t%s" % (self.delta, 1/x["delta"]))
+                print("\tATHENA risk [needs to be <= %s]:\t%s" % (self.alpha, x["risk"]))
+                print("\tboth conditions are required to be satisfied.")
+                #print("P-value:\t%s\n" % (x["risk"]))
+
+            round_number = round_number + 1
+            #print(str(x))
+            ###del w
+
