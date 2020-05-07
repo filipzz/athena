@@ -13,7 +13,7 @@ if __name__ == '__main__':
     info_text = 'This program lets for computing ATHENA parameters.'
     parser = argparse.ArgumentParser(description=info_text)
     parser.add_argument("-v", "-V", "--version", help="shows program version", action="store_true")
-    parser.add_argument("-n", "--new", help="creates new election folder where all data are stored")
+    parser.add_argument("-n", "--new", "--name", help="creates/reads election name")
     parser.add_argument("-a", "--alpha", help="set alpha (risk limit) for the election", type=float, default=0.1)
     parser.add_argument("-g", "--delta", help="set delta (upset limit) for the audit", type=float, default=1.0)
     parser.add_argument("-c", "--candidates", help="set the candidate list (names)", nargs="*")
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
     parser.add_argument("-f", "--file", help="read data from the file")
-    parser.add_argument("-l", "--load", help="set the contest to be read")
+    #parser.add_argument("-l", "--load", help="set the contest to be read")
     parser.add_argument("-i", "--interactive", help="sets mode to interactive", const=1, default=0, nargs="?")
     parser.add_argument("--type", help="set the audit type (athena/bravo/arlo/minerva/metis)", default="athena")
     parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+", type=int)
@@ -75,9 +75,9 @@ if __name__ == '__main__':
                     sys.exit(2)
             else:
                 ballots_cast = sum(results)
-        elif args.file and args.load:
+        elif args.file and args.new:
             file_name = args.file
-            contest_name = args.load
+            contest_name = args.new
             mode = "read"
         else:
             print("Missing -b / --ballots argument")
@@ -187,17 +187,19 @@ if __name__ == '__main__':
 
         election_object = Election(election)
         #tools.print_election(election)
-        #election_object.print_election()
+    election_object.print_election()
 
     #print(election)
 
     #print("Round schedule: " + str(round_schedule))
 
     if mode_rounds == "rounds":
-        for i in range(len(candidates)):
+        #for i in range(len(candidates)):
+        for i in election_object.declared_winners:
             ballots_i = results[i]
             candidate_i = candidates[i]
-            for j in range(i + 1, len(candidates)):
+            #for j in range(i + 1, len(candidates)):
+            for j in election_object.declared_losers:
                 ballots_j = results[j]
                 candidate_j = candidates[j]
 
@@ -267,7 +269,7 @@ if __name__ == '__main__':
 
         print("\n")
 
-        election_object.print_election()
+        #election_object.print_election()
 
         #print(election)
 

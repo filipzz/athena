@@ -82,6 +82,7 @@ class Audit():
                 logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
                 bc = ballots_i + ballots_j
                 scalling_ratio = self.election.ballots_cast / bc
+
                 winner = max(ballots_i, ballots_j)
                 logging.info("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
                 rs = []
@@ -107,7 +108,7 @@ class Audit():
                     rescaled.append(next_round_rescaled)
                     future_round_sizes[i] = max(future_round_sizes[i], next_round_rescaled)
                     logging.info("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
-                    logging.info("\t\t\t\tnr: %s\trnr: %s" % (next_round, next_round_rescaled))
+                    logging.info("\t\t\t\tnr: %s\trnr: %s\tsr: %s" % (next_round, next_round_rescaled, scalling_ratio))
 
                 found_solutions[candidate_i + "-" + candidate_j] = {"pstop_goal": pstop_goals, "next_round_sizes": rescaled, "prob_stop": next_round_sizes["prob_stop"]}
 
@@ -181,16 +182,16 @@ class Audit():
                 logging.info("find_kmins_for_risk")
                 logging.info(str(test_info))
 
-                print("\n\t\tAUDIT result for: " +  str(candidate_i) + " vs " + str(candidate_j))
+                logging.info("\n\t\tAUDIT result for: " +  str(candidate_i) + " vs " + str(candidate_j))
                 logging.info("\t\trequired winner:\t" + str(pairwise_audit_kmins))
                 logging.info("\t\tobserved winner:\t" + str(self.audit_observations[winner_pos]))
                 logging.info("\t\tobserved loser: \t" + str(self.audit_observations[loser_pos]))
                 logging.info("\t\tround schedule: \t" + str(rs))
 
                 if test_info["passed"] == 1:
-                    print("\n\t\tTest passed")
+                    logging.info("\n\t\tTest passed")
                 else:
-                    print("\n\t\tTest FAILED")
+                    logging.info("\n\t\tTest FAILED")
 
                 #w = audit_object.estimate_risk(margin, actual_kmins, round_schedule)
                 #w = audit_object.estimate_risk(margin, test_info["kmins"], self.round_schedule, audit_observations)
@@ -202,8 +203,8 @@ class Audit():
                 audit_risk = min(filter(lambda x: x > 0, w["audit_ratio"]))
                 #logging.info(str(w))
                 #logging.info("Risk spent:\t%s" % (ratio[-1]))
-                print("\t\tLR [needs to be > %s]:\t\t\t%s" % (self.delta, 1/deltas[-1]))
-                print("\t\tATHENA risk [needs to be <= %s]:\t%s" % (self.alpha, audit_risk))
+                logging.info("\t\tLR [needs to be > %s]:\t\t\t%s" % (self.delta, 1/deltas[-1]))
+                logging.info("\t\tATHENA risk [needs to be <= %s]:\t%s" % (self.alpha, audit_risk))
 
                 if test_info["passed"] != 1:
                     test_passed = False

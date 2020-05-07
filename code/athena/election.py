@@ -97,7 +97,8 @@ class Election():
         print("(Declared) Votes for winner: " + str(self.winner))
 
     def print_number(self, val):
-        return "{:,}".format(val).replace(","," ")
+        #return "{:,}".format(val).replace(","," ")
+        return val
 
     def get_candidates(self):
         return self.candidates
