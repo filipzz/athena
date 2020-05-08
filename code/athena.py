@@ -167,7 +167,9 @@ if __name__ == '__main__':
 
     if mode == "read":
         election_object = Election(election)
-        election_object.read_from_file(file_name, contest_name)
+        #election_object.read_from_file(file_name, contest_name)
+        election_object.read_election_data(file_name)
+        election_object.load_contest_data(contest_name)
         #election_object.print_election()
         candidates = election_object.candidates
         election["candidates"] = candidates
@@ -265,9 +267,13 @@ if __name__ == '__main__':
 
     elif mode_rounds == "interactive":
 
-        w = Audit(audit_type, alpha, delta)
-        w.add_election(election)
-        w.add_round_schedule(round_schedule)
+        w = Audit(audit_type)
+
+        w.read_election_results(file_name)
+        w.load_contest(contest_name)
+        #w = Audit(audit_type, alpha, delta)
+        #w.add_election(election)
+        #w.add_round_schedule(round_schedule)
 
         w.run_interactive()
 
