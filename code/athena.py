@@ -267,13 +267,15 @@ if __name__ == '__main__':
 
     elif mode_rounds == "interactive":
 
-        w = Audit(audit_type)
 
-        w.read_election_results(file_name)
-        w.load_contest(contest_name)
-        #w = Audit(audit_type, alpha, delta)
-        #w.add_election(election)
-        #w.add_round_schedule(round_schedule)
+        if mode == "read":
+            w = Audit(audit_type)
+            w.read_election_results(file_name)
+            w.load_contest(contest_name)
+        else:
+            w = Audit(audit_type, alpha, delta)
+            w.add_election(election)
+            w.add_round_schedule(round_schedule)
 
         w.run_interactive()
 
