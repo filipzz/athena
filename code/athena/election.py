@@ -1,7 +1,8 @@
-#import athena.tools
 import heapq
 import json
-import sys
+import requests
+from urllib.parse import urlparse
+
 
 class Election():
 
@@ -9,55 +10,64 @@ class Election():
         self.ballots_cast = []
         self.candidates = []
         self.results = []
-        self.winners = []
+        self.winners = 1 # number of winners
         self.name = []
         self.model = ""
         self.declared_winners = []
         self.declared_losers = []
+        self.data = None
         pass
 
     def __init__(self, election = None):
-        #if election is None:
-        self.ballots_cast = []
-        self.candidates = []
-        self.results = []
-        self.winners = []
-        self.name = []
-        self.model = ""
-        self.declared_winners = []
-        self.declared_losers = []
-        #else:
-        if "ballots_cast" in election:
-            self.ballots_cast = election["ballots_cast"]
+        if election is not None:
+            self.ballots_cast = []
+            self.candidates = []
+            self.results = []
+            self.winners = 1 # number of winners
+            self.name = []
+            self.model = ""
+            self.declared_winners = []
+            self.declared_losers = []
+            #else:
+            if "ballots_cast" in election:
+                self.ballots_cast = election["ballots_cast"]
 
-        if "candidates" in election:
-            self.candidates = election["candidates"]
+            if "candidates" in election:
+                self.candidates = election["candidates"]
 
-        if "results" in election:
-            self.results = election["results"]
+            if "results" in election:
+                self.results = election["results"]
 
-        if "winners" in election:
-            self.winners = election["winners"]
+            if "winners" in election:
+                self.winners = election["winners"]
 
-        if "name" in election:
-            self.name = election["name"]
+            if "name" in election:
+                self.name = election["name"]
 
-        if "model" in election:
-            self.model = election["model"]
+            if "model" in election:
+                self.model = election["model"]
 
-        # we store information about declared winners and declared losers
-        self.declared_winners = []
-        self.declared_losers = []
+            # we store information about declared winners and declared losers
+            self.declared_winners = []
+            self.declared_losers = []
 
-        self.find_winners()
+            self.find_winners()
 
-    def read_from_file(self, file_name, contest):
-        with open(file_name, 'r') as f:
-            data = json.load(f)
+    def read_election_data(self, file_name):
+        parsed = urlparse(file_name)
+        if all([parsed.scheme, parsed.netloc, parsed.path]):
+            #self.election.read_from_url(file_name)
+            self.data = json.loads(requests.get(file_name).text)
+        else:
+            #self.election.read_from_file(file_name)
+            with open(file_name, 'r') as f:
+                self.data = json.load(f)
 
-        self.ballots_cast = data["total_ballots"]
 
-        info = data[contest]
+    def load_contest_data(self, contest):
+        self.ballots_cast = self.data["total_ballots"]
+
+        info = self.data[contest]
         self.candidates = info["candidates"]
         self.results = info["votes"]
         self.winners = 1
@@ -66,6 +76,7 @@ class Election():
         self.name = contest
 
         self.find_winners()
+
 
 
     def find_winners(self):

@@ -1,22 +1,22 @@
 import logging
 import math
 import sys
-from array import *
 
 from .athena import AthenaAudit
 from .election import Election
 
 class Audit():
 
-    def __init__(self, audit_type, alpha, delta = 1):
+    def __init__(self, audit_type, alpha = 0.1, delta = 1):
         self.audit_type = audit_type
-        self.elections = []
+        self.election = Election()
         self.round_schedule = []
         self.audit_observations = [[]]
         self.round_observations = [[]]
         self.audit_kmins = []
         self.alpha = alpha
         self.delta = delta
+        self.election_data_file = ""
 
 
 
@@ -29,6 +29,24 @@ class Audit():
         self.round_observations = [[] for j in range(len(self.election.candidates))]
         #for i in range(len(self.election.candidates)):
         #    self.audit_observations[i].append([])
+
+    def read_election_results(self, url):
+        self.election_data_file = url
+        self.election.read_election_data(url)
+
+    def load_contest(self, contest):
+        self.election.load_contest_data(contest)
+        self.audit_observations = [[] for j in range(len(self.election.candidates))]
+        self.round_observations = [[] for j in range(len(self.election.candidates))]
+
+    def get_contests(self):
+        contest_list = []
+        for contest in self.election.data:
+            if contest not in {'total_ballots', 'd_ballots', 'r_ballots', 'nonpartisan_ballots'}:
+                contest_list.append(contest)
+
+        return contest_list
+
 
     def add_round_schedule(self, round_schedule):
         self.round_schedule = round_schedule
@@ -338,8 +356,8 @@ class Audit():
                 #print(x)
             else:
                 print("\n\nAudit failed")
-                print("\tLR [needs to be > %s]:\t\t\t%s" % (self.delta, 1/x["delta"]))
-                print("\tATHENA risk [needs to be <= %s]:\t%s" % (self.alpha, x["risk"]))
+                print("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
+                print("\tATHENA risk:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
                 print("\tboth conditions are required to be satisfied.")
                 #print("P-value:\t%s\n" % (x["risk"]))
 
