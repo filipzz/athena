@@ -40,12 +40,7 @@ class Audit():
         self.round_observations = [[] for j in range(len(self.election.candidates))]
 
     def get_contests(self):
-        contest_list = []
-        for contest in self.election.data:
-            if contest not in {'total_ballots', 'd_ballots', 'r_ballots', 'nonpartisan_ballots'}:
-                contest_list.append(contest)
-
-        return contest_list
+        return self.election.get_contests()
 
 
     def add_round_schedule(self, round_schedule):
@@ -75,8 +70,6 @@ class Audit():
 
         logging.info("Current observations: " + str(self.audit_observations))
         for i in range(len(self.election.candidates)):
-            #print(self.audit_observations)
-            #print(observations[i])
             self.round_observations[i].append(observations[i])
             if len(self.audit_observations[i]) > 0:
                 self.audit_observations[i].append(max(self.audit_observations[i]) + observations[i])
@@ -93,11 +86,9 @@ class Audit():
         future_round_sizes = [0] * len(pstop_goals)
         #future_prob_stop = [0] * len(pstop_goals)
 
-        #for i in range(len(self.election.candidates)):
         for i in self.election.declared_winners:
             ballots_i = self.election.results[i]
             candidate_i = self.election.candidates[i]
-            #for j in range(i + 1, len(self.election.candidates)):
             for j in self.election.declared_losers:
                 ballots_j = self.election.results[j]
                 candidate_j = self.election.candidates[j]
