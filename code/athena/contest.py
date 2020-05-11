@@ -1,47 +1,52 @@
 import heapq
+import sys
 import json
 import requests
 from urllib import parse
 
-class Election():
+class Contest():
 
 
-    def __init__(self, election = None):
+    def __init__(self, contest = None):
         self.ballots_cast = []
         self.candidates = []
         self.results = []
         self.winners = 1 # number of winners
         self.name = []
+        self.min_to_win = 0
         self.model = ""
         self.reported_winners = []
         self.declared_winners = []
         self.declared_losers = []
         self.data = None
-        if election is not None:
-            if "ballots_cast" in election:
-                self.ballots_cast = election["ballots_cast"]
+        self.contest_type = ""
+        if contest is not None:
+            if "contest_ballots" in contest:
+                self.ballots_cast = contest["contest_ballots"]
 
-            if "candidates" in election:
-                self.candidates = election["candidates"]
+            if "candidates" in contest:
+                self.candidates = contest["candidates"]
 
-            if "results" in election:
-                self.results = election["results"]
+            if "results" in contest:
+                self.results = contest["results"]
 
-            if "winners" in election:
-                self.winners = election["winners"]
+            if "num_winners" in contest:
+                self.winners = contest["num_winners"]
 
-            if "name" in election:
-                self.name = election["name"]
+            if "name" in contest:
+                self.name = contest["name"]
 
-            if "model" in election:
-                self.model = election["model"]
+            if "model" in contest:
+                self.model = contest["model"]
+
+            if "contest_type" in contest:
+                self.contest_type = contest["contest_type"]
 
             # we store information about declared winners and declared losers
             self.declared_winners = []
             self.declared_losers = []
 
             self.find_winners()
-
 
     def read_election_data(self, file_name):
         try:
@@ -56,8 +61,10 @@ class Election():
         self.ballots_cast = self.data["total_ballots"]
 
 
-    def load_contest_data(self, contest):
+    def load_contest_data(self, contest, data = None):
 
+        if data is not None:
+            self.data = data
         info = self.data["contests"][contest]
         for candidate, result in info["tally"].items():
             self.candidates.append(candidate) #info["candidates"]
@@ -75,9 +82,9 @@ class Election():
 
     def find_winners(self):
         if len(self.results) > 0:
-            self.winners_min = min(heapq.nlargest(self.winners, self.results)) # this is the min number of votes to get to be a winner
+            self.min_to_win = min(heapq.nlargest(self.winners, self.results)) # this is the min number of votes to get to be a winner
             for candidate_id, candidate_result in zip(range(len(self.results)), self.results):
-                if candidate_result >= self.winners_min:
+                if candidate_result >= self.min_to_win:
                     self.declared_winners.append(candidate_id)
                 else:
                     self.declared_losers.append(candidate_id)
@@ -93,14 +100,12 @@ class Election():
             if len(self.declared_winners) > self.winners:
                 raise ValueError("Too many winners")
 
-    def get_contests(self):
-        return list(self.data["contests"].keys())
 
     def print_election(self):
-        print("Results of: " + self.name)
-        print("Number of valid ballots: " + str(self.print_number(self.ballots_cast)))
+        #print("Results of: " + self.name)
+        print("Number of contest ballots: " + str(self.print_number(self.ballots_cast)))
         for i, candidate, ballots in zip(range(1,len(self.candidates)+1), self.candidates, self.results):
-            if ballots >= self.winners_min:
+            if ballots >= self.min_to_win:
                 print("\t%s* %s\t%s" % (i, candidate, self.print_number(ballots)))
             else:
                 print("\t%s %s\t%s" % (i, candidate, self.print_number(ballots)))

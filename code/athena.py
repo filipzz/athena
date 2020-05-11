@@ -5,7 +5,7 @@ import math
 import logging
 #import athena.tools
 from athena.athena import AthenaAudit
-from athena.election import Election
+from athena.contest import Contest
 from athena.audit import Audit
 
 if __name__ == '__main__':
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     save_to = "elections/" + name
 
     if mode == "read":
-        election_object = Election(election)
+        election_object = Contest(election)
         #election_object.read_from_file(file_name, contest_name)
         election_object.read_election_data(file_name)
         election_object.load_contest_data(contest_name)
@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
         #print("Candidates: ", candidates)
 
-        election_object = Election(election)
+        election_object = Contest(election)
         #tools.print_election(election)
     election_object.print_election()
 
@@ -270,6 +270,8 @@ if __name__ == '__main__':
 
         if mode == "read":
             w = Audit(audit_type)
+
+            w.read_election_data(file_name)
             w.read_election_results(file_name)
             w.load_contest(contest_name)
         else:
