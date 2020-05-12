@@ -22,13 +22,17 @@ class Audit():
         self.alpha = alpha
         self.delta = delta
         self.election_data_file = ""
-        self.round_number = 0
+        self.round_number = 1
         self.audit_completed = False
         self.ballots_cast = 0
         self.min_kmins = []
         self.data = None
         self.contests = []
         self.contest_list = []
+        self.ballots_sampled = []
+        self.risks = []
+        self.deltas = []
+        self.audit_pairs = []
 
     def read_election_data(self, file_name):
         try:
@@ -70,6 +74,10 @@ class Audit():
         self.election.load_contest_data(contest, self.data)
         self.audit_observations = [[] for j in range(len(self.election.candidates))]
         self.round_observations = [[] for j in range(len(self.election.candidates))]
+
+        for winner in self.election.declared_winners:
+            for loser in self.election.declared_losers:
+                self.audit_pairs.append([winner, loser])
 
     def get_contests(self):
         return self.election.get_contests()
@@ -120,46 +128,47 @@ class Audit():
         future_round_sizes = [0] * len(pstop_goals)
         #future_prob_stop = [0] * len(pstop_goals)
 
-        for i in self.election.declared_winners:
+        for i, j in self.audit_pairs:
+            #for i in self.election.declared_winners:
             ballots_i = self.election.results[i]
             candidate_i = self.election.candidates[i]
-            for j in self.election.declared_losers:
-                ballots_j = self.election.results[j]
-                candidate_j = self.election.candidates[j]
+            #for j in self.election.declared_losers:
+            ballots_j = self.election.results[j]
+            candidate_j = self.election.candidates[j]
 
-                logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
-                bc = ballots_i + ballots_j
-                scalling_ratio = self.election.ballots_cast / bc
+            logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
+            bc = ballots_i + ballots_j
+            scalling_ratio = self.election.ballots_cast / bc
 
-                winner = max(ballots_i, ballots_j)
-                logging.info("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
-                rs = []
-                #for x in self.round_schedule:
-                #    y = math.floor(x * bc / self.election.ballots_cast)
-                #    rs.append(y)
-                for rs_i, rs_j in zip(self.audit_observations[i], self.audit_observations[j]):
-                    rs.append(rs_i + rs_j)
+            winner = max(ballots_i, ballots_j)
+            logging.info("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
+            rs = []
+            #for x in self.round_schedule:
+            #    y = math.floor(x * bc / self.election.ballots_cast)
+            #    rs.append(y)
+            for rs_i, rs_j in zip(self.audit_observations[i], self.audit_observations[j]):
+                rs.append(rs_i + rs_j)
 
 
-                margin = (2 * winner - bc)/bc
+            margin = (2 * winner - bc)/bc
 
-                audit_object = AthenaAudit()
+            audit_object = AthenaAudit()
 
-                #logging.info("\tpstop goals: " + str(pstop_goals))
-                logging.info("\tpairwise round schedule: " + str(rs))
-                rescaled = []
-                next_round_sizes = audit_object.find_next_round_sizes(self.audit_type, margin, self.alpha, self.delta,
-                                                                      rs, pstop_goals)
-                for i, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
-                    rs = [] + self.round_schedule
-                    next_round_rescaled = math.ceil(next_round * scalling_ratio)
-                    rs.append(next_round_rescaled)
-                    rescaled.append(next_round_rescaled)
-                    future_round_sizes[i] = max(future_round_sizes[i], next_round_rescaled)
-                    logging.info("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
-                    logging.info("\t\t\t\tnr: %s\trnr: %s\tsr: %s" % (next_round, next_round_rescaled, scalling_ratio))
+            #logging.info("\tpstop goals: " + str(pstop_goals))
+            logging.info("\tpairwise round schedule: " + str(rs))
+            rescaled = []
+            next_round_sizes = audit_object.find_next_round_sizes(self.audit_type, margin, self.alpha, self.delta,
+                                                                  rs, pstop_goals)
+            for i, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
+                rs = [] + self.round_schedule
+                next_round_rescaled = math.ceil(next_round * scalling_ratio)
+                rs.append(next_round_rescaled)
+                rescaled.append(next_round_rescaled)
+                future_round_sizes[i] = max(future_round_sizes[i], next_round_rescaled)
+                logging.info("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
+                logging.info("\t\t\t\tnr: %s\trnr: %s\tsr: %s" % (next_round, next_round_rescaled, scalling_ratio))
 
-                found_solutions[candidate_i + "-" + candidate_j] = {"pstop_goal": pstop_goals, "next_round_sizes": rescaled, "prob_stop": next_round_sizes["prob_stop"]}
+            found_solutions[candidate_i + "-" + candidate_j] = {"pstop_goal": pstop_goals, "next_round_sizes": rescaled, "prob_stop": next_round_sizes["prob_stop"]}
 
         return {"detailed" : found_solutions, "future_round_sizes" : future_round_sizes}
 
@@ -174,110 +183,114 @@ class Audit():
         smallest_margin_id = ""
         min_kmins = [0] * len(self.election.candidates)
 
-        #for i in range(len(self.election.candidates)):
-        for i in self.election.declared_winners:
+        audit_pairs_next = []
+        for i, j in self.audit_pairs:
+        #for i in self.election.declared_winners:
             ballots_i = self.election.results[i]
             candidate_i = self.election.candidates[i]
             #for j in range(i + 1, len(self.election.candidates)):
-            for j in self.election.declared_losers:
-                pair_id = str(i) + "-" + str(j)
-                ballots_j = self.election.results[j]
-                candidate_j = self.election.candidates[j]
+            #for j in self.election.declared_losers:
+            pair_id = str(i) + "-" + str(j)
+            ballots_j = self.election.results[j]
+            candidate_j = self.election.candidates[j]
 
-                logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
-                bc = ballots_i + ballots_j
-                winner = max(ballots_i, ballots_j)
-                if winner == ballots_i:
-                    winner_pos = i
-                    loser_pos = j
-                else:
-                    winner_pos = j
-                    loser_pos = i
-                logging.info("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
-                rs = []
+            logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
+            bc = ballots_i + ballots_j
+            winner = max(ballots_i, ballots_j)
+            if winner == ballots_i:
+                winner_pos = i
+                loser_pos = j
+            else:
+                winner_pos = j
+                loser_pos = i
+            logging.info("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
+            rs = []
 
-                #for x in self.round_schedule:
-                #    y = math.floor(x * bc / self.election.ballots_cast)
-                #    rs.append(y)
+            #for x in self.round_schedule:
+            #    y = math.floor(x * bc / self.election.ballots_cast)
+            #    rs.append(y)
 
-                # we build a round schedule that takes into account only relevant ballots for the given pair
-                for rs_i, rs_j in zip(self.audit_observations[i], self.audit_observations[j]):
-                    rs.append(rs_i + rs_j)
+            # we build a round schedule that takes into account only relevant ballots for the given pair
+            for rs_i, rs_j in zip(self.audit_observations[i], self.audit_observations[j]):
+                rs.append(rs_i + rs_j)
 
-                #print("round schedule", rs)
+            #print("round schedule", rs)
 
-                margin = (2 * winner - bc)/bc
+            margin = (2 * winner - bc)/bc
 
-                audit_object = AthenaAudit()
-                if self.audit_type.lower() == "bravo" or self.audit_type.lower() == "wald":
-                    audit_athena = audit_object.bravo(margin, self.alpha, rs)
-                elif self.audit_type.lower() == "arlo":
-                    audit_athena = audit_object.arlo(margin, self.alpha, rs)
-                elif self.audit_type.lower() == "minerva":
-                    audit_athena = audit_object.minerva(margin, self.alpha, rs)
-                elif self.audit_type.lower() == "metis":
-                    audit_athena = audit_object.metis(margin, self.alpha, rs)
-                else:
-                    audit_athena = audit_object.athena(margin, self.alpha, self.delta, rs)
+            audit_object = AthenaAudit()
+            if self.audit_type.lower() == "bravo" or self.audit_type.lower() == "wald":
+                audit_athena = audit_object.bravo(margin, self.alpha, rs)
+            elif self.audit_type.lower() == "arlo":
+                audit_athena = audit_object.arlo(margin, self.alpha, rs)
+            elif self.audit_type.lower() == "minerva":
+                audit_athena = audit_object.minerva(margin, self.alpha, rs)
+            elif self.audit_type.lower() == "metis":
+                audit_athena = audit_object.metis(margin, self.alpha, rs)
+            else:
+                audit_athena = audit_object.athena(margin, self.alpha, self.delta, rs)
 
-                #risk_goal = audit_athena["prob_tied_sum"]
-                pairwise_audit_kmins = []
-                #self.audit_kmins = audit_athena["kmins"]
-                pairwise_audit_kmins = audit_athena["kmins"]
+            #risk_goal = audit_athena["prob_tied_sum"]
+            pairwise_audit_kmins = []
+            #self.audit_kmins = audit_athena["kmins"]
+            pairwise_audit_kmins = audit_athena["kmins"]
 
-                logging.info(str(audit_athena))
+            logging.info(str(audit_athena))
 
-                #test_info = audit_object.find_kmins_for_risk(self.audit_kmins, self.audit_observations[winner_pos])
-                test_info = audit_object.find_kmins_for_risk(pairwise_audit_kmins, self.audit_observations[winner_pos])
+            #test_info = audit_object.find_kmins_for_risk(self.audit_kmins, self.audit_observations[winner_pos])
+            test_info = audit_object.find_kmins_for_risk(pairwise_audit_kmins, self.audit_observations[winner_pos])
 
-                logging.info("find_kmins_for_risk")
-                logging.info(str(test_info))
+            logging.info("find_kmins_for_risk")
+            logging.info(str(test_info))
 
-                logging.info("\n\t\tAUDIT result for: " +  str(candidate_i) + " vs " + str(candidate_j))
-                logging.info("\t\trequired winner:\t" + str(pairwise_audit_kmins))
-                print(pairwise_audit_kmins, min_kmins, min_kmins[winner_pos])
-                if pairwise_audit_kmins[-1] > min_kmins[winner_pos]:
-                    min_kmins[winner_pos] = pairwise_audit_kmins[-1]
-                logging.info("\t\tobserved winner:\t" + str(self.audit_observations[winner_pos]))
-                logging.info("\t\tobserved loser: \t" + str(self.audit_observations[loser_pos]))
-                logging.info("\t\tround schedule: \t" + str(rs))
+            logging.info("\n\t\tAUDIT result for: " +  str(candidate_i) + " vs " + str(candidate_j))
+            logging.info("\t\trequired winner:\t" + str(pairwise_audit_kmins))
+            #print(pairwise_audit_kmins, min_kmins, min_kmins[winner_pos])
+            if pairwise_audit_kmins[-1] > min_kmins[winner_pos]:
+                min_kmins[winner_pos] = pairwise_audit_kmins[-1]
+            logging.info("\t\tobserved winner:\t" + str(self.audit_observations[winner_pos]))
+            logging.info("\t\tobserved loser: \t" + str(self.audit_observations[loser_pos]))
+            logging.info("\t\tround schedule: \t" + str(rs))
 
-                if test_info["passed"] == 1:
-                    logging.info("\n\t\tTest passed")
-                else:
-                    logging.info("\n\t\tTest FAILED")
+            if test_info["passed"] == 1:
+                logging.info("\n\t\tTest passed")
+            else:
+                logging.info("\n\t\tTest FAILED")
+                audit_pairs_next.append([i, j])
 
-                #w = audit_object.estimate_risk(margin, actual_kmins, round_schedule)
-                #w = audit_object.estimate_risk(margin, test_info["kmins"], self.round_schedule, audit_observations)
-                #w = audit_object.estimate_risk(margin, self.audit_kmins, self.round_schedule, audit_observations)
-                w = audit_object.estimate_risk(margin, pairwise_audit_kmins, rs, self.audit_observations[winner_pos])
-                #logging.info(str(w))
-                #ratio = w["ratio"]
-                deltas = w["deltas"]
-                audit_risk = min(filter(lambda x: x > 0, w["audit_ratio"]))
-                #logging.info(str(w))
-                #logging.info("Risk spent:\t%s" % (ratio[-1]))
-                logging.info("\t\tLR [needs to be > %s]:\t\t\t%s" % (self.delta, 1/deltas[-1]))
-                logging.info("\t\tdelta [needs to be < %s]:\t\t%s" % (self.delta, deltas[-1]))
-                logging.info("\t\tATHENA risk [needs to be <= %s]:\t%s" % (self.alpha, audit_risk))
+            #w = audit_object.estimate_risk(margin, actual_kmins, round_schedule)
+            #w = audit_object.estimate_risk(margin, test_info["kmins"], self.round_schedule, audit_observations)
+            #w = audit_object.estimate_risk(margin, self.audit_kmins, self.round_schedule, audit_observations)
+            w = audit_object.estimate_risk(margin, pairwise_audit_kmins, rs, self.audit_observations[winner_pos])
+            #logging.info(str(w))
+            #ratio = w["ratio"]
+            deltas = w["deltas"]
+            audit_risk = min(filter(lambda x: x > 0, w["audit_ratio"]))
+            #logging.info(str(w))
+            #logging.info("Risk spent:\t%s" % (ratio[-1]))
+            logging.info("\t\tdelta [needs to be > %s]:\t\t\t%s" % (self.delta, 1/deltas[-1]))
+            logging.info("\t\tLR [needs to be < %s]:\t\t%s" % (self.delta, deltas[-1]))
+            logging.info("\t\tATHENA risk [needs to be <= %s]:\t%s" % (self.alpha, audit_risk))
 
-                if test_info["passed"] != 1:
-                    test_passed = False
+            if test_info["passed"] != 1:
+                test_passed = False
 
-                risks.append(audit_risk)
-                delta.append(deltas[-1])
+            risks.append(audit_risk)
+            delta.append(deltas[-1])
 
-                result[pair_id] = {"risk": audit_risk, "delta": deltas[-1],  "passed": test_info["passed"], "observed_winner": self.audit_observations[winner_pos], "observed_loser": self.audit_observations[loser_pos], "required": pairwise_audit_kmins}
+            result[pair_id] = {"risk": audit_risk, "delta": deltas[-1],  "passed": test_info["passed"], "observed_winner": self.audit_observations[winner_pos], "observed_loser": self.audit_observations[loser_pos], "required": pairwise_audit_kmins}
 
-                if margin < smallest_margin:
-                    smallest_margin = margin
-                    smallest_margin_id = pair_id
+            if margin < smallest_margin:
+                smallest_margin = margin
+                smallest_margin_id = pair_id
 
 
         if test_passed == True:
             passed = 1
 
-        return {"risk": max(risks), "delta": min(delta), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result, "min_kmins": min_kmins}
+        self.audit_pairs = audit_pairs_next
+
+        return {"risk": max(risks), "delta": max(delta), "deltamin": min(delta), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result, "min_kmins": min_kmins}
 
     def run_interactive(self):
 
@@ -291,7 +304,6 @@ class Audit():
             sys.exit()
 
         #round_number = 1
-        self.round_number = self.round_number + 1
         self.audit_completed = False
         list_of_candidates = self.election.candidates
 
@@ -389,6 +401,9 @@ class Audit():
         observed = x["observed"]
         required = x["required"]
         self.min_kmins = x["min_kmins"]
+        self.risks.append(x["risk"])
+        self.deltas.append(x["delta"])
+        self.ballots_sampled.append(new_valid_ballots)
 
         if x["passed"] == 1:
             self.audit_completed = True
@@ -397,7 +412,9 @@ class Audit():
             #print(x)
         else:
             print("\n\nAudit failed")
-            print("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
+            print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
+            print("\tLR:\t\t%s\t[needs to be > %s]" % (x["delta"], self.delta))
+            print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
             print("\tATHENA risk:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
             print("\tboth conditions are required to be satisfied.")
             #print("P-value:\t%s\n" % (x["risk"]))
@@ -405,13 +422,73 @@ class Audit():
             #round_number = round_number + 1
             #print(str(x))
             ###del w
+        self.round_number = self.round_number + 1
 
-    def present_state(self):
+    def show_election_results(self):
         d = {'Candidates': self.election.candidates, 'Results': self.election.results}
         df = pd.DataFrame(data=d)
-        rn_caption = "Round_" + str(self.round_number)
-        r = []
-        for i in range(len(self.election.candidates)):
-            r.append(self.audit_observations[i][self.round_number - 1])
-            df[rn_caption] = r
-        df
+        return df.style.set_properties(subset = pd.IndexSlice[self.election.winners, :], **{'color' : 'green'})
+
+
+    '''
+    Method presents a DataFrame with audit results
+    '''
+    def present_state(self):
+
+        if self.round_number == 0:
+            return self.show_election_results()
+
+        summary = ["Sum", "Delta", "P-Value"]
+
+        '# columns related to election results'
+        list_of_candidates = [] + self.election.candidates
+        for a in summary:
+            list_of_candidates.append(" ") # this is sum row
+        #list_of_candidates.append(" ") # this is delta row
+        #list_of_candidates.append(" ") # this is p-value row
+
+        audit_results = [] + self.election.results
+        for a in summary:
+            audit_results.append(a)
+
+        d = {'Candidates': list_of_candidates, 'Results': audit_results}
+        df = pd.DataFrame(data=d)
+
+        '# columns related to audit rounds'
+        if self.round_number > 1:
+
+            '# Results column of results of sampling'
+            for rd in range(self.round_number - 1):
+                col_caption = "Round " + str(rd + 1)
+                r = []
+                for i in range(len(self.election.candidates)):
+                    r.append(self.round_observations[i][rd])
+                r.append(str(self.ballots_sampled[rd]))
+                r.append("{:.4f}".format(1/self.deltas[rd]))
+                r.append("{:.4f}".format(self.risks[rd]))
+                print(r)
+                df[col_caption] = r
+
+            '# Total column - sum of sampled ballots'
+            r = []
+            col_caption = "Total"
+            for i in range(len(self.election.candidates)):
+                r.append(self.audit_observations[i][self.round_number - 2])
+            for i in summary:
+                r.append(" ")
+            df[col_caption] = r
+
+            '# Column Required - presents the value of kmin required to pass the audit'
+            r = []
+            col_caption = "Required"
+            for i in range(len(self.election.candidates)):
+                if self.min_kmins[i] == 0:
+                    r.append(" ")
+                else:
+                    r.append(self.min_kmins[i])
+            for i in summary:
+                r.append(" ")
+            df[col_caption] = r
+
+        return df.style.set_properties(subset = pd.IndexSlice[self.election.winners, :], **{'color' : 'green'})
+

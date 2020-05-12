@@ -103,7 +103,7 @@ class Contest():
 
     def print_election(self):
         #print("Results of: " + self.name)
-        print("Number of contest ballots: " + str(self.print_number(self.ballots_cast)))
+        #print("Number of contest ballots: " + str(self.print_number(self.ballots_cast)))
         for i, candidate, ballots in zip(range(1,len(self.candidates)+1), self.candidates, self.results):
             if ballots >= self.min_to_win:
                 print("\t%s* %s\t%s" % (i, candidate, self.print_number(ballots)))
