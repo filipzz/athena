@@ -292,6 +292,51 @@ class Audit():
 
         return {"risk": max(risks), "delta": max(delta), "deltamin": min(delta), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result, "min_kmins": min_kmins}
 
+    """
+    Method that simulates a single round of the audit
+    """
+    def set_observations(self, new_ballots, new_valid_ballots, round_observation):
+        """
+        Parameters
+        ----------
+        :param new_ballots: number of total ballots sampled in the round
+        :param new_valid_ballots: number of ballots sampled in the round that are relevant to the contest
+        :param round_observation: an array of number of ballots sampled for each candidate in the round
+        """
+
+        #round_number = 1
+        self.audit_completed = False
+        list_of_candidates = self.election.candidates
+
+        if new_valid_ballots > new_ballots or sum(round_observation) > new_valid_ballots:
+            print("Incorrect number of valid ballots entered: ")
+            sys.exit(0)
+
+
+        self.add_observations(round_observation)
+        x = self.find_risk() #actual_kmins)
+        observed = x["observed"]
+        required = x["required"]
+        self.min_kmins = x["min_kmins"]
+        self.risks.append(x["risk"])
+        self.deltas.append(x["delta"])
+        self.ballots_sampled.append(new_valid_ballots)
+
+        if x["passed"] == 1:
+            self.audit_completed = True
+            print("\n\n\tAudit Successfully completed!")
+            print("\tP-value:\t%s\n" % (x["risk"]))
+            #print(x)
+        else:
+            print("\n\nAudit failed")
+            print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
+            print("\tLR:\t\t%s\t[needs to be > %s]" % (x["delta"], self.delta))
+            print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
+            print("\tATHENA risk:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
+            print("\tboth conditions are required to be satisfied.")
+        self.round_number = self.round_number + 1
+
+
     def run_interactive(self):
 
         while self.audit_completed is False:
