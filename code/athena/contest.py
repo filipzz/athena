@@ -8,7 +8,7 @@ class Contest():
 
 
     def __init__(self, contest = None):
-        self.ballots_cast = []
+        self.ballots_cast = 0
         self.candidates = []
         self.results = []
         self.winners = 1 # number of winners
@@ -99,6 +99,7 @@ class Contest():
 
             if len(self.declared_winners) > self.winners:
                 raise ValueError("Too many winners")
+
 
 
     def print_election(self):

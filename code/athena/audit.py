@@ -62,13 +62,21 @@ class Audit():
         self.election = new_election
         self.audit_observations = [[] for j in range(len(self.election.candidates))]
         self.round_observations = [[] for j in range(len(self.election.candidates))]
+        for winner in self.election.declared_winners:
+            for loser in self.election.declared_losers:
+                self.audit_pairs.append([winner, loser])
+        self.ballots_cast = election["ballots_cast"]
 
     def read_election_results(self, url):
         self.election_data_file = url
         self.election.read_election_data(url)
 
     def get_contests(self):
-        return list(self.data["contests"].keys())
+        x = self.data["contests"]
+        y = x.keys()
+        return list(y)
+
+        #return list(self.data["contests"].keys())
 
 
     def load_contest(self, contest):
@@ -79,9 +87,6 @@ class Audit():
         for winner in self.election.declared_winners:
             for loser in self.election.declared_losers:
                 self.audit_pairs.append([winner, loser])
-
-    def get_contests(self):
-        return self.election.get_contests()
 
 
     def add_round_schedule(self, round_schedule):
@@ -139,6 +144,7 @@ class Audit():
 
             logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
             bc = ballots_i + ballots_j
+            #print(self.election.ballots_cast)
             scalling_ratio = self.election.ballots_cast / bc
 
             winner = max(ballots_i, ballots_j)
@@ -185,6 +191,7 @@ class Audit():
         min_kmins = [0] * len(self.election.candidates)
 
         audit_pairs_next = []
+        #print(self.audit_pairs)
         for i, j in self.audit_pairs:
         #for i in self.election.declared_winners:
             ballots_i = self.election.results[i]
@@ -267,6 +274,7 @@ class Audit():
             #ratio = w["ratio"]
             deltas = w["deltas"]
             #audit_risk = min(filter(lambda x: x > 0, w["audit_ratio"]))
+            logging.debug("w: %s" % (w))
             audit_risk = w["audit_ratio"][-1]
             #logging.info(str(w))
             #logging.info("Risk spent:\t%s" % (ratio[-1]))
@@ -292,8 +300,8 @@ class Audit():
 
         self.audit_pairs = audit_pairs_next
 
-        #print(risks)
-        #print(delta)
+        logging.debug("risks: %s" % (risks))
+        logging.debug("delta: %s" % (delta))
 
         return {"risk": max(risks), "delta": max(delta), "deltamin": min(delta), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result, "min_kmins": min_kmins}
 
@@ -354,6 +362,25 @@ class Audit():
         while self.audit_completed is False:
             self.run_audit_round()
 
+    def predict_round_sizes(self, pstop_goal):
+        x = self.find_next_round_size(pstop_goal)
+
+        future_round_sizes = x["future_round_sizes"]
+
+        if len(self.round_schedule) > 0:
+            below_kmin = 0 #max(required) - max(observed)
+            n_future_round_sizes =  list(map(lambda x: x - max(self.round_schedule) + 2 * below_kmin, future_round_sizes))
+        else:
+            n_future_round_sizes = future_round_sizes
+
+        predicted = []
+        for p, s in zip(pstop_goal, n_future_round_sizes):
+
+            predicted.append([p, s])
+
+
+        return predicted
+
     def run_audit_round(self):
 
 
@@ -362,7 +389,7 @@ class Audit():
             sys.exit()
 
         #round_number = 1
-        self.audit_completed = False
+        #self.audit_completed = False
         list_of_candidates = self.election.candidates
 
         #while audit_completed is False:
@@ -385,19 +412,13 @@ class Audit():
         else:
             audit_completed = True
 
-        x = self.find_next_round_size(pstop_goal)
-        #print(str(x))
+        predicted_round_sizes = self.predict_round_sizes(pstop_goal)
 
-        future_round_sizes = x["future_round_sizes"]
-
-        if len(self.round_schedule) > 0:
-            below_kmin = 0 #max(required) - max(observed)
-            n_future_round_sizes =  list(map(lambda x: x - max(self.round_schedule) + 2 * below_kmin, future_round_sizes))
-        else:
-            n_future_round_sizes = future_round_sizes
+        logging.debug("predicted round size: %s" % (predicted_round_sizes))
 
         print("\nSelect round size: ")
-        for p, rs in zip(pstop_goal, n_future_round_sizes):
+        for prs in predicted_round_sizes:
+            p, rs = prs
             print("Complete with prob. %s when you sample %s more ballots." % (p, rs))
 
 
@@ -531,7 +552,6 @@ class Audit():
                 r.append(str(self.ballots_sampled[rd]))
                 r.append("{:.4f}".format(1/self.deltas[rd]))
                 r.append("{:.4f}".format(self.risks[rd]))
-                #print(r)
                 df[col_caption] = r
 
             '# Total column - sum of sampled ballots'
