@@ -4,7 +4,8 @@ import sys
 import json
 import requests
 from urllib import parse
-import pandas as pd
+
+
 
 from .athena import AthenaAudit
 from .contest import Contest
@@ -265,7 +266,8 @@ class Audit():
             #logging.info(str(w))
             #ratio = w["ratio"]
             deltas = w["deltas"]
-            audit_risk = min(filter(lambda x: x > 0, w["audit_ratio"]))
+            #audit_risk = min(filter(lambda x: x > 0, w["audit_ratio"]))
+            audit_risk = w["audit_ratio"]
             #logging.info(str(w))
             #logging.info("Risk spent:\t%s" % (ratio[-1]))
             logging.info("\t\tdelta [needs to be > %s]:\t\t\t%s" % (self.delta, 1/deltas[-1]))
@@ -289,6 +291,9 @@ class Audit():
             passed = 1
 
         self.audit_pairs = audit_pairs_next
+
+        print(risks)
+        print(delta)
 
         return {"risk": max(risks), "delta": max(delta), "deltamin": min(delta), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result, "min_kmins": min_kmins}
 
@@ -325,14 +330,16 @@ class Audit():
         if x["passed"] == 1:
             self.audit_completed = True
             print("\n\n\tAudit Successfully completed!")
-            print("\tP-value:\t%s\n" % (x["risk"]))
+            print("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
+            print("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
+            #print("\tP-value:\t%s\n" % (x["risk"]))
             #print(x)
         else:
-            print("\n\nAudit failed")
-            print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
-            print("\tLR:\t\t%s\t[needs to be > %s]" % (x["delta"], self.delta))
-            print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
-            print("\tATHENA risk:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
+            print("\n\n\tRound: %s audit failed" % (self.round_number))
+            #print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
+            print("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
+            print("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
+            print("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
             print("\tboth conditions are required to be satisfied.")
         self.round_number = self.round_number + 1
 
@@ -343,6 +350,7 @@ class Audit():
             self.run_audit_round()
 
     def run_audit_round(self):
+
 
         if self.audit_completed is True:
             print("Audit is completed!")
@@ -452,11 +460,14 @@ class Audit():
 
         if x["passed"] == 1:
             self.audit_completed = True
-            print("\n\n\tAudit Successfully completed!")
+            print("\n\n\tRound: %s audit completed" % (self.round_number))
+            #print("\tAudit Successfully completed!")
             print("\tP-value:\t%s\n" % (x["risk"]))
+            self.audit_completed = True
             #print(x)
         else:
-            print("\n\nAudit failed")
+            print("\n\n\tRound: %s audit failed" % (self.round_number))
+            #print("\tAudit failed")
             print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
             print("\tLR:\t\t%s\t[needs to be > %s]" % (x["delta"], self.delta))
             print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
@@ -470,6 +481,8 @@ class Audit():
         self.round_number = self.round_number + 1
 
     def show_election_results(self):
+        import pandas as pd
+
         d = {'Candidates': self.election.candidates, 'Results': self.election.results}
         df = pd.DataFrame(data=d)
         return df.style.set_properties(subset = pd.IndexSlice[self.election.winners, :], **{'color' : 'green'})
@@ -479,11 +492,13 @@ class Audit():
     Method presents a DataFrame with audit results
     '''
     def present_state(self):
+        import pandas as pd
+
 
         if self.round_number == 0:
             return self.show_election_results()
 
-        summary = ["Sum", "Delta", "P-Value"]
+        summary = ["Sum", "LR", "P-Value"]
 
         '# columns related to election results'
         list_of_candidates = [] + self.election.candidates
@@ -511,7 +526,7 @@ class Audit():
                 r.append(str(self.ballots_sampled[rd]))
                 r.append("{:.4f}".format(1/self.deltas[rd]))
                 r.append("{:.4f}".format(self.risks[rd]))
-                print(r)
+                #print(r)
                 df[col_caption] = r
 
             '# Total column - sum of sampled ballots'
@@ -535,5 +550,5 @@ class Audit():
                 r.append(" ")
             df[col_caption] = r
 
-        return df.style.set_properties(subset = pd.IndexSlice[self.election.winners, :], **{'color' : 'green'})
+        return df.style.set_properties(subset = pd.IndexSlice[self.election.winners, :], **{'color' : 'blue'})
 
