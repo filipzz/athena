@@ -478,7 +478,6 @@ class AthenaAudit():
             else:
                 ratio.append(0)
 
-        print(deltas)
 
         return {"prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "audit_ratio": audit_ratio[1:len(audit_ratio)], "ratio": ratio, "deltas": deltas}
 

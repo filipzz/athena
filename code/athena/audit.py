@@ -267,7 +267,7 @@ class Audit():
             #ratio = w["ratio"]
             deltas = w["deltas"]
             #audit_risk = min(filter(lambda x: x > 0, w["audit_ratio"]))
-            audit_risk = w["audit_ratio"]
+            audit_risk = w["audit_ratio"][-1]
             #logging.info(str(w))
             #logging.info("Risk spent:\t%s" % (ratio[-1]))
             logging.info("\t\tdelta [needs to be > %s]:\t\t\t%s" % (self.delta, 1/deltas[-1]))
