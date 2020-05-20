@@ -1,0 +1,125 @@
+{
+	"name": "montgomery_primary_2020",
+	"total_ballots": 69743,
+	"contests": {
+		"d_president": {
+			"contest_ballots": 37874,
+			"tally": {
+				"Bennet": 51,
+				"Biden": 29011,
+				"Bloomberg": 702,
+				"Buttigieg": 525,
+				"Gabbard": 137,
+				"Klobuchar": 406,
+				"Patrick": 27,
+				"Sanders": 5713,
+				"Steyer": 62,
+				"Warren": 1118,
+				"Write_Ins": 122
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"Biden"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"d_congress": {
+			"contest_ballots": 35177,
+			"tally": {
+				"Moyer": 10130,
+				"Tims": 25047
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"Tims"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"d_senator": {
+			"contest_ballots": 20510,
+			"tally": {
+				"Fogel": 16867,
+				"Griggs": 3643
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"Fogel"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"d_cc_1_2_2021": {
+			"contest_ballots": 35313,
+			"tally": {
+				"Dodge": 24425,
+				"Rountree": 10888
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"Dodge"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"d_cc_1_3_2021": {
+			"contest_ballots": 35218,
+			"tally": {
+				"Lieberman": 28353,
+				"West": 6865
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"Lieberman"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"r_10th": {
+			"contest_ballots": 27642,
+			"tally": {
+				"Anderson": 1964,
+				"Flanders": 1454,
+				"Turner": 24224
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"Turner"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"r_senator": {
+			"contest_ballots": 23068,
+			"tally": {
+				"Antani": 14866,
+				"Robinson": 2885,
+				"Selby": 5317
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"Antani"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"r_42nd": {
+			"contest_ballots": 8985,
+			"tally": {
+				"Stubbs": 2341,
+				"Young": 6644
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"Young"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"r_cc_1_2_2021": {
+			"contest_ballots": 24229,
+			"tally": {
+				"Scearce": 8538,
+				"Setzer": 15691
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"Setzer"
+			],
+			"contest_type": "PLURALITY"
+		}
+	}
+}
