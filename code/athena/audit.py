@@ -298,10 +298,10 @@ class Audit():
         if test_passed == True:
             passed = 1
 
-        self.audit_pairs = audit_pairs_next
-
         logging.debug("risks: %s" % (risks))
         logging.debug("delta: %s" % (delta))
+
+        self.audit_pairs = audit_pairs_next
 
         return {"risk": max(risks), "delta": max(delta), "deltamin": min(delta), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result, "min_kmins": min_kmins}
 
