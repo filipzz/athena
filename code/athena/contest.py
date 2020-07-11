@@ -66,6 +66,10 @@ class Contest():
         if data is not None:
             self.data = data
         info = self.data["contests"][contest]
+
+        print("results", self.results)
+        self.results = []
+        self.candidates = []
         for candidate, result in info["tally"].items():
             self.candidates.append(candidate) #info["candidates"]
             self.results.append(result)
@@ -88,7 +92,6 @@ class Contest():
                     self.declared_winners.append(candidate_id)
                 else:
                     self.declared_losers.append(candidate_id)
-
 
             reported_list = self.reported_winners
             declared_list = self.declared_winners

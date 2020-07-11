@@ -180,6 +180,12 @@ if __name__ == '__main__':
         election["winners"] = 1
     else:
         election["ballots_cast"] = ballots_cast
+        election["total_ballots"] = ballots_cast
+        tally = {}
+        for can, votes in zip(candidates, results):
+            tally[can] = votes
+        election["contests"] = {'default': {'contest_ballots': ballots_cast, 'tally': tally, 'num_winners': winners, "reported_winners": ["A"]}}
+        election["data"] = {'name': 'x', 'total_ballots': ballots_cast, 'contests' : election["contests"]}
         election["candidates"] = candidates
         election["results"] = results
         election["winners"] = winners
@@ -258,11 +264,30 @@ if __name__ == '__main__':
                 print("\t%s ratio:\t%s" % (audit_type, str(true_risk)))
 
     elif mode_rounds == "pstop":
-        w = Audit(audit_type, alpha, delta)
-        w.add_election(election)
-        w.add_round_schedule(round_schedule)
-        x = w.find_next_round_size(pstop_goal)
-        print(str(x))
+
+        if mode == "read":
+            w = Audit(audit_type, alpha)
+            w.read_election_results(file_name)
+            w.load_contest("default")
+            print("ele-d", w.election.data)
+            print(w.data)
+            #print(w.contests)
+            #print(w.contest_list)
+            w.election.print_election()
+            print(w.predict_round_sizes(pstop_goal))
+        else:
+            w = Audit(audit_type, alpha, delta)
+            w.add_election(election)
+            w.load_contest("default")
+            w.add_round_schedule(round_schedule)
+            #print(election)
+            print("ele-d", w.election.data)
+            print(w.data)
+            #print(w.contests)
+            #print(round_schedule)
+            #x = w.find_next_round_size(pstop_goal)
+            x = w.predict_round_sizes(pstop_goal)
+            print(str(x))
 
 
     elif mode_rounds == "interactive":

@@ -39,8 +39,10 @@ class Audit():
         try:
             parsed = parse.urlparse(file_name)
             if all([parsed.scheme, parsed.netloc, parsed.path]):
+                print("try: ", parsed.scheme, parsed.netloc, parsed.path)
                 self.data = json.loads(requests.get(file_name).text)
             else:
+                print("go: ", file_name)
                 with open(file_name, 'r') as f:
                     self.data = json.load(f)
         except:
@@ -57,15 +59,22 @@ class Audit():
 
 
 
+
+
+
     def add_election(self, election):
         new_election = Contest(election)
         self.election = new_election
+        #self.contests.append(new_election)
+
+        self.contest_list.append("default")
         self.audit_observations = [[] for j in range(len(self.election.candidates))]
         self.round_observations = [[] for j in range(len(self.election.candidates))]
-        for winner in self.election.declared_winners:
-            for loser in self.election.declared_losers:
-                self.audit_pairs.append([winner, loser])
+        self.election.ballots_cast = election["ballots_cast"]
         self.ballots_cast = election["ballots_cast"]
+        self.data = election["data"]
+        new_contest = Contest(self.data["contests"]["default"])
+        self.contests.append(new_contest)
 
     def read_election_results(self, url):
         self.election_data_file = url
@@ -87,6 +96,10 @@ class Audit():
         for winner in self.election.declared_winners:
             for loser in self.election.declared_losers:
                 self.audit_pairs.append([winner, loser])
+
+        print(self.election.declared_losers)
+        print(self.election.declared_winners)
+        print(self.audit_pairs)
 
 
     def add_round_schedule(self, round_schedule):
