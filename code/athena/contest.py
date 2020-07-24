@@ -8,36 +8,52 @@ class Contest():
 
 
     def __init__(self, contest = None):
-        self.ballots_cast = 0
+        self.ballots_cast = 0 # to be removed -> contest_ballots
+        self.contest_ballots = 0
+        self.tally = []
         self.candidates = []
         self.results = []
-        self.winners = 1 # number of winners
+        self.winners = 1 # to be removed -> num_winners #number of winners
+        self.num_winner = 1
         self.name = []
         self.min_to_win = 0
         self.model = ""
         self.reported_winners = []
-        self.declared_winners = []
+        self.declared_winners = [] # to be removed
         self.declared_losers = []
         self.data = None
         self.contest_type = ""
         if contest is not None:
             if "contest_ballots" in contest:
                 self.ballots_cast = contest["contest_ballots"]
+                self.contest_ballots = contest["contest_ballots"]
 
-            if "candidates" in contest:
+            if "candidates" in contest: # to be removed
                 self.candidates = contest["candidates"]
 
-            if "results" in contest:
+            if "results" in contest: # to be removed
                 self.results = contest["results"]
 
             if "num_winners" in contest:
                 self.winners = contest["num_winners"]
+                self.num_winner = contest["num_winners"]
 
             if "name" in contest:
                 self.name = contest["name"]
 
             if "model" in contest:
                 self.model = contest["model"]
+
+            if "tally" in contest:
+                for candidate, result in contest["tally"].items():
+                    self.candidates.append(candidate) #info["candidates"]
+                    self.results.append(result)
+                self.tally = contest["tally"]
+
+            if "reported_winners" in contest:
+                self.reported_winners = contest["reported_winners"]
+
+
 
             if "contest_type" in contest:
                 self.contest_type = contest["contest_type"]
@@ -47,6 +63,10 @@ class Contest():
             self.declared_losers = []
 
             self.find_winners()
+
+    def __str__(self):
+
+        return f"""{{"contest_ballots": {self.ballots_cast}, "num_winners": {self.winners}, "reported_winners": {self.reported_winners}, "contest_type": "{self.contest_type}", "tally": {self.tally}}}"""
 
     def read_election_data(self, file_name):
         try:
