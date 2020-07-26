@@ -507,9 +507,11 @@ class Audit():
     '''
     Method presents a DataFrame with audit results
     '''
-    def present_state(self):
+    def present_state(self, contest_name = None):
         import pandas as pd
 
+        if contest_name is None:
+            contest_name = self.active_contest
 
         if self.round_number == 0:
             return self.show_election_results()
@@ -565,5 +567,5 @@ class Audit():
                 r.append(" ")
             df[col_caption] = r
 
-        return df.style.set_properties(subset = pd.IndexSlice[self.election.winners, :], **{'color' : 'blue'})
+        return df.style.set_properties(subset = pd.IndexSlice[self.election.contests[contest_name].winners, :], **{'color' : 'blue'})
 
