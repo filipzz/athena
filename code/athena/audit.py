@@ -126,7 +126,9 @@ class Audit():
                 self.audit_observations[i].append(observations[i])
 
 
-    def find_next_round_size(self, pstop_goals):
+    def find_next_round_size(self, pstop_goals, contest_name = None):
+        if contest_name is None:
+            contest_name = self.active_contest
         logging.info("setting round schedule")
 
         found_solutions = {}
@@ -135,15 +137,15 @@ class Audit():
 
         for i, j in self.audit_pairs:
             #for i in self.election.declared_winners:
-            ballots_i = self.election.results[i]
-            candidate_i = self.election.candidates[i]
+            ballots_i = self.election.contests[contest_name].results[i]
+            candidate_i = self.election.contests[contest_name].candidates[i]
             #for j in self.election.declared_losers:
-            ballots_j = self.election.results[j]
-            candidate_j = self.election.candidates[j]
+            ballots_j = self.election.contests[contest_name].results[j]
+            candidate_j = self.election.contests[contest_name].candidates[j]
 
             logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
             bc = ballots_i + ballots_j
-            scalling_ratio = self.election.ballots_cast / bc
+            scalling_ratio = self.election.total_ballots / bc
 
             winner = max(ballots_i, ballots_j)
             logging.info("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
