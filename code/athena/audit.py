@@ -236,7 +236,11 @@ class Audit():
 
         return {"detailed" : found_solutions, "future_round_sizes" : future_round_sizes}
 
-    def find_risk(self):#, audit_observations):
+    def find_risk(self, contest_name = None):#, audit_observations):
+
+        if contest_name is None:
+            contest_name = self.active_contest
+
         result = {}
 
         test_passed = True
@@ -245,18 +249,18 @@ class Audit():
         delta =[]
         smallest_margin = 1
         smallest_margin_id = ""
-        min_kmins = [0] * len(self.election.candidates)
+        min_kmins = [0] * len(self.election.contests[contest_name].candidates)
 
         audit_pairs_next = []
         for i, j in self.audit_pairs:
         #for i in self.election.declared_winners:
-            ballots_i = self.election.results[i]
-            candidate_i = self.election.candidates[i]
+            ballots_i = self.election.contests[contest_name].results[i] # TODO: change to tally
+            candidate_i = self.election.contests[contest_name].candidates[i]
             #for j in range(i + 1, len(self.election.candidates)):
             #for j in self.election.declared_losers:
             pair_id = str(i) + "-" + str(j)
-            ballots_j = self.election.results[j]
-            candidate_j = self.election.candidates[j]
+            ballots_j = self.election.contests[contest_name].results[j]
+            candidate_j = self.election.contests[contest_name].candidates[j]
 
             logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
             bc = ballots_i + ballots_j
@@ -275,8 +279,8 @@ class Audit():
             #    rs.append(y)
 
             # we build a round schedule that takes into account only relevant ballots for the given pair
-            for rs_i, rs_j in zip(self.audit_observations[i], self.audit_observations[j]):
-                rs.append(rs_i + rs_j)
+            #for rs_i, rs_j in zip(self.audit_observations[i], self.audit_observations[j]):
+            for rs_i, rs_j in zip(self.observations[contest_name][i], self.observations[contest_name][j]):                rs.append(rs_i + rs_j)
 
             margin = (2 * winner - bc)/bc
 
@@ -300,7 +304,8 @@ class Audit():
             logging.info(str(audit_athena))
 
             #test_info = audit_object.find_kmins_for_risk(self.audit_kmins, self.audit_observations[winner_pos])
-            test_info = audit_object.find_kmins_for_risk(pairwise_audit_kmins, self.audit_observations[winner_pos])
+            #test_info = audit_object.find_kmins_for_risk(pairwise_audit_kmins, self.audit_observations[winner_pos])
+            test_info = audit_object.find_kmins_for_risk(pairwise_audit_kmins, self.observations[contest_name][winner_pos])
 
             logging.info("find_kmins_for_risk")
             logging.info(str(test_info))
@@ -309,8 +314,10 @@ class Audit():
             logging.info("\t\trequired winner:\t" + str(pairwise_audit_kmins))
             if pairwise_audit_kmins[-1] > min_kmins[winner_pos]:
                 min_kmins[winner_pos] = pairwise_audit_kmins[-1]
-            logging.info("\t\tobserved winner:\t" + str(self.audit_observations[winner_pos]))
-            logging.info("\t\tobserved loser: \t" + str(self.audit_observations[loser_pos]))
+            #logging.info("\t\tobserved winner:\t" + str(self.audit_observations[winner_pos]))
+            #logging.info("\t\tobserved loser: \t" + str(self.audit_observations[loser_pos]))
+            logging.info("\t\tobserved winner:\t" + str(self.observations[contest_name][winner_pos]))
+            logging.info("\t\tobserved loser: \t" + str(self.observations[contest_name][loser_pos]))
             logging.info("\t\tround schedule: \t" + str(rs))
 
             if test_info["passed"] == 1:
@@ -322,7 +329,8 @@ class Audit():
             #w = audit_object.estimate_risk(margin, actual_kmins, round_schedule)
             #w = audit_object.estimate_risk(margin, test_info["kmins"], self.round_schedule, audit_observations)
             #w = audit_object.estimate_risk(margin, self.audit_kmins, self.round_schedule, audit_observations)
-            w = audit_object.estimate_risk(margin, pairwise_audit_kmins, rs, self.audit_observations[winner_pos])
+            #w = audit_object.estimate_risk(margin, pairwise_audit_kmins, rs, self.audit_observations[winner_pos])
+            w = audit_object.estimate_risk(margin, pairwise_audit_kmins, rs, self.observations[contest_name][winner_pos])
             #logging.info(str(w))
             #ratio = w["ratio"]
             deltas = w["deltas"]
@@ -341,7 +349,10 @@ class Audit():
             risks.append(audit_risk)
             delta.append(deltas[-1])
 
-            result[pair_id] = {"risk": audit_risk, "delta": deltas[-1],  "passed": test_info["passed"], "observed_winner": self.audit_observations[winner_pos], "observed_loser": self.audit_observations[loser_pos], "required": pairwise_audit_kmins}
+            result[pair_id] = {"risk": audit_risk, "delta": deltas[-1],  "passed": test_info["passed"],
+                               "observed_winner": self.observations[contest_name][winner_pos],
+                               "observed_loser": self.observations[contest_name][loser_pos],
+                               "required": pairwise_audit_kmins}
 
             if margin < smallest_margin:
                 smallest_margin = margin
@@ -356,7 +367,15 @@ class Audit():
         logging.debug("risks: %s" % (risks))
         logging.debug("delta: %s" % (delta))
 
-        return {"risk": max(risks), "delta": max(delta), "deltamin": min(delta), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result, "min_kmins": min_kmins}
+        return {"risk": max(risks),
+                "delta": max(delta),
+                "deltamin": min(delta),
+                "passed": passed,
+                "observed": result[smallest_margin_id],
+                "required": result[smallest_margin_id],
+                "pairwise": result,
+                "min_kmins": min_kmins
+                }
 
 
 
