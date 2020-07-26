@@ -107,7 +107,11 @@ class Audit():
             self.audit_observations[i].append([0])
         logging.info(self.audit_observations)
 
-    def add_observations(self, observations):
+    def add_observations(self, observations, contest_name = None):
+
+        if contest_name is None:
+            contest_name = self.active_contest
+
         logging.info("Updating round schedule")
         new_valid_ballots = sum(observations)
         if len(self.round_schedule) > 0:
@@ -118,12 +122,17 @@ class Audit():
             #actual_kmins = [new_winner]
         logging.info(self.round_schedule)
 
-        logging.info("Current observations: " + str(self.audit_observations))
-        for i in range(len(self.election.candidates)):
-            if len(self.audit_observations[i]) > 0:
-                self.audit_observations[i].append(max(self.audit_observations[i]) + observations[i])
+        #logging.info("Current observations: " + str(self.audit_observations))
+        logging.info("Current observations: " + str(self.observations))
+        for i in range(len(self.election.contests[contest_name].candidates)):
+            #if len(self.audit_observations[i]) > 0:
+            #    self.audit_observations[i].append(max(self.audit_observations[i]) + observations[i])
+            #else:
+            #    self.audit_observations[i].append(observations[i])
+            if len(self.observations[contest_name][i]) > 0:
+                self.observations[contest_name][i].append(max(self.observations[contest_name][i]) + observations[i])
             else:
-                self.audit_observations[i].append(observations[i])
+                self.observations[contest_name][i].append(observations[i])
 
     """
     Method that simulates a single round of the audit
@@ -151,7 +160,7 @@ class Audit():
                 raise ValueError("Incorrect number of valid ballots entered")
 
 
-            self.add_observations(round_observation)
+            self.add_observations(round_observation, contest_name)
             x = self.find_risk() #actual_kmins)
             #observed = x["observed"]
             #required = x["required"]
