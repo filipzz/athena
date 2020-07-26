@@ -15,7 +15,7 @@ class Audit():
 
     def __init__(self, audit_type, alpha = 0.1, delta = 1):
         self.election = Election()
-        self.active_contest = ""
+        self.active_contest = None
         self.observations = {}
         self.audit_type = audit_type
         #self.election = Contest()
@@ -124,6 +124,54 @@ class Audit():
                 self.audit_observations[i].append(max(self.audit_observations[i]) + observations[i])
             else:
                 self.audit_observations[i].append(observations[i])
+
+    """
+    Method that simulates a single round of the audit
+    """
+    def set_observations(self, new_ballots, new_valid_ballots, round_observation, contest_name = None):
+        """
+        Parameters
+        ----------
+        :param new_ballots: number of total ballots sampled in the round
+        :param new_valid_ballots: number of ballots sampled in the round that are relevant to the contest
+        :param round_observation: an array of number of ballots sampled for each candidate in the round
+        """
+
+        if contest_name is None:
+            contest_name = self.active_contest
+
+        if self.audit_completed == True:
+            logging.error("\n\n\tAudit already completed. No more observations are needed.\n")
+            raise ValueError("Audit already completed")
+        else:
+            list_of_candidates = self.election.contests[contest_name].candidates
+
+            if new_valid_ballots > new_ballots or sum(round_observation) > new_valid_ballots:
+                logging.error("Incorrect number of valid ballots entered: ")
+                raise ValueError("Incorrect number of valid ballots entered")
+
+
+            self.add_observations(round_observation)
+            x = self.find_risk() #actual_kmins)
+            #observed = x["observed"]
+            #required = x["required"]
+            self.min_kmins = x["min_kmins"]
+            self.risks.append(x["risk"])
+            self.deltas.append(x["delta"])
+            self.ballots_sampled.append(new_valid_ballots)
+
+            if x["passed"] == 1:
+                self.audit_completed = True
+                logging.info("\n\n\tAudit Successfully completed!")
+                logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
+                logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
+            else:
+                logging.info("\n\n\tRound: %s audit failed" % (self.round_number))
+                logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
+                logging.info("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
+                logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
+                logging.info("\tboth conditions are required to be satisfied.")
+            self.round_number = self.round_number + 1
 
 
     def find_next_round_size(self, pstop_goals, contest_name = None):
@@ -301,50 +349,6 @@ class Audit():
 
         return {"risk": max(risks), "delta": max(delta), "deltamin": min(delta), "passed": passed, "observed": result[smallest_margin_id], "required": result[smallest_margin_id], "pairwise": result, "min_kmins": min_kmins}
 
-    """
-    Method that simulates a single round of the audit
-    """
-    def set_observations(self, new_ballots, new_valid_ballots, round_observation):
-        """
-        Parameters
-        ----------
-        :param new_ballots: number of total ballots sampled in the round
-        :param new_valid_ballots: number of ballots sampled in the round that are relevant to the contest
-        :param round_observation: an array of number of ballots sampled for each candidate in the round
-        """
-
-        if self.audit_completed == True:
-            logging.error("\n\n\tAudit already completed. No more observations are needed.\n")
-            raise ValueError("Audit already completed")
-        else:
-            list_of_candidates = self.election.candidates
-
-            if new_valid_ballots > new_ballots or sum(round_observation) > new_valid_ballots:
-                logging.error("Incorrect number of valid ballots entered: ")
-                raise ValueError("Incorrect number of valid ballots entered")
-
-
-            self.add_observations(round_observation)
-            x = self.find_risk() #actual_kmins)
-            #observed = x["observed"]
-            #required = x["required"]
-            self.min_kmins = x["min_kmins"]
-            self.risks.append(x["risk"])
-            self.deltas.append(x["delta"])
-            self.ballots_sampled.append(new_valid_ballots)
-
-            if x["passed"] == 1:
-                self.audit_completed = True
-                logging.info("\n\n\tAudit Successfully completed!")
-                logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
-                logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
-            else:
-                logging.info("\n\n\tRound: %s audit failed" % (self.round_number))
-                logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
-                logging.info("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
-                logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
-                logging.info("\tboth conditions are required to be satisfied.")
-            self.round_number = self.round_number + 1
 
 
     def run_interactive(self):
