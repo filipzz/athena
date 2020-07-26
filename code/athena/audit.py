@@ -87,8 +87,10 @@ class Audit():
         self.audit_observations = self.observations[contest] # to be removed
         #[[] for j in range(len(self.election.candidates))] # to be removed
 
-        for winner in self.election.declared_winners:
-            for loser in self.election.declared_losers:
+        self.audit_pairs = []
+
+        for winner in self.election.contests[contest].declared_winners:
+            for loser in self.election.contests[contest].declared_losers:
                 self.audit_pairs.append([winner, loser])
 
     def add_round_schedule(self, round_schedule):
@@ -493,9 +495,11 @@ class Audit():
     def show_election_results(self):
         import pandas as pd
 
-        d = {'Candidates': self.election.candidates, 'Results': self.election.results}
+        #d = {'Candidates': self.election.candidates, 'Results': self.election.results}
+        d = {'Candidates': self.election.contests[self.active_contest].candidates,
+             'Results': self.election.contests[self.active_contest].results}
         df = pd.DataFrame(data=d)
-        return df.style.set_properties(subset = pd.IndexSlice[self.election.winners, :], **{'color' : 'green'})
+        return df.style.set_properties(subset = pd.IndexSlice[self.election.contests[self.active_contest].winners, :], **{'color' : 'green'})
 
 
     '''
@@ -511,13 +515,13 @@ class Audit():
         summary = ["Sum", "LR", "P-Value"]
 
         '# columns related to election results'
-        list_of_candidates = [] + self.election.candidates
+        list_of_candidates = [] + self.election.contests[self.active_contest].candidates
         for a in summary:
             list_of_candidates.append(" ") # this is sum row
         #list_of_candidates.append(" ") # this is delta row
         #list_of_candidates.append(" ") # this is p-value row
 
-        audit_results = [] + self.election.results
+        audit_results = [] + self.election.contests[self.active_contest].results
         for a in summary:
             audit_results.append(a)
 
