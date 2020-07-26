@@ -15,11 +15,12 @@ class Contest():
         self.results = []
         self.winners = 1 # to be removed -> num_winners #number of winners
         self.num_winner = 1
+        self.num_candidates = 0
         self.name = []
         self.min_to_win = 0
         self.model = ""
         self.reported_winners = []
-        self.declared_winners = [] # to be removed
+        self.declared_winners = []
         self.declared_losers = []
         self.data = None
         self.contest_type = ""
@@ -49,6 +50,7 @@ class Contest():
                     self.candidates.append(candidate) #info["candidates"]
                     self.results.append(result)
                 self.tally = contest["tally"]
+                self.num_candidates = len(self.candidates)
 
             if "reported_winners" in contest:
                 self.reported_winners = contest["reported_winners"]
@@ -64,9 +66,11 @@ class Contest():
 
             self.find_winners()
 
-    def __str__(self):
+    #def __str__(self):
+    #    return f"""{{"contest_ballots": {self.ballots_cast}, "num_winners": {self.winners}, "reported_winners": {self.reported_winners}, "contest_type": "{self.contest_type}", "tally": {self.tally}}}"""
 
-        return f"""{{"contest_ballots": {self.ballots_cast}, "num_winners": {self.winners}, "reported_winners": {self.reported_winners}, "contest_type": "{self.contest_type}", "tally": {self.tally}}}"""
+    def __repr__(self):
+        return f'{{"contest_ballots": {self.ballots_cast}, "num_winners": {self.winners}, "reported_winners": {self.reported_winners}, "contest_type": "{self.contest_type}", "tally": {self.tally!r}, "declared_winners": {self.declared_winners}, "declared_losers": {self.declared_losers}}}'
 
     def read_election_data(self, file_name):
         try:
