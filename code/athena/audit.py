@@ -88,7 +88,7 @@ class Audit():
         self.active_contest = contest
         self.audit_observations = self.observations[contest] # to be removed
         #[[] for j in range(len(self.election.candidates))] # to be removed
-        self.round_observations = [[] for j in range(len(self.election.candidates))] # to be removed
+        #self.round_observations = [[] for j in range(len(self.election.candidates))] # to be removed
 
         for winner in self.election.declared_winners:
             for loser in self.election.declared_losers:
@@ -536,7 +536,8 @@ class Audit():
                 col_caption = "Round " + str(rd + 1)
                 r = []
                 for i in range(len(self.election.candidates)):
-                    r.append(self.round_observations[i][rd])
+                    #r.append(self.round_observations[i][rd])
+                    r.append(self.audit_observations[i][rd])
                 r.append(str(self.ballots_sampled[rd]))
                 r.append("{:.4f}".format(1/self.deltas[rd]))
                 r.append("{:.4f}".format(self.risks[rd]))
