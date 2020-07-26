@@ -551,13 +551,13 @@ class Audit():
         summary = ["Sum", "LR", "P-Value"]
 
         '# columns related to election results'
-        list_of_candidates = [] + self.election.contests[self.active_contest].candidates
+        list_of_candidates = [] + self.election.contests[contest_name].candidates
         for a in summary:
             list_of_candidates.append(" ") # this is sum row
         #list_of_candidates.append(" ") # this is delta row
         #list_of_candidates.append(" ") # this is p-value row
 
-        audit_results = [] + self.election.contests[self.active_contest].results
+        audit_results = [] + self.election.contests[contest_name].results
         for a in summary:
             audit_results.append(a)
 
@@ -571,8 +571,9 @@ class Audit():
             for rd in range(self.round_number - 1):
                 col_caption = "Round " + str(rd + 1)
                 r = []
-                for i in range(len(self.election.candidates)):
-                    r.append(self.audit_observations[i][rd])
+                for i in range(len(self.election.contests[contest_name].candidates)):
+                    #r.append(self.audit_observations[i][rd])
+                    r.append(self.observations[contest_name][i][rd])
                 r.append(str(self.ballots_sampled[rd]))
                 r.append("{:.4f}".format(1/self.deltas[rd]))
                 r.append("{:.4f}".format(self.risks[rd]))
@@ -581,8 +582,9 @@ class Audit():
             '# Total column - sum of sampled ballots'
             r = []
             col_caption = "Total"
-            for i in range(len(self.election.candidates)):
-                r.append(self.audit_observations[i][self.round_number - 2])
+            for i in range(len(self.election.contests[contest_name].candidates)):
+                #r.append(self.audit_observations[i][self.round_number - 2])
+                r.append(self.observations[contest_name][i][self.round_number - 2])
             for i in summary:
                 r.append(" ")
             df[col_caption] = r
@@ -590,7 +592,7 @@ class Audit():
             '# Column Required - presents the value of kmin required to pass the audit'
             r = []
             col_caption = "Required"
-            for i in range(len(self.election.candidates)):
+            for i in range(len(self.election.contests[contest_name].candidates)):
                 if self.min_kmins[i] == 0:
                     r.append(" ")
                 else:
