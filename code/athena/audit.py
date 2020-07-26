@@ -22,7 +22,6 @@ class Audit():
         self.audited_contests = []
         self.round_schedule = []
         self.audit_observations = [[]]
-        self.round_observations = [[]]
         self.audit_kmins = []
         self.alpha = alpha
         self.delta = delta
@@ -67,7 +66,6 @@ class Audit():
         self.contest_list.append("default")
         self.observations["default"] = [[] for j in range(len(self.election.candidates))]
         self.audit_observations = [[] for j in range(len(self.election.candidates))]
-        self.round_observations = [[] for j in range(len(self.election.candidates))]
         self.election.ballots_cast = election["ballots_cast"]
         self.ballots_cast = election["ballots_cast"]
         self.data = election["data"]
@@ -88,7 +86,6 @@ class Audit():
         self.active_contest = contest
         self.audit_observations = self.observations[contest] # to be removed
         #[[] for j in range(len(self.election.candidates))] # to be removed
-        #self.round_observations = [[] for j in range(len(self.election.candidates))] # to be removed
 
         for winner in self.election.declared_winners:
             for loser in self.election.declared_losers:
@@ -121,7 +118,6 @@ class Audit():
 
         logging.info("Current observations: " + str(self.audit_observations))
         for i in range(len(self.election.candidates)):
-            self.round_observations[i].append(observations[i])
             if len(self.audit_observations[i]) > 0:
                 self.audit_observations[i].append(max(self.audit_observations[i]) + observations[i])
             else:
@@ -536,7 +532,6 @@ class Audit():
                 col_caption = "Round " + str(rd + 1)
                 r = []
                 for i in range(len(self.election.candidates)):
-                    #r.append(self.round_observations[i][rd])
                     r.append(self.audit_observations[i][rd])
                 r.append(str(self.ballots_sampled[rd]))
                 r.append("{:.4f}".format(1/self.deltas[rd]))
