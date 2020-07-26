@@ -9,12 +9,16 @@ from urllib import parse
 
 from .athena import AthenaAudit
 from .contest import Contest
+from .election import Election
 
 class Audit():
 
     def __init__(self, audit_type, alpha = 0.1, delta = 1):
+        self.election = Election()
+        self.active_contest = ""
+        self.observations = {}
         self.audit_type = audit_type
-        self.election = Contest()
+        #self.election = Contest()
         self.audited_contests = []
         self.round_schedule = []
         self.audit_observations = [[]]
@@ -35,31 +39,21 @@ class Audit():
         self.deltas = []
         self.audit_pairs = []
 
-    def read_election_data(self, file_name):
-        try:
-            parsed = parse.urlparse(file_name)
-            if all([parsed.scheme, parsed.netloc, parsed.path]):
-                print("try: ", parsed.scheme, parsed.netloc, parsed.path)
-                self.data = json.loads(requests.get(file_name).text)
-            else:
-                print("go: ", file_name)
-                with open(file_name, 'r') as f:
-                    self.data = json.load(f)
-        except:
-            raise Exception("Can't read the file")
-        self.ballots_cast = self.data["total_ballots"]
+    def __str__(self):
+        return f'audit type: {self.audit_type}\n' \
+               f'alpha: {self.alpha}\n' \
+               f'observations: {self.audit_observations}'
 
-        for contest_name in self.data["contests"]:
+    def read_election_results(self, url):
+        self.election_data_file = url
+        self.election.read_election_data(url)
+        self.ballots_cast = self.election.total_ballots # temporary
+
+        #self.contests = self.election.contests.keys() # temporary
+
+        for contest_name in self.election.contests:
             self.contest_list.append(contest_name)
-            new_contest = Contest(self.data["contests"][contest_name])
-            self.contests.append(new_contest)
-
-        for con in self.contests:
-            con.print_election()
-
-
-
-
+            self.observations[contest_name] = [[] for j in range((self.election.contests[contest_name].num_candidates))]
 
 
     def add_election(self, election):
@@ -67,7 +61,11 @@ class Audit():
         self.election = new_election
         #self.contests.append(new_election)
 
+        #print(new_election)
+        #print(self.election)
+
         self.contest_list.append("default")
+        self.observations["default"] = [[] for j in range(len(self.election.candidates))]
         self.audit_observations = [[] for j in range(len(self.election.candidates))]
         self.round_observations = [[] for j in range(len(self.election.candidates))]
         self.election.ballots_cast = election["ballots_cast"]
@@ -76,9 +74,6 @@ class Audit():
         new_contest = Contest(self.data["contests"]["default"])
         self.contests.append(new_contest)
 
-    def read_election_results(self, url):
-        self.election_data_file = url
-        self.election.read_election_data(url)
 
     def get_contests(self):
         x = self.data["contests"]
@@ -89,18 +84,15 @@ class Audit():
 
 
     def load_contest(self, contest):
-        self.election.load_contest_data(contest, self.data)
-        self.audit_observations = [[] for j in range(len(self.election.candidates))]
-        self.round_observations = [[] for j in range(len(self.election.candidates))]
+        #self.election.load_contest_data(contest, self.data)
+        self.active_contest = contest
+        self.audit_observations = self.observations[contest] # to be removed
+        #[[] for j in range(len(self.election.candidates))] # to be removed
+        self.round_observations = [[] for j in range(len(self.election.candidates))] # to be removed
 
         for winner in self.election.declared_winners:
             for loser in self.election.declared_losers:
                 self.audit_pairs.append([winner, loser])
-
-        print(self.election.declared_losers)
-        print(self.election.declared_winners)
-        print(self.audit_pairs)
-
 
     def add_round_schedule(self, round_schedule):
         self.round_schedule = round_schedule
@@ -136,10 +128,6 @@ class Audit():
                 self.audit_observations[i].append(observations[i])
 
 
-
-        #print(self.round_observations)
-        #print(self.audit_observations)
-
     def find_next_round_size(self, pstop_goals):
         logging.info("setting round schedule")
 
@@ -157,7 +145,6 @@ class Audit():
 
             logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
             bc = ballots_i + ballots_j
-            #print(self.election.ballots_cast)
             scalling_ratio = self.election.ballots_cast / bc
 
             winner = max(ballots_i, ballots_j)
@@ -204,7 +191,6 @@ class Audit():
         min_kmins = [0] * len(self.election.candidates)
 
         audit_pairs_next = []
-        #print(self.audit_pairs)
         for i, j in self.audit_pairs:
         #for i in self.election.declared_winners:
             ballots_i = self.election.results[i]
@@ -235,8 +221,6 @@ class Audit():
             for rs_i, rs_j in zip(self.audit_observations[i], self.audit_observations[j]):
                 rs.append(rs_i + rs_j)
 
-            #print("round schedule", rs)
-
             margin = (2 * winner - bc)/bc
 
             audit_object = AthenaAudit()
@@ -266,7 +250,6 @@ class Audit():
 
             logging.info("\n\t\tAUDIT result for: " +  str(candidate_i) + " vs " + str(candidate_j))
             logging.info("\t\trequired winner:\t" + str(pairwise_audit_kmins))
-            #print(pairwise_audit_kmins, min_kmins, min_kmins[winner_pos])
             if pairwise_audit_kmins[-1] > min_kmins[winner_pos]:
                 min_kmins[winner_pos] = pairwise_audit_kmins[-1]
             logging.info("\t\tobserved winner:\t" + str(self.audit_observations[winner_pos]))
@@ -331,23 +314,20 @@ class Audit():
         """
 
         if self.audit_completed == True:
-            print("\n\n\tAudit already completed. No more observations are needed.\n")
+            logging.error("\n\n\tAudit already completed. No more observations are needed.\n")
+            raise ValueError("Audit already completed")
         else:
-                #sys.exit(0)
-
-            #round_number = 1
-            #self.audit_completed = False
             list_of_candidates = self.election.candidates
 
             if new_valid_ballots > new_ballots or sum(round_observation) > new_valid_ballots:
-                print("Incorrect number of valid ballots entered: ")
-                sys.exit(0)
+                logging.error("Incorrect number of valid ballots entered: ")
+                raise ValueError("Incorrect number of valid ballots entered")
 
 
             self.add_observations(round_observation)
             x = self.find_risk() #actual_kmins)
-            observed = x["observed"]
-            required = x["required"]
+            #observed = x["observed"]
+            #required = x["required"]
             self.min_kmins = x["min_kmins"]
             self.risks.append(x["risk"])
             self.deltas.append(x["delta"])
@@ -355,18 +335,15 @@ class Audit():
 
             if x["passed"] == 1:
                 self.audit_completed = True
-                print("\n\n\tAudit Successfully completed!")
-                print("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
-                print("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
-                #print("\tP-value:\t%s\n" % (x["risk"]))
-                #print(x)
+                logging.info("\n\n\tAudit Successfully completed!")
+                logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
+                logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
             else:
-                print("\n\n\tRound: %s audit failed" % (self.round_number))
-                #print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
-                print("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
-                print("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
-                print("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
-                print("\tboth conditions are required to be satisfied.")
+                logging.info("\n\n\tRound: %s audit failed" % (self.round_number))
+                logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
+                logging.info("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
+                logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
+                logging.info("\tboth conditions are required to be satisfied.")
             self.round_number = self.round_number + 1
 
 
@@ -398,8 +375,8 @@ class Audit():
 
 
         if self.audit_completed is True:
-            print("Audit is completed!")
-            sys.exit()
+            logging.error("Audit is completed!")
+            raise ValueError("Audit is completed")
 
         #round_number = 1
         #self.audit_completed = False
@@ -444,9 +421,7 @@ class Audit():
             #print("\n\nEnter the number of ballots drawn in this round: ")
             message = "\n\n\tEnter the number of (all) ballots drawn in this round: " # + str(round_number) + ": "
             new_ballots = int(input(message))
-            new_valid_ballots = new_ballots
 
-            #print("\n\n\tEnter the number of relevant ballots: ")
             new_valid_ballots = int(input("\tEnter the number of relevant ballots: "))
 
             if new_valid_ballots <= new_ballots:

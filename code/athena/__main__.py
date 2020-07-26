@@ -43,6 +43,7 @@ if __name__ == '__main__':
     if args.new:
         mode = "new"
         name = args.new
+        contest_name = args.new
 
         alpha = args.alpha
         if alpha < 0.0 or alpha >= 0.5:
@@ -170,7 +171,7 @@ if __name__ == '__main__':
         #election_object.read_from_file(file_name, contest_name)
         election_object.read_election_data(file_name)
         election_object.load_contest_data(contest_name)
-        #election_object.print_election()
+        election_object.print_election()
         candidates = election_object.candidates
         election["candidates"] = candidates
         ballots_cast = election_object.ballots_cast
@@ -184,8 +185,12 @@ if __name__ == '__main__':
         tally = {}
         for can, votes in zip(candidates, results):
             tally[can] = votes
-        election["contests"] = {'default': {'contest_ballots': ballots_cast, 'tally': tally, 'num_winners': winners, "reported_winners": ["A"]}}
-        election["data"] = {'name': 'x', 'total_ballots': ballots_cast, 'contests' : election["contests"]}
+        #election["contests"] = '{{}: {"contest_ballots": {}, "tally": {}, "num_winners": {}, "reported_winners": ["A"]}}'.format(contest_name, ballots_cast, tally, winners)
+        election["contests"] = f'{{ "{contest_name}": {{"contest_ballots": {ballots_cast}, "tally": {tally}, "num_winners": {winners}, "reported_winners": ["A"]}} }}'
+        #print(election["contests"])
+        #election["data"] = {'name': 'x', 'total_ballots': ballots_cast, 'contests' : election["contests"]}
+        election["data"] = f'{{"name": "x", "total_ballots": {ballots_cast}, "contests" : {election["contests"]}}}'
+        print(election["data"])
         election["candidates"] = candidates
         election["results"] = results
         election["winners"] = winners
@@ -195,7 +200,10 @@ if __name__ == '__main__':
 
         election_object = Contest(election)
         #tools.print_election(election)
-    election_object.print_election()
+
+    #for election[""]
+    #print(election)
+    #election_object.print_election()
 
     #print(election)
 
@@ -268,9 +276,9 @@ if __name__ == '__main__':
         if mode == "read":
             w = Audit(audit_type, alpha)
             w.read_election_results(file_name)
-            w.load_contest("default")
-            print("ele-d", w.election.data)
-            print(w.data)
+            w.load_contest(contest_name)
+            #print("ele-d", w.election.data)
+            #print(w.data)
             #print(w.contests)
             #print(w.contest_list)
             w.election.print_election()
@@ -278,11 +286,11 @@ if __name__ == '__main__':
         else:
             w = Audit(audit_type, alpha, delta)
             w.add_election(election)
-            w.load_contest("default")
+            w.load_contest(contest_name)
             w.add_round_schedule(round_schedule)
             #print(election)
-            print("ele-d", w.election.data)
-            print(w.data)
+            #print("ele-d", w.election.data)
+            #print(w.data)
             #print(w.contests)
             #print(round_schedule)
             #x = w.find_next_round_size(pstop_goal)
@@ -295,8 +303,6 @@ if __name__ == '__main__':
 
         if mode == "read":
             w = Audit(audit_type)
-
-            w.read_election_data(file_name)
             w.read_election_results(file_name)
             w.load_contest(contest_name)
         else:
