@@ -17,6 +17,7 @@ class Audit():
         self.election = Election()
         self.active_contest = None
         self.observations = {}
+        self.status = {}
         self.audit_type = audit_type
         #self.election = Contest()
         self.audited_contests = []
@@ -56,6 +57,7 @@ class Audit():
 
 
     def add_election(self, election):
+        print(election)
         new_election = Contest(election)
         self.election = new_election
         #self.contests.append(new_election)
@@ -144,6 +146,7 @@ class Audit():
         :param new_ballots: number of total ballots sampled in the round
         :param new_valid_ballots: number of ballots sampled in the round that are relevant to the contest
         :param round_observation: an array of number of ballots sampled for each candidate in the round
+        :param contest_name: a name of a contest for which audit observations are added
         """
 
         if contest_name is None:
@@ -526,14 +529,16 @@ class Audit():
             ###del w
         self.round_number = self.round_number + 1
 
-    def show_election_results(self):
+    def show_election_results(self, contest_name = None):
         import pandas as pd
 
+        if contest_name is None:
+            contest_name = self.active_contest
         #d = {'Candidates': self.election.candidates, 'Results': self.election.results}
-        d = {'Candidates': self.election.contests[self.active_contest].candidates,
-             'Results': self.election.contests[self.active_contest].results}
+        d = {'Candidates': self.election.contests[contest_name].candidates,
+             'Results': self.election.contests[contest_name].results}
         df = pd.DataFrame(data=d)
-        return df.style.set_properties(subset = pd.IndexSlice[self.election.contests[self.active_contest].winners, :], **{'color' : 'green'})
+        return df.style.set_properties(subset = pd.IndexSlice[self.election.contests[contest_name].winners, :], **{'color' : 'green'})
 
 
     '''
@@ -573,7 +578,10 @@ class Audit():
                 r = []
                 for i in range(len(self.election.contests[contest_name].candidates)):
                     #r.append(self.audit_observations[i][rd])
-                    r.append(self.observations[contest_name][i][rd])
+                    if rd > 0:
+                        r.append((self.observations[contest_name][i][rd] - self.observations[contest_name][i][rd-1]))
+                    else:
+                        r.append(self.observations[contest_name][i][rd])
                 r.append(str(self.ballots_sampled[rd]))
                 r.append("{:.4f}".format(1/self.deltas[rd]))
                 r.append("{:.4f}".format(self.risks[rd]))
