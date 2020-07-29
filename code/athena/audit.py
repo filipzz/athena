@@ -46,33 +46,21 @@ class Audit():
 
     def read_election_results(self, url):
         self.election_data_file = url
-        self.election.read_election_data(url)
+        election_data = self.election.read_election_data(url)
+        self.add_election(election_data)
+
+    def add_election(self, election):
+        new_election = Election(election) # Contest(election["data"])
+        self.election = new_election
         self.ballots_cast = self.election.total_ballots # temporary
 
-        #self.contests = self.election.contests.keys() # temporary
-
+        first_contest = True
         for contest_name in self.election.contests:
             self.contest_list.append(contest_name)
             self.observations[contest_name] = [[] for j in range((self.election.contests[contest_name].num_candidates))]
-
-
-    def add_election(self, election):
-        print(election)
-        new_election = Contest(election)
-        self.election = new_election
-        #self.contests.append(new_election)
-
-        #print(new_election)
-        #print(self.election)
-
-        self.contest_list.append("default")
-        self.observations["default"] = [[] for j in range(len(self.election.candidates))]
-        self.audit_observations = [[] for j in range(len(self.election.candidates))]
-        self.election.ballots_cast = election["ballots_cast"]
-        self.ballots_cast = election["ballots_cast"]
-        self.data = election["data"]
-        new_contest = Contest(self.data["contests"]["default"])
-        self.contests.append(new_contest)
+            if first_contest is True:
+                self.active_contest = contest_name
+                first_contest = False
 
 
     def get_contests(self):
@@ -382,10 +370,10 @@ class Audit():
 
 
 
-    def run_interactive(self):
+    def run_interactive(self, contest_name = None):
 
         while self.audit_completed is False:
-            self.run_audit_round()
+            self.run_audit_round(contest_name = None)
 
     def predict_round_sizes(self, pstop_goal):
         x = self.find_next_round_size(pstop_goal)
@@ -406,8 +394,10 @@ class Audit():
 
         return predicted
 
-    def run_audit_round(self):
+    def run_audit_round(self, contest_name = None):
 
+        if contest_name is None:
+            contest_name = self.active_contest
 
         if self.audit_completed is True:
             logging.error("Audit is completed!")
@@ -415,7 +405,7 @@ class Audit():
 
         #round_number = 1
         #self.audit_completed = False
-        list_of_candidates = self.election.candidates
+        list_of_candidates = self.election.contests[contest_name].candidates
 
         #while audit_completed is False:
         print("\n\n---------------------- Round number: ", self.round_number, " -----------------\n")

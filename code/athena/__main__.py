@@ -3,6 +3,7 @@ import argparse
 import string
 import math
 import logging
+import json
 #import athena.tools
 from athena.athena import AthenaAudit
 from athena.contest import Contest
@@ -185,20 +186,24 @@ if __name__ == '__main__':
         tally = {}
         for can, votes in zip(candidates, results):
             tally[can] = votes
-        #election["contests"] = '{{}: {"contest_ballots": {}, "tally": {}, "num_winners": {}, "reported_winners": ["A"]}}'.format(contest_name, ballots_cast, tally, winners)
-        election["contests"] = f'{{ "{contest_name}": {{"contest_ballots": {ballots_cast}, "tally": {tally}, "num_winners": {winners}, "reported_winners": ["A"]}} }}'
+        tallyj = json.dumps(tally)
+        #election["contests"] = f'{{"{contest_name}": {{"contest_ballots": {ballots_cast}, "tally": {tallyj}, "num_winners": {winners}, "reported_winners": ["A"]}} }}'
+        #election["data"] = f'{{"name": "x", "total_ballots": {ballots_cast}, "contests" : {election["contests"]}}}'
+        election["contests"] = {contest_name: {"contest_ballots": ballots_cast, "tally": tally, "num_winners": winners, "reported_winners": ["A"]}}
+        election["data"] = {"name": "x", "total_ballots": ballots_cast, "contests" : election["contests"]}
         #print(election["contests"])
-        #election["data"] = {'name': 'x', 'total_ballots': ballots_cast, 'contests' : election["contests"]}
-        election["data"] = f'{{"name": "x", "total_ballots": {ballots_cast}, "contests" : {election["contests"]}}}'
+        #json.loads(election["contests"])
         print(election["data"])
+        #print(election["data"])
         election["candidates"] = candidates
         election["results"] = results
         election["winners"] = winners
 
+        #print(json.loads(election["contests"]))
 
         #print("Candidates: ", candidates)
 
-        election_object = Contest(election)
+        election_object = Contest(election["data"])
         #tools.print_election(election)
 
     #for election[""]
@@ -281,10 +286,11 @@ if __name__ == '__main__':
             #print(w.data)
             #print(w.contests)
             #print(w.contest_list)
-            w.election.print_election()
+            #w.election.print_election()
             print(w.predict_round_sizes(pstop_goal))
         else:
             w = Audit(audit_type, alpha, delta)
+            print(election)
             w.add_election(election)
             w.load_contest(contest_name)
             w.add_round_schedule(round_schedule)
