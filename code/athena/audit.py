@@ -11,6 +11,11 @@ class Status():
     def __init__(self):
         self.round_number = 1
         self.params = []
+        self.min_kmins = []
+        self.risks = []
+        self.deltas = []
+        self.audit_pairs = []
+        self.audit_completed = False
 
 
 class Audit():
@@ -24,21 +29,15 @@ class Audit():
         #self.election = Contest()
         self.audited_contests = []
         self.round_schedule = []
-        self.audit_observations = [[]]
-        self.audit_kmins = []
         self.alpha = alpha
         self.delta = delta
         self.election_data_file = ""
-        self.audit_completed = False
         self.ballots_cast = 0
-        self.min_kmins = []
         self.data = None
         self.contests = []
         self.contest_list = []
         self.ballots_sampled = []
-        self.risks = []
-        self.deltas = []
-        self.audit_pairs = []
+        self.data_frame = {}
 
     def __str__(self):
         return f'audit type: {self.audit_type}\n' \
@@ -74,10 +73,8 @@ class Audit():
 
 
     def load_contest(self, contest):
-        #self.election.load_contest_data(contest, self.data)
         self.active_contest = contest
         self.audit_observations = self.observations[contest] # to be removed
-        #[[] for j in range(len(self.election.candidates))] # to be removed
 
         self.audit_pairs = []
 
@@ -89,38 +86,18 @@ class Audit():
         self.round_schedule = round_schedule
 
 
-    # deprecated - we need to know the sample size anyway
-    def extend_round_schedule(self, next_round):
-        logging.info("Current round schedule:\t%s" % (self.election.round_schedule))
-        self.round_schedule.append(next_round)
-        logging.info("New round schedule:\t%s" % (self.election.round_schedule))
-        logging.info("Extended observations")
-        for i in range(self.election.candidates):
-            self.audit_observations[i].append([0])
-        logging.info(self.audit_observations)
-
     def add_observations(self, observations, contest_name = None):
 
         if contest_name is None:
             contest_name = self.active_contest
 
-        logging.info("Updating round schedule")
         new_valid_ballots = sum(observations)
         if len(self.round_schedule) > 0:
             self.round_schedule = self.round_schedule + [new_valid_ballots + max(self.round_schedule)]
-            #actual_kmins = actual_kmins + [new_winner + max(actual_kmins)]
         else:
             self.round_schedule = [new_valid_ballots]
-            #actual_kmins = [new_winner]
-        logging.info(self.round_schedule)
 
-        #logging.info("Current observations: " + str(self.audit_observations))
-        logging.info("Current observations: " + str(self.observations))
         for i in range(len(self.election.contests[contest_name].candidates)):
-            #if len(self.audit_observations[i]) > 0:
-            #    self.audit_observations[i].append(max(self.audit_observations[i]) + observations[i])
-            #else:
-            #    self.audit_observations[i].append(observations[i])
             if len(self.observations[contest_name][i]) > 0:
                 self.observations[contest_name][i].append(max(self.observations[contest_name][i]) + observations[i])
             else:
@@ -142,7 +119,7 @@ class Audit():
         if contest_name is None:
             contest_name = self.active_contest
 
-        if self.audit_completed == True:
+        if self.status[contest_name].audit_completed == True:
             logging.error("\n\n\tAudit already completed. No more observations are needed.\n")
             raise ValueError("Audit already completed")
         else:
@@ -157,13 +134,13 @@ class Audit():
             x = self.find_risk() #actual_kmins)
             #observed = x["observed"]
             #required = x["required"]
-            self.min_kmins = x["min_kmins"]
-            self.risks.append(x["risk"])
-            self.deltas.append(x["delta"])
-            self.ballots_sampled.append(new_valid_ballots)
+            self.status[contest_name].min_kmins = x["min_kmins"]
+            self.status[contest_name].risks.append(x["risk"])
+            self.status[contest_name].deltas.append(x["delta"])
+            self.status[contest_name].ballots_sampled.append(new_valid_ballots)
 
             if x["passed"] == 1:
-                self.audit_completed = True
+                self.status[contest_name].audit_completed = True
                 logging.info("\n\n\tAudit Successfully completed!")
                 logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
                 logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
@@ -603,5 +580,6 @@ class Audit():
                 r.append(" ")
             df[col_caption] = r
 
-        return df.style.set_properties(subset = pd.IndexSlice[self.election.contests[contest_name].winners, :], **{'color' : 'blue'})
-
+        #return df.style.set_properties(subset = pd.IndexSlice[self.election.contests[contest_name].winners, :], **{'color' : 'blue'})
+        self.data_frame[contest_name] = df.style.set_properties(subset = pd.IndexSlice[self.election.contests[contest_name].winners, :], **{'color' : 'blue'})
+        return self.data_frame[contest_name]
