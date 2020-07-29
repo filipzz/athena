@@ -7,6 +7,12 @@ import sys
 from .athena import AthenaAudit
 from .election import Election
 
+class Status():
+    def __init__(self):
+        self.round_number = 1
+        self.params = []
+
+
 class Audit():
 
     def __init__(self, audit_type, alpha = 0.1, delta = 1):
@@ -23,7 +29,6 @@ class Audit():
         self.alpha = alpha
         self.delta = delta
         self.election_data_file = ""
-        self.round_number = 1
         self.audit_completed = False
         self.ballots_cast = 0
         self.min_kmins = []
@@ -55,6 +60,7 @@ class Audit():
         for contest_name in self.election.contests:
             self.contest_list.append(contest_name)
             self.observations[contest_name] = [[] for j in range((self.election.contests[contest_name].num_candidates))]
+            self.status[contest_name] = Status()
             if first_contest is True:
                 self.active_contest = contest_name
                 first_contest = False
@@ -162,12 +168,14 @@ class Audit():
                 logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
                 logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
             else:
-                logging.info("\n\n\tRound: %s audit failed" % (self.round_number))
+                logging.info("\n\n\tRound: %s audit failed" % (self.status[contest_name].round_number))
                 logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
                 logging.info("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
                 logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
                 logging.info("\tboth conditions are required to be satisfied.")
-            self.round_number = self.round_number + 1
+
+            self.status[contest_name].round_number = self.status[contest_name].round_number + 1
+            self.status[contest_name].params.append(x)
 
 
     def find_next_round_size(self, pstop_goals, contest_name = None):
@@ -404,7 +412,7 @@ class Audit():
         list_of_candidates = self.election.contests[contest_name].candidates
 
         #while audit_completed is False:
-        print("\n\n---------------------- Round number: ", self.round_number, " -----------------\n")
+        print("\n\n---------------------- Round number: ", self.status[contest_name].round_number, " -----------------\n")
         print("Your choices: ")
         print("[1] Find next round size at 70%, 80%, 90%")
         print("[2] Enter other goal for probability of stopping.")
@@ -495,13 +503,13 @@ class Audit():
 
         if x["passed"] == 1:
             self.audit_completed = True
-            print("\n\n\tRound: %s audit completed" % (self.round_number))
+            print("\n\n\tRound: %s audit completed" % (self.status[contest_name].round_number))
             #print("\tAudit Successfully completed!")
             print("\tP-value:\t%s\n" % (x["risk"]))
             self.audit_completed = True
             #print(x)
         else:
-            print("\n\n\tRound: %s audit failed" % (self.round_number))
+            print("\n\n\tRound: %s audit failed" % (self.status[contest_name].round_number))
             #print("\tAudit failed")
             print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
             print("\tLR:\t\t%s\t[needs to be > %s]" % (x["delta"], self.delta))
@@ -513,7 +521,7 @@ class Audit():
             #round_number = round_number + 1
             #print(str(x))
             ###del w
-        self.round_number = self.round_number + 1
+        self.status[contest_name].round_number = self.status[contest_name].round_number + 1
 
     def show_election_results(self, contest_name = None):
         import pandas as pd
@@ -536,7 +544,7 @@ class Audit():
         if contest_name is None:
             contest_name = self.active_contest
 
-        if self.round_number == 0:
+        if self.status[contest_name].round_number == 0:
             return self.show_election_results()
 
         summary = ["Sum", "LR", "P-Value"]
@@ -556,10 +564,10 @@ class Audit():
         df = pd.DataFrame(data=d)
 
         '# columns related to audit rounds'
-        if self.round_number > 1:
+        if self.status[contest_name].round_number > 1:
 
             '# Results column of results of sampling'
-            for rd in range(self.round_number - 1):
+            for rd in range(self.status[contest_name].round_number - 1):
                 col_caption = "Round " + str(rd + 1)
                 r = []
                 for i in range(len(self.election.contests[contest_name].candidates)):
@@ -577,8 +585,8 @@ class Audit():
             r = []
             col_caption = "Total"
             for i in range(len(self.election.contests[contest_name].candidates)):
-                #r.append(self.audit_observations[i][self.round_number - 2])
-                r.append(self.observations[contest_name][i][self.round_number - 2])
+                #r.append(self.audit_observations[i][self.status[contest_name].round_number - 2])
+                r.append(self.observations[contest_name][i][self.status[contest_name].round_number - 2])
             for i in summary:
                 r.append(" ")
             df[col_caption] = r
