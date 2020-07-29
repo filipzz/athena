@@ -109,7 +109,7 @@ if __name__ == '__main__':
             pstop_goal = args.pstop
             if not args.rounds:
                 round_schedule = []
-            print(str(pstop_goal))
+            #print(str(pstop_goal))
 
         elif args.interactive:
             pstop_goal = []
@@ -193,7 +193,7 @@ if __name__ == '__main__':
         election["data"] = {"name": "x", "total_ballots": ballots_cast, "contests" : election["contests"]}
         #print(election["contests"])
         #json.loads(election["contests"])
-        print(election["data"])
+        #print(election["data"])
         #print(election["data"])
         election["candidates"] = candidates
         election["results"] = results
@@ -216,6 +216,8 @@ if __name__ == '__main__':
 
     if mode_rounds == "rounds":
         #for i in range(len(candidates)):
+        print("option temporary unavailable")
+        """ # temporary commented out
         for i in election_object.declared_winners:
             ballots_i = results[i]
             candidate_i = candidates[i]
@@ -275,6 +277,7 @@ if __name__ == '__main__':
                     else:
                         true_risk.append(pt/p)
                 print("\t%s ratio:\t%s" % (audit_type, str(true_risk)))
+            """
 
     elif mode_rounds == "pstop":
 
@@ -290,7 +293,7 @@ if __name__ == '__main__':
             print(w.predict_round_sizes(pstop_goal))
         else:
             w = Audit(audit_type, alpha, delta)
-            print(election)
+            #print(election)
             w.add_election(election)
             w.load_contest(contest_name)
             w.add_round_schedule(round_schedule)
@@ -314,6 +317,7 @@ if __name__ == '__main__':
         else:
             w = Audit(audit_type, alpha, delta)
             w.add_election(election)
+            w.load_contest(contest_name)
             w.add_round_schedule(round_schedule)
 
         w.run_interactive()
