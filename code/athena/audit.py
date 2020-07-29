@@ -16,6 +16,7 @@ class Status():
         self.deltas = []
         self.audit_pairs = []
         self.audit_completed = False
+        self.ballots_sampled = []
 
 
 class Audit():
@@ -36,7 +37,6 @@ class Audit():
         self.data = None
         self.contests = []
         self.contest_list = []
-        self.ballots_sampled = []
         self.data_frame = {}
 
     def __str__(self):
@@ -72,15 +72,15 @@ class Audit():
         #return list(self.data["contests"].keys())
 
 
-    def load_contest(self, contest):
-        self.active_contest = contest
-        self.audit_observations = self.observations[contest] # to be removed
+    def load_contest(self, contest_name):
+        self.active_contest = contest_name
+        self.audit_observations = self.observations[contest_name] # to be removed
 
-        self.audit_pairs = []
+        self.status[contest_name].audit_pairs = []
 
-        for winner in self.election.contests[contest].declared_winners:
-            for loser in self.election.contests[contest].declared_losers:
-                self.audit_pairs.append([winner, loser])
+        for winner in self.election.contests[contest_name].declared_winners:
+            for loser in self.election.contests[contest_name].declared_losers:
+                self.status[contest_name].audit_pairs.append([winner, loser])
 
     def add_round_schedule(self, round_schedule):
         self.round_schedule = round_schedule
@@ -164,7 +164,7 @@ class Audit():
         future_round_sizes = [0] * len(pstop_goals)
         #future_prob_stop = [0] * len(pstop_goals)
 
-        for i, j in self.audit_pairs:
+        for i, j in self.status[contest_name].audit_pairs:
             #for i in self.election.declared_winners:
             ballots_i = self.election.contests[contest_name].results[i]
             candidate_i = self.election.contests[contest_name].candidates[i]
@@ -224,7 +224,7 @@ class Audit():
         min_kmins = [0] * len(self.election.contests[contest_name].candidates)
 
         audit_pairs_next = []
-        for i, j in self.audit_pairs:
+        for i, j in self.status[contest_name].audit_pairs:
         #for i in self.election.declared_winners:
             ballots_i = self.election.contests[contest_name].results[i] # TODO: change to tally
             candidate_i = self.election.contests[contest_name].candidates[i]
@@ -334,7 +334,7 @@ class Audit():
         if test_passed == True:
             passed = 1
 
-        self.audit_pairs = audit_pairs_next
+        self.status[contest_name].audit_pairs = audit_pairs_next
 
         logging.debug("risks: %s" % (risks))
         logging.debug("delta: %s" % (delta))
@@ -350,11 +350,14 @@ class Audit():
                 }
 
 
-
     def run_interactive(self, contest_name = None):
 
-        while self.audit_completed is False:
+        if contest_name is None:
+            contest_name = self.active_contest
+
+        while self.status[contest_name].audit_completed is False:
             self.run_audit_round(contest_name = None)
+
 
     def predict_round_sizes(self, pstop_goal):
         x = self.find_next_round_size(pstop_goal)
@@ -380,7 +383,7 @@ class Audit():
         if contest_name is None:
             contest_name = self.active_contest
 
-        if self.audit_completed is True:
+        if self.status[contest_name].audit_completed is True:
             logging.error("Audit is completed!")
             raise ValueError("Audit is completed")
 
@@ -406,7 +409,7 @@ class Audit():
                 print("Entered value is incorrect")
                 sys.exit(1)
         else:
-            audit_completed = True
+            self.status[contest_name].audit_completed = True
 
         predicted_round_sizes = self.predict_round_sizes(pstop_goal)
 
@@ -473,17 +476,17 @@ class Audit():
         x = self.find_risk() #actual_kmins)
         observed = x["observed"]
         required = x["required"]
-        self.min_kmins = x["min_kmins"]
-        self.risks.append(x["risk"])
-        self.deltas.append(x["delta"])
-        self.ballots_sampled.append(new_valid_ballots)
+        self.status[contest_name].min_kmins = x["min_kmins"]
+        self.status[contest_name].risks.append(x["risk"])
+        self.status[contest_name].deltas.append(x["delta"])
+        self.status[contest_name].ballots_sampled.append(new_valid_ballots)
 
         if x["passed"] == 1:
-            self.audit_completed = True
+            self.status[contest_name].audit_completed = True
             print("\n\n\tRound: %s audit completed" % (self.status[contest_name].round_number))
             #print("\tAudit Successfully completed!")
             print("\tP-value:\t%s\n" % (x["risk"]))
-            self.audit_completed = True
+            self.status[contest_name].audit_completed = True
             #print(x)
         else:
             print("\n\n\tRound: %s audit failed" % (self.status[contest_name].round_number))
@@ -553,9 +556,9 @@ class Audit():
                         r.append((self.observations[contest_name][i][rd] - self.observations[contest_name][i][rd-1]))
                     else:
                         r.append(self.observations[contest_name][i][rd])
-                r.append(str(self.ballots_sampled[rd]))
-                r.append("{:.4f}".format(1/self.deltas[rd]))
-                r.append("{:.4f}".format(self.risks[rd]))
+                r.append(str(self.status[contest_name].ballots_sampled[rd]))
+                r.append("{:.4f}".format(1/self.status[contest_name].deltas[rd]))
+                r.append("{:.4f}".format(self.status[contest_name].risks[rd]))
                 df[col_caption] = r
 
             '# Total column - sum of sampled ballots'
@@ -572,10 +575,10 @@ class Audit():
             r = []
             col_caption = "Required"
             for i in range(len(self.election.contests[contest_name].candidates)):
-                if self.min_kmins[i] == 0:
+                if self.status[contest_name].min_kmins[i] == 0:
                     r.append(" ")
                 else:
-                    r.append(self.min_kmins[i])
+                    r.append(self.status[contest_name].min_kmins[i])
             for i in summary:
                 r.append(" ")
             df[col_caption] = r
