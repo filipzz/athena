@@ -25,7 +25,7 @@ class Contest():
         self.data = None
         self.contest_type = ""
         if contest is not None:
-            print(contest)
+            #print(contest)
             #if "contest_ballots" in contest:
             #    self.ballots_cast = contest["contest_ballots"]
             #    self.contest_ballots = contest["contest_ballots"]
@@ -92,7 +92,6 @@ class Contest():
             self.data = data
         info = self.data["contests"][contest]
 
-        print("results", self.results)
         self.results = []
         self.candidates = []
         for candidate, result in info["tally"].items():
