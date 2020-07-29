@@ -1,14 +1,10 @@
 import logging
 import math
 import sys
-import json
-import requests
-from urllib import parse
 
 
 
 from .athena import AthenaAudit
-from .contest import Contest
 from .election import Election
 
 class Audit():
@@ -49,6 +45,7 @@ class Audit():
         election_data = self.election.read_election_data(url)
         self.add_election(election_data)
 
+
     def add_election(self, election):
         new_election = Election(election) # Contest(election["data"])
         self.election = new_election
@@ -61,7 +58,6 @@ class Audit():
             if first_contest is True:
                 self.active_contest = contest_name
                 first_contest = False
-
 
     def get_contests(self):
         x = self.data["contests"]
