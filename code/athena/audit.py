@@ -19,6 +19,10 @@ class Status():
         self.ballots_sampled = []
 
 
+    def __repr__(self):
+        return f"""{{"round_number": {self.round_number}, "min_kmins": {self.min_kmins}, "risks": {self.risks}}}"""
+
+
 class Audit():
 
     def __init__(self, audit_type, alpha = 0.1, delta = 1):
@@ -39,10 +43,11 @@ class Audit():
         self.contest_list = []
         self.data_frame = {}
 
-    def __str__(self):
+    def __repr__(self):
         return f'audit type: {self.audit_type}\n' \
                f'alpha: {self.alpha}\n' \
-               f'observations: {self.audit_observations}'
+               f'observations: {self.audit_observations}\n' \
+               f'status: {self.status!r}'
 
     def read_election_results(self, url):
         self.election_data_file = url
