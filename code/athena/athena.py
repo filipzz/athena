@@ -233,7 +233,7 @@ class AthenaAudit():
         # Define upper tolerance for probability tests to allow some fudge
         one_tol = 1.0 + 1e-8
 
-        assert self.non_decreasing(kmins[1:]), f'Internal error: kmin values not monotonic: {kmins[1:]}'
+        #assert self.non_decreasing(kmins[1:]), f'Internal error: kmin values not monotonic: {kmins[1:]}'
         assert all(0.0 <= prob <= one_tol for prob in prob_sum[1:]), f'Internal error: prob_sum <0 or >1: {prob_sum[1:]}'
         assert all(0.0 <= prob <= one_tol for prob in prob_tied_sum[1:]), f'Internal error: prob_tied_sum <0 or >1: {prob_tied_sum[1:]}'
         assert self.non_decreasing(prob_sum[1:]), f'Internal error: prob_sum values not monotonic: {prob_sum[1:]}'
