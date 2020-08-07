@@ -1,25 +1,70 @@
 # Athena - Risk Limiting Audit (Round-by-Round)
 
+This library is an implementation of [The ATHENA Class of Risk-Limiting Ballot Polling Audits](https://arxiv.org/pdf/2008.02315.pdf)
 
+
+# Installation
+
+```bash
+python -m pip install git+https://github.com/filipzz/athena.git
+```
 
 # Usage
+
+## As a library
+See [athena.ipynb](athena.ipynb)
+
+## As a command line
 
 Typical use:
 
 ```bash
-python3 code/athena.py --new raceName --ballots 5000 3000 2000 --round_schedule 100 200
+python -m athena --name contestName --ballots 5000 3000 2000 --round_schedule 100 200
 ```
 where:
 
 - **--ballots** is a list of votes each candidate received
 - **--round_schedule** is the round schedule for the audit
-- **--type** is an optional argument that lets one see result of different audity types Aurrror (default) | Bravo/Wald | Arlo
+- **--type** is an optional argument that lets one see result of different audit types **athena** (default) | **bravo** (wald) | **arlo**
 
-and with shorter parameternames:
+and with shorter parameter names:
 
 ```bash
-python3 code/athena.py -n raceName -b 5000 3000 2000  -r 100 200 --type arlo
+python -m athena -n contestName -b 5000 3000 2000  -r 100 200 --type arlo
 ```
+
+Election data can be read from a json file:
+
+```json
+ {
+	"name": "Local Elections 2020",
+	"total_ballots": 10000,
+	"contests": {
+		"contest_1": {
+			"contest_ballots": 10000,
+			"tally": {
+				"A": 6000,
+				"B": 4000
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"A"
+			],
+			"contest_type": "PLURALITY"
+		}
+    }
+}
+```
+
+Then one needs to call it with parameter *--file** and provide the name of the contest (with the
+example above: -n contest_1):
+
+```bash
+ python -m athena --file  athena/test_data/simple.json --new contest_1 --pstop .7
+```
+
+
+# Usage
 
 ## Finding stopping probabilities
 
@@ -30,7 +75,7 @@ for a given results:
 - **--pstop** (list of stopping probabilities for the next round)
 
 ```bash
-python3 athena.py -n asd -b 60000 40000 --pstop .7 .8 .9 
+python3 -m athena -n asd -b 60000 40000 --pstop .7 .8 .9 
 ```
 
 returns:
@@ -63,7 +108,7 @@ round schedule: []
 If one want to estimate round sizes for the next round, round_schedule parameter needs to be added
 
 ```bash
-python3 code/athena.py -n asd -b 60000 40000 --pstop .5 .8  --rounds 132
+python3 -m athena -n asd -b 60000 40000 --pstop .5 .8  --rounds 132
 [0.5, 0.8]
 Results of: asd
 Number of valid ballots: 100 000
@@ -90,7 +135,7 @@ To get obtain detailed information about a selected round schedule (e.g., [132, 
 one needs to call it without **--pstop** parameter.
 
 ```bash
-python3 code/athena.py -n asd -b 60000 40000 --rounds 132 297
+python3 -m athena -n asd -b 60000 40000 --rounds 132 297
 Results of: asd
 Number of valid ballots: 100000
 	1 A	60000
@@ -117,7 +162,7 @@ A (60000) vs B (40000)
 At the end we may want to check how, for that round schedule Arlo audit would work
 
 ```bash
-python3 code/athena.py -n asd -b 60000 40000 --rounds 132 297 --type arlo
+python3 -m athena -n asd -b 60000 40000 --rounds 132 297 --type arlo
 Results of: asd
 Number of valid ballots: 100000
 	1 A	60000
@@ -150,13 +195,13 @@ test that stops after up to **max** ballots checked.
 Calling:
 
 ```bash
-python3 code/athena.py -n asd -b 6000 4000  --rounds 17 --type BRAVO
+python3 -m athena -n asd -b 6000 4000  --rounds 17 --type BRAVO
 ```
 
 Is equivalent to calling:
 
 ```bash
-python3 code/athena.py -n asd -b 6000 4000  --rounds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+python3 -m athena -n asd -b 6000 4000  --rounds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
 ```
 
 Note that **athena** uses the code that is optimized for a few rounds of (potentially) large sizes
@@ -199,7 +244,7 @@ Risk:	0.10015171727863798
 ## Help
 
 ```
-python3 code/athena.py -h
+python3 -m athena -h
 ```
 
 returns:
