@@ -69,6 +69,18 @@ class Audit():
                 self.active_contest = contest_name
                 first_contest = False
 
+    def add_contest(self, contest_dict):
+        total_ballots = sum(tally for tally in contest_dict['tally'].values())
+        election_name = "election_name"
+        contest_name = "contest_name"
+        election = {
+            'name': election_name,
+            'total_ballots': total_ballots,
+            'contests': {contest_name: contest_dict}
+        }
+        self.add_election(election)
+        self.active_contest = contest_name
+
     def get_contests(self):
         x = self.data["contests"]
         y = x.keys()
@@ -125,13 +137,10 @@ class Audit():
             contest_name = self.active_contest
 
         if self.status[contest_name].audit_completed == True:
-            logging.error("\n\n\tAudit already completed. No more observations are needed.\n")
             raise ValueError("Audit already completed")
         else:
-            list_of_candidates = self.election.contests[contest_name].candidates
 
             if new_valid_ballots > new_ballots or sum(round_observation) > new_valid_ballots:
-                logging.error("Incorrect number of valid ballots entered: ")
                 raise ValueError("Incorrect number of valid ballots entered")
 
 
