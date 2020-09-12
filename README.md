@@ -16,24 +16,37 @@ See [athena.ipynb](athena.ipynb)
 
 ## As a command line
 
-Typical use:
+### Entering data from command line
 
 ```bash
-python -m athena --name contestName --ballots 5000 3000 2000 --round_schedule 100 200
+python -m athena --name contestName --ballots 5000 3000 2000 --pstop .9 .95 --type athena
 ```
 where:
 
 - **--ballots** is a list of votes each candidate received
-- **--round_schedule** is the round schedule for the audit
+- **--name** name of a contest
+- **--pstop** is a list of stopping probabilities
 - **--type** is an optional argument that lets one see result of different audit types **athena** (default) | **bravo** (wald) | **arlo**
 
+The above call would return:
+
+```bash
+[[0.9, 148], [0.95, 213]]
+```
+
+which means that if *148* will be drawn the audit would stop with probability 90%
+while if *213* ballots are drawn then the probability of completing audit would be 95%.
+
+The above call can be
 and with shorter parameter names:
 
 ```bash
-python -m athena -n contestName -b 5000 3000 2000  -r 100 200 --type arlo
+python -m athena -n contestName -b 5000 3000 2000  -p .9 --type arlo
 ```
 
-Election data can be read from a json file:
+### Reading data from a file
+
+Election data can be read from a json file of the following form:
 
 ```json
  {
@@ -56,15 +69,21 @@ Election data can be read from a json file:
 }
 ```
 
-Then one needs to call it with parameter *--file** and provide the name of the contest (with the
-example above: -n contest_1):
+A file may contain many contests.
+
+Then one needs to provide a path to a file (parameter **--file**)  and provide the name of the contest (with the
+example above: **-n contest_1**):
 
 ```bash
- python -m athena --file  athena/test_data/simple.json --new contest_1 --pstop .7
+python -m athena --file  athena/test_data/simple.json --new contest_1 --pstop .7
 ```
 
 
 # Usage
+
+Athena helps to:
+
+- estimate the number of ballots to be drawn in order to complete audit with a
 
 ## Finding stopping probabilities
 
@@ -75,7 +94,7 @@ for a given results:
 - **--pstop** (list of stopping probabilities for the next round)
 
 ```bash
-python3 -m athena -n asd -b 60000 40000 --pstop .7 .8 .9 
+python -m athena -n asd -b 60000 40000 --pstop .7 .8 .9 
 ```
 
 returns:
@@ -108,7 +127,7 @@ round schedule: []
 If one want to estimate round sizes for the next round, round_schedule parameter needs to be added
 
 ```bash
-python3 -m athena -n asd -b 60000 40000 --pstop .5 .8  --rounds 132
+python -m athena -n asd -b 60000 40000 --pstop .5 .8  --rounds 132
 [0.5, 0.8]
 Results of: asd
 Number of valid ballots: 100 000
@@ -216,35 +235,17 @@ python3 code/aurror_old.py -n asd -b 6000 4000  --rounds 17
 ## Estimating true audit risk
 
 ```
-python3 athena.py -n 2016_Minnesota -c Clinton Trump -b 1367825 1323232  --rounds 14880 32138   --risk 7530
-Results of: 2016_Minnesota
-Number of valid ballots: 2 691 057
-	1 Clinton	1 367 825
-	2 Trump	1 323 232
-
-Parameters: 
-Alpha:  0.1
-Gamma:  1.0
-Model:  bin
-Round schedule: [14880, 32138]
+python -m athena -n 2016_Minnesota  -b 1367825 1323232  --rounds 14880 32138   --risk 7530
 
 
-Clinton (1 367 825) vs Trump (1 323 232)
-	margin:	0.01657081213813011
+{'2016_Minnesota': {"round_number": 2, "min_kmins": [7531, 0], "risks": [0.10015171727863798]}}
 
-	AUDIT result:
-		observed:	[7530]
-		required:	[7531, 16226]
-
-		Test FAILED
-
-Risk:	0.10015171727863798
 ```
 
 ## Help
 
 ```
-python3 -m athena -h
+python -m athena -h
 ```
 
 returns:
