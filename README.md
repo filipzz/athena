@@ -34,15 +34,17 @@ The above call would return:
 [[0.9, 148], [0.95, 213]]
 ```
 
-which means that if *148* will be drawn the audit would stop with probability 90%
+which means that if *148* will be drawn the audit would stop (on average) with probability 90%
 while if *213* ballots are drawn then the probability of completing audit would be 95%.
 
-The above call can be
-and with shorter parameter names:
+The above result may be obtained with shorter parameter names:
 
 ```bash
-python -m athena -n contestName -b 5000 3000 2000  -p .9 --type arlo
+python -m athena -n contestName -b 5000 3000 2000  -p .9
 ```
+
+since the default aduit type is Athena.
+
 
 ### Reading data from a file
 
@@ -75,7 +77,7 @@ Then one needs to provide a path to a file (parameter **--file**)  and provide t
 example above: **-n contest_1**):
 
 ```bash
-python -m athena --file  athena/test_data/simple.json --new contest_1 --pstop .7
+python -m athena --file  athena/test_data/simple.json --name contest_1 --pstop .7
 ```
 
 

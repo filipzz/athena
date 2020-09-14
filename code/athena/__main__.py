@@ -1,55 +1,67 @@
 import sys
 import argparse
 import string
-import math
 import logging
 import json
-#import athena.tools
-from athena.athena import AthenaAudit
 from athena.contest import Contest
 from athena.audit import Audit
 
 if __name__ == '__main__':
 
-    info_text = 'This program lets for computing ATHENA parameters.'
+    info_text = 'This program lets for performing ATHENA audit. \n' \
+                'There are two main use cases:\n' \
+                '\t(1) find out how many ballots need to be drawn at random to complete audit with e.g., 90%:\n' \
+                '\t\tpython -m athena --name contestName --ballots 5000 3000 --pstop .9\n' \
+                'where: --ballots 5000 3000 corresponds to number of ballots each canidate got, --pstop is the desired stopping probability' \
+                '\t(2) when a certain number of ballots is drawn, evaluate the p-value:\n' \
+                '\t\tpython -m athena --name contestName --ballots 5000 3000 --rounds 120 --risk 70\n' \
+                'where --rounds 120 means that 120 relevant ballots were drawn and --risk 70 means that 70 of them were for the winner and one wants to evaluate the p-value'
+
     parser = argparse.ArgumentParser(description=info_text)
     parser.add_argument("-v", "-V", "--version", help="shows program version", action="store_true")
-    parser.add_argument("-n", "--new", "--name", help="creates/reads election name")
     parser.add_argument("-a", "--alpha", help="set alpha (risk limit) for the election", type=float, default=0.1)
-    parser.add_argument("-g", "--delta", help="set delta (upset limit) for the audit", type=float, default=1.0)
-    parser.add_argument("-c", "--candidates", help="set the candidate list (names)", nargs="*")
     parser.add_argument("-b", "--ballots", help="set the list of ballots cast for every candidate", nargs="*", type=int)
-    parser.add_argument("-t", "--total", help="set the total number of ballots in given contest", type=int)
-    parser.add_argument("-r", "--rounds", "--round_schedule", help="set the round schedule", nargs="+", type=int)
-    parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
-    parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
-    parser.add_argument("-f", "--file", help="read data from the file")
-    #parser.add_argument("-l", "--load", help="set the contest to be read")
-    parser.add_argument("-i", "--interactive", help="sets mode to interactive", const=1, default=0, nargs="?")
-    parser.add_argument("--type", help="set the audit type (athena/bravo/arlo/minerva/metis)", default="athena")
-    parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+", type=int)
+    parser.add_argument("-c", "--candidates", help="set the candidate list (names)", nargs="*")
     parser.add_argument("-d", "--debuglevel", type=int, default=logging.WARNING,
                         help="Set logging level to debuglevel, expressed as an integer: "
                         "DEBUG=10, INFO=20, WARNING=30, ERROR=40, CRITICAL=50. "
                         "The default is %(default)s" )
+    parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+", type=int)
+    parser.add_argument("-f", "--file", help="read data from the file")
+    parser.add_argument("-g", "--delta", help="set delta (upset limit) for the audit", type=float, default=1.0)
+    parser.add_argument("-i", "--interactive", help="sets mode to interactive", const=1, default=0, nargs="?")
+    parser.add_argument("-n", "--name", help="sets election name")
+    parser.add_argument("-N", "--new", "--new", help="sets election name")
+    parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
+    parser.add_argument("-r", "--rounds", "--round_schedule", help="set the round schedule", nargs="+", type=int)
+    parser.add_argument("-t", "--total", help="set the total number of ballots in given contest", type=int)
+    parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
+    parser.add_argument("--type", help="set the audit type (athena/bravo/arlo/minerva/metis)", default="athena")
 
-    args = parser.parse_args()
+    args, args_unknown = parser.parse_known_args()
 
     logging.basicConfig(level=args.debuglevel)
 
     audit_type = "ATHENA"
+    alpha = 0.1
 
     if args.version:
         print("ATHENA version 0.5")
-    if args.new:
+    if (args.new is not None) or (args.name is not None):
         mode = "new"
-        name = args.new
-        contest_name = args.new
+        if args.new:
+            name = args.new
+            contest_name = args.new
 
-        alpha = args.alpha
-        if alpha < 0.0 or alpha >= 0.5:
-            print("Value of alpha is incorrect")
-            sys.exit(2)
+        if args.name:
+            name = args.name
+            contest_name = args.name
+
+        if args.alpha:
+            alpha = args.alpha
+            if alpha < 0.0 or alpha >= 0.5:
+                print("Value of alpha is incorrect")
+                sys.exit(2)
 
         delta = args.delta
         if delta < 0.0:
@@ -153,7 +165,7 @@ if __name__ == '__main__':
     #elif args.load:
     #    mode = "read"
     else:
-        print("Call python3 athena.py -h for help")
+        print("Call python -m athena -h for help")
 
     model = "bin"
 
