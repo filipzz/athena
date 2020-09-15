@@ -1,8 +1,8 @@
 {
-	"name": "x",
+	"name": "Local Elections 2020",
 	"total_ballots": 10000,
 	"contests": {
-		"two_candidates": {
+		"contest_1": {
 			"contest_ballots": 10000,
 			"tally": {
 				"A": 6000,
