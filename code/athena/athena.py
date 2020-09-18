@@ -241,12 +241,13 @@ class AthenaAudit():
 
         return {"kmins": kmins[1:len(kmins)], "prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "deltas": deltas[1:len(kmins)]}
 
-    def find_next_round_size(self, audit_type, margin, alpha, delta, round_schedule, quant, round_min):
+    def find_next_round_size(self, audit_type, margin, alpha, delta, round_schedule, quant, round_min, observations=[]):
         """
         For given audit parameters, computes the expected size of the next round.
 
         Parameters
         ----------
+        :param observations:
         :param margin: margin for that race
         :param alpha: risk limit
         :param delta: delta parameter
@@ -350,7 +351,7 @@ class AthenaAudit():
 
         return {"size": good_candidate, "prob_stop": good_pstop}
 
-    def find_next_round_sizes(self, audit_type, margin, alpha, delta, round_schedule, quants):
+    def find_next_round_sizes(self, audit_type, margin, alpha, delta, round_schedule, quants, observations=[]):
         '''
         For a given list of possible stopping probabilities (called quants e.g., quants = [.7, .8, .9]) returns a list of
         next round sizes  for which probability of stoping is larger than quants
@@ -359,6 +360,7 @@ class AthenaAudit():
 
         Parameters
         ----------
+        :param observations: 
         :param margin: margin for given race
         :param alpha: risk limit
         :param round_schedule: round schedule (so far)
@@ -454,6 +456,8 @@ class AthenaAudit():
             audit_round_risk[round] = sum(prob_tied_table[audit_observations[round]:len(prob_tied_table)])
             if audit_round_pstop[round] > 0:
                 audit_ratio[round] = audit_round_risk[round] / audit_round_pstop[round]
+            else:
+                audit_ratio[round] = 0.0
 
 
 
@@ -461,6 +465,8 @@ class AthenaAudit():
             if prob_table[kmins[round]] is not 0 and round < len(audit_observations):
                 if prob_table[audit_observations[round]] > 0:
                     deltas.append(abs(prob_tied_table[audit_observations[round]] / prob_table[audit_observations[round]]))
+                else:
+                    deltas.append(0.0)
 
             # cleaning prob_table/prob_tied_table
             for i in range(kmins[round], round_schedule[round] + 1):
