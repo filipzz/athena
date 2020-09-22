@@ -241,6 +241,140 @@ class AthenaAudit():
 
         return {"kmins": kmins[1:len(kmins)], "prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "deltas": deltas[1:len(kmins)]}
 
+    def find_next_round_size_observations(self, audit_type, margin, alpha, delta, round_schedule, quant, observations):
+        result = self.audit(audit_type, margin, alpha, delta, round_schedule)
+        print(result["kmins"])
+        p = (1+margin)/2
+        #draws_dist = binom.pmf(range(0, (round_size - round_size_prev) + 1), (round_size - round_size_prev), p)
+        #return fftconvolve(prob_table_prev, draws_dist)
+
+    def find_next_round_size_next(self, audit_type, margin, alpha, delta, round_schedule, quant, round_min, observations_i, observations_j):
+        """
+        For given audit parameters, computes the expected size of the next round.
+
+        Parameters
+        ----------
+        :param observations:
+        :param margin: margin for that race
+        :param alpha: risk limit
+        :param delta: delta parameter
+        :param round_schedule: round schedule
+        :param quant: desired probability of stopping in the next round
+        :param round_min: min size of the next round
+        :return:
+
+            * size - the size of the next round
+            * prob_stop - the probability of
+        """
+        #TODO: change round_max into a parameter
+        upper_limit = 100000
+        round_max = upper_limit # * ballots_cast
+
+        round_size_prev = observations_i + observations_j
+
+        prob_table_prev = [0] * (observations_i + 1)
+        prob_table_prev[observations_i] = 1.0
+
+        p = (1+margin)/2
+        draws_dist = binom.pmf(range(0, (round_max - round_size_prev) + 1), (round_max - round_size_prev), p)
+        prob_table = fftconvolve(prob_table_prev, draws_dist)
+
+        new_round_schedule = round_schedule + [round_max]
+
+        #find the stopping probability for new_round_schedule:
+        result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
+        kmin = result["kmins"][-1]
+
+        stopping_probability_max = sum(prob_table[kmin:])
+
+        if stopping_probability_max < quant:
+            logging.warning("FULL RECOUNT is suggested! (upper_limit = %s)" % (upper_limit))
+            logging.warning("Probability of stopping at: %s is %s" % (new_round_schedule, stopping_probability_max))
+            return {"size": round_max, "prob_stop": stopping_probability_max}
+
+
+        if len(round_schedule) > 0:
+            round_candidate = round_schedule[-1] + math.floor(( round_max)/2)
+        else:
+            round_candidate = math.floor((round_max)/2)
+
+        round_min_found = False
+
+
+        while round_min_found is False:
+            new_round_schedule = round_schedule + [round_candidate]
+
+            draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
+            prob_table = fftconvolve(prob_table_prev, draws_dist)
+            result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
+            kmin = result["kmins"][-1]
+            stopping_probability = sum(prob_table[kmin:])
+
+            if stopping_probability >= quant:
+                round_max = round_candidate
+                if len(round_schedule) > 0:
+                    round_candidate = round_schedule[-1] + math.floor((round_max - round_schedule[-1])/2)
+                else:
+                    round_candidate = math.floor((round_max)/2)
+            else:
+                round_min = round_candidate
+                round_min_found = True
+
+
+        # the main loop:
+        # * we have round_min (for which the probability of stopping is smaller than quant), and
+        # * we have round_max (for which the probability of stopping is larger than quant)
+        # we perform binary search to find a candidate (round_candidate) for the next round size
+        # It may happen that this value:
+        # * will not be the first round size that satisfied our requirement
+        # * it may(?)  be slightly below the quant (because of non-monotonicity)
+        while True:
+            round_candidate = round((round_max + round_min)/2)
+            new_round_schedule = round_schedule + [round_candidate]
+            draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
+            prob_table = fftconvolve(prob_table_prev, draws_dist)
+            result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
+            kmin = result["kmins"][-1]
+            stopping_probability = sum(prob_table[kmin:])
+
+
+            if stopping_probability <= quant:
+                round_min = round_candidate
+            else:
+                round_max = round_candidate
+
+            # TODO: change "10" into something parametrized
+            if (0 < stopping_probability - quant < .01) or round_max - round_min <= 1:
+                round_candidate = round_max
+                new_round_schedule = round_schedule + [round_candidate]
+                draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
+                prob_table = fftconvolve(prob_table_prev, draws_dist)
+                result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
+                kmin = result["kmins"][-1]
+                stopping_probability = sum(prob_table[kmin:])
+                break
+
+        good_candidate = round_candidate
+        good_pstop = stopping_probability #prob_table[-1]
+
+        # we found a point for which the inequalities are met
+        # but maybe we may go down a little bit... one by one:
+        #while True:
+        #    round_candidate = round_candidate - 1
+        #    new_round_schedule = round_schedule + [round_candidate]
+        #    result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
+        #    prob_table = result["prob_sum"]
+        #    if self.relative_prob(prob_table) <= quant:
+        #        break
+        #    else:
+        #        good_candidate = round_candidate
+        #        good_pstop = prob_table[-1]
+
+
+        return {"size": good_candidate, "prob_stop": good_pstop}
+
+
+
     def find_next_round_size(self, audit_type, margin, alpha, delta, round_schedule, quant, round_min, observations=[]):
         """
         For given audit parameters, computes the expected size of the next round.
@@ -350,6 +484,38 @@ class AthenaAudit():
 
 
         return {"size": good_candidate, "prob_stop": good_pstop}
+
+    def find_next_round_sizes_next(self, audit_type, margin, alpha, delta, round_schedule, quants, observations_i, observations_j):
+        '''
+        For a given list of possible stopping probabilities (called quants e.g., quants = [.7, .8, .9]) returns a list of
+        next round sizes  for which probability of stoping is larger than quants
+
+        ...
+
+        Parameters
+        ----------
+        :param observations:
+        :param margin: margin for given race
+        :param alpha: risk limit
+        :param round_schedule: round schedule (so far)
+        :param quants: list of desired stopping probabilities
+        :return: a list of expected round sizes
+        '''
+        rounds = []
+        prob_stop = []
+        for quant in quants:
+            #print("\n\tstarting for: " + str(quant))
+            #print("\tround schedule: " + str(round_schedule))
+            results = self.find_next_round_size_next(audit_type, margin, alpha, delta, round_schedule, quant, 1, observations_i, observations_j)
+            new_round = results["size"]
+            new_round_schedule = round_schedule + [new_round]
+            #print("\t" + str(quant) + "\t" + str(new_round_schedule))
+            round_candidate = results["size"]
+            rounds.append(round_candidate)
+            prob_stop.append(results["prob_stop"])
+
+        return {"rounds" : rounds, "prob_stop" : prob_stop}
+
 
     def find_next_round_sizes(self, audit_type, margin, alpha, delta, round_schedule, quants, observations=[]):
         '''
