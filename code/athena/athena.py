@@ -182,6 +182,11 @@ class AthenaAudit():
         #print("Starting audit for %s %s %s %s %s" % (audit_type, margin, alpha, delta, round_schedule))
 
         self.set_checks(audit_type)
+        self.audit_type = audit_type
+        self.margin = margin
+        self.alpha = alpha
+        self.delta = delta
+
 
         round_schedule = [0] + round_schedule
         number_of_rounds = len(round_schedule)
@@ -247,6 +252,7 @@ class AthenaAudit():
         p = (1+margin)/2
         #draws_dist = binom.pmf(range(0, (round_size - round_size_prev) + 1), (round_size - round_size_prev), p)
         #return fftconvolve(prob_table_prev, draws_dist)
+
 
     def find_next_round_size(self, audit_type, margin, alpha, delta, round_schedule, quant, round_min, observations_i, observations_j):
         """
