@@ -168,7 +168,7 @@ class Audit():
             self.status[contest_name].round_number = self.status[contest_name].round_number + 1
             self.status[contest_name].params.append(x)
 
-    def find_next_round_size_next(self, pstop_goals, contest_name = None):
+    def find_next_round_size(self, pstop_goals, contest_name = None):
         if contest_name is None:
             contest_name = self.active_contest
         logging.info("setting round schedule")
@@ -215,7 +215,7 @@ class Audit():
             #logging.info("\tpstop goals: " + str(pstop_goals))
             logging.info("\tpairwise round schedule: " + str(rs))
             rescaled = []
-            next_round_sizes = audit_object.find_next_round_sizes_next(self.audit_type, margin, self.alpha, self.delta, rs,
+            next_round_sizes = audit_object.find_next_round_sizes(self.audit_type, margin, self.alpha, self.delta, rs,
                                                                   pstop_goals, observations_i, observations_j)
             for k, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
                 rs = [] + self.round_schedule
@@ -388,7 +388,7 @@ class Audit():
 
     def predict_round_sizes(self, pstop_goal):
 
-        x = self.find_next_round_size_next(pstop_goal)
+        x = self.find_next_round_size(pstop_goal)
 
         future_round_sizes = x["future_round_sizes"]
 

@@ -248,7 +248,7 @@ class AthenaAudit():
         #draws_dist = binom.pmf(range(0, (round_size - round_size_prev) + 1), (round_size - round_size_prev), p)
         #return fftconvolve(prob_table_prev, draws_dist)
 
-    def find_next_round_size_next(self, audit_type, margin, alpha, delta, round_schedule, quant, round_min, observations_i, observations_j):
+    def find_next_round_size(self, audit_type, margin, alpha, delta, round_schedule, quant, round_min, observations_i, observations_j):
         """
         For given audit parameters, computes the expected size of the next round.
 
@@ -385,7 +385,7 @@ class AthenaAudit():
         return {"size": good_candidate, "prob_stop": good_pstop}
 
 
-    def find_next_round_sizes_next(self, audit_type, margin, alpha, delta, round_schedule, quants, observations_i, observations_j):
+    def find_next_round_sizes(self, audit_type, margin, alpha, delta, round_schedule, quants, observations_i, observations_j):
         '''
         For a given list of possible stopping probabilities (called quants e.g., quants = [.7, .8, .9]) returns a list of
         next round sizes  for which probability of stoping is larger than quants
@@ -406,7 +406,7 @@ class AthenaAudit():
         for quant in quants:
             #print("\n\tstarting for: " + str(quant))
             #print("\tround schedule: " + str(round_schedule))
-            results = self.find_next_round_size_next(audit_type, margin, alpha, delta, round_schedule, quant, 1, observations_i, observations_j)
+            results = self.find_next_round_size(audit_type, margin, alpha, delta, round_schedule, quant, 1, observations_i, observations_j)
             new_round = results["size"]
             new_round_schedule = round_schedule + [new_round]
             #print("\t" + str(quant) + "\t" + str(new_round_schedule))
