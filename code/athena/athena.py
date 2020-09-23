@@ -250,12 +250,6 @@ class AthenaAudit():
 
         return {"kmins": kmins[1:len(kmins)], "prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "deltas": deltas[1:len(kmins)]}
 
-    def find_next_round_size_observations(self, audit_type, margin, alpha, delta, round_schedule, quant, observations):
-        result = self.audit(audit_type, margin, alpha, delta, round_schedule)
-        print(result["kmins"])
-        p = (1+margin)/2
-        #draws_dist = binom.pmf(range(0, (round_size - round_size_prev) + 1), (round_size - round_size_prev), p)
-        #return fftconvolve(prob_table_prev, draws_dist)
 
     def find_stopping_probability(self, audit_type, margin, alpha, delta, new_round_schedule, prob_table_prev):
 
@@ -265,7 +259,7 @@ class AthenaAudit():
         else:
             round_size_prev = 0
         p = (1+margin)/2
-        
+
         draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
         prob_table = fftconvolve(prob_table_prev, draws_dist)
         result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
