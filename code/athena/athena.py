@@ -43,6 +43,12 @@ class AthenaAudit():
     margin = 0.0
     alpha = 0.1
 
+    def __init__(self, audit_type, alpha, delta):
+        self.alpha = alpha
+        self.audit_type = audit_type
+        self.set_checks(audit_type)
+
+
     def set_checks(self, audit_type):
         if audit_type.lower() in {"bravo", "wald", "arlo"}:
             self.check_delta = 1
@@ -252,7 +258,6 @@ class AthenaAudit():
 
 
     def find_stopping_probability(self, audit_type, margin, alpha, delta, new_round_schedule, prob_table_prev):
-
         round_candidate = new_round_schedule[-1]
         if len(new_round_schedule) > 1:
             round_size_prev = new_round_schedule[-2]
@@ -281,6 +286,8 @@ class AthenaAudit():
         :param round_schedule: round schedule
         :param quant: desired probability of stopping in the next round
         :param round_min: min size of the next round
+        :param observations_i: number of ballots drawn for the winner (so far) in the audit
+        :param observations_j: number of ballots drawn for the loser (so far) in the audit
         :return:
 
             * size - the size of the next round
