@@ -213,12 +213,12 @@ class Audit():
             rescaled = []
             next_round_sizes = audit_object.find_next_round_sizes_next(self.audit_type, margin, self.alpha, self.delta, rs,
                                                                   pstop_goals, observations_i, observations_j)
-            for i, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
+            for k, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
                 rs = [] + self.round_schedule
                 next_round_rescaled = math.ceil(next_round * scalling_ratio)
                 rs.append(next_round_rescaled)
                 rescaled.append(next_round_rescaled)
-                future_round_sizes[i] = max(future_round_sizes[i], next_round_rescaled)
+                future_round_sizes[k] = max(future_round_sizes[k], next_round_rescaled)
                 logging.info("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
                 logging.info("\t\t\t\tnr: %s\trnr: %s\tsr: %s" % (next_round, next_round_rescaled, scalling_ratio))
 
@@ -267,12 +267,12 @@ class Audit():
             rescaled = []
             next_round_sizes = audit_object.find_next_round_sizes(self.audit_type, margin, self.alpha, self.delta, rs,
                                                                   pstop_goals)
-            for i, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
+            for k, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
                 rs = [] + self.round_schedule
                 next_round_rescaled = math.ceil(next_round * scalling_ratio)
                 rs.append(next_round_rescaled)
                 rescaled.append(next_round_rescaled)
-                future_round_sizes[i] = max(future_round_sizes[i], next_round_rescaled)
+                future_round_sizes[k] = max(future_round_sizes[k], next_round_rescaled)
                 logging.info("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
                 logging.info("\t\t\t\tnr: %s\trnr: %s\tsr: %s" % (next_round, next_round_rescaled, scalling_ratio))
 
