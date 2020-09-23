@@ -35,9 +35,13 @@ class AthenaAudit():
 
     """
 
+
     check_delta = 0
     check_sum = 0
     check_memory = 0
+    audit_type = ""
+    margin = 0.0
+    alpha = 0.1
 
     def set_checks(self, audit_type):
         if audit_type.lower() in {"bravo", "wald", "arlo"}:
@@ -253,6 +257,22 @@ class AthenaAudit():
         #draws_dist = binom.pmf(range(0, (round_size - round_size_prev) + 1), (round_size - round_size_prev), p)
         #return fftconvolve(prob_table_prev, draws_dist)
 
+    def find_stopping_probability(self, audit_type, margin, alpha, delta, new_round_schedule, prob_table_prev):
+
+        round_candidate = new_round_schedule[-1]
+        if len(new_round_schedule) > 1:
+            round_size_prev = new_round_schedule[-2]
+        else:
+            round_size_prev = 0
+        p = (1+margin)/2
+        
+        draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
+        prob_table = fftconvolve(prob_table_prev, draws_dist)
+        result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
+        kmin = result["kmins"][-1]
+        stopping_probability = sum(prob_table[kmin:])
+        return stopping_probability
+
 
     def find_next_round_size(self, audit_type, margin, alpha, delta, round_schedule, quant, round_min, observations_i, observations_j):
         """
@@ -284,21 +304,11 @@ class AthenaAudit():
 
         prob_table_prev = [0] * (observations_i + 1)
         prob_table_prev[observations_i] = 1.0
-
-        p = (1+margin)/2
-        draws_dist = binom.pmf(range(0, (round_max - round_size_prev) + 1), (round_max - round_size_prev), p)
-        prob_table = fftconvolve(prob_table_prev, draws_dist)
-
         new_round_schedule = round_schedule + [round_max]
-
-        #find the stopping probability for new_round_schedule:
-        result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-        kmin = result["kmins"][-1]
-
-        stopping_probability_max = sum(prob_table[kmin:])
+        stopping_probability_max = self.find_stopping_probability(audit_type, margin, alpha, delta, new_round_schedule, prob_table_prev)
 
         if stopping_probability_max < quant:
-            logging.warning("FULL RECOUNT is suggested! (upper_limit = %s)" % (upper_limit))
+            logging.warning("FULL RECOUNT is suggested! (upper_limit = %s)" % (round_max))
             logging.warning("Probability of stopping at: %s is %s" % (new_round_schedule, stopping_probability_max))
             return {"size": round_max, "prob_stop": stopping_probability_max}
 
@@ -313,12 +323,7 @@ class AthenaAudit():
 
         while round_min_found is False:
             new_round_schedule = round_schedule + [round_candidate]
-
-            draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
-            prob_table = fftconvolve(prob_table_prev, draws_dist)
-            result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-            kmin = result["kmins"][-1]
-            stopping_probability = sum(prob_table[kmin:])
+            stopping_probability = self.find_stopping_probability(audit_type, margin, alpha, delta, new_round_schedule, prob_table_prev)
 
             if stopping_probability >= quant:
                 round_max = round_candidate
@@ -341,12 +346,7 @@ class AthenaAudit():
         while True:
             round_candidate = round((round_max + round_min)/2)
             new_round_schedule = round_schedule + [round_candidate]
-            draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
-            prob_table = fftconvolve(prob_table_prev, draws_dist)
-            result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-            kmin = result["kmins"][-1]
-            stopping_probability = sum(prob_table[kmin:])
-
+            stopping_probability = self.find_stopping_probability(audit_type, margin, alpha, delta, new_round_schedule, prob_table_prev)
 
             if stopping_probability <= quant:
                 round_min = round_candidate
@@ -357,11 +357,7 @@ class AthenaAudit():
             if (0 < stopping_probability - quant < .01) or round_max - round_min <= 1:
                 round_candidate = round_max
                 new_round_schedule = round_schedule + [round_candidate]
-                draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
-                prob_table = fftconvolve(prob_table_prev, draws_dist)
-                result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-                kmin = result["kmins"][-1]
-                stopping_probability = sum(prob_table[kmin:])
+                stopping_probability = self.find_stopping_probability(audit_type, margin, alpha, delta, new_round_schedule, prob_table_prev)
                 break
 
         good_candidate = round_candidate
@@ -371,15 +367,8 @@ class AthenaAudit():
         # but maybe we may go down a little bit... one by one:
         while True:
             round_candidate = round_candidate - 1
-            #new_round_schedule = round_schedule + [round_candidate]
-            #result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-            #prob_table = result["prob_sum"]
             new_round_schedule = round_schedule + [round_candidate]
-            draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
-            prob_table = fftconvolve(prob_table_prev, draws_dist)
-            result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-            kmin = result["kmins"][-1]
-            stopping_probability = sum(prob_table[kmin:])
+            stopping_probability = self.find_stopping_probability(audit_type, margin, alpha, delta, new_round_schedule, prob_table_prev)
 
             if stopping_probability <= quant:
                 break
