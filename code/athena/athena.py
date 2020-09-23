@@ -266,9 +266,13 @@ class AthenaAudit():
             * size - the size of the next round
             * prob_stop - the probability of
         """
-        #TODO: change round_max into a parameter
-        upper_limit = 100000
-        round_max = upper_limit # * ballots_cast
+        #TODO: change the upper limit round_max into a parameter (or a value depending on the number of ballots cast)
+        if quant <= .9  and len(round_schedule) < 1:
+            round_max = math.ceil((18 * math.log(alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
+        else:
+            round_max = 100000 # * ballots_cast
+        #upper_limit = 100000
+        #round_max = upper_limit # * ballots_cast
 
         round_size_prev = observations_i + observations_j
 
@@ -359,131 +363,27 @@ class AthenaAudit():
 
         # we found a point for which the inequalities are met
         # but maybe we may go down a little bit... one by one:
-        #while True:
-        #    round_candidate = round_candidate - 1
-        #    new_round_schedule = round_schedule + [round_candidate]
-        #    result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-        #    prob_table = result["prob_sum"]
-        #    if self.relative_prob(prob_table) <= quant:
-        #        break
-        #    else:
-        #        good_candidate = round_candidate
-        #        good_pstop = prob_table[-1]
-
-
-        return {"size": good_candidate, "prob_stop": good_pstop}
-
-
-
-    def find_next_round_size(self, audit_type, margin, alpha, delta, round_schedule, quant, round_min, observations=[]):
-        """
-        For given audit parameters, computes the expected size of the next round.
-
-        Parameters
-        ----------
-        :param observations:
-        :param margin: margin for that race
-        :param alpha: risk limit
-        :param delta: delta parameter
-        :param round_schedule: round schedule
-        :param quant: desired probability of stopping in the next round
-        :param round_min: min size of the next round
-        :return:
-
-            * size - the size of the next round
-            * prob_stop - the probability of
-        """
-        #print("find_next_round_size")
-        if quant <= .9  and len(round_schedule) < 1:
-            round_max = math.ceil((18 * math.log(alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
-        else:
-            round_max = 100000 # * ballots_cast
-        new_round_schedule = round_schedule + [round_max]
-        result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-        #print("audit results: %s" % (result))
-        prob_table = result["prob_sum"]
-        stopping_probability_max = self.relative_prob(prob_table)
-        if stopping_probability_max < quant:
-            logging.warning("FULL RECOUNT is suggested!")
-            logging.warning("Probability of stopping at: %s is %s" % (new_round_schedule, stopping_probability_max))
-            return {"size": round_max, "prob_stop": stopping_probability_max}
-
-        #print("here we are")
-
-        if len(round_schedule) > 0:
-            round_candidate = round_schedule[-1] + math.floor(( round_max)/2)
-        else:
-            round_candidate = math.floor((round_max)/2)
-
-        round_min_found = False
-
-
-        while round_min_found is False:
-            new_round_schedule = round_schedule + [round_candidate]
-            result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-            prob_table = result["prob_sum"]
-            #print("%s\t%s\t%s\t%s\t%s\t%s" % (round_min, round_candidate, round_max, new_round_schedule, prob_table, self.relative_prob(prob_table)))
-            #print("\t" + str(prob_table))
-
-            if self.relative_prob(prob_table) >= quant:
-                round_max = round_candidate
-                if len(round_schedule) > 0:
-                    round_candidate = round_schedule[-1] + math.floor((round_max - round_schedule[-1])/2)
-                else:
-                    round_candidate = math.floor((round_max)/2)
-            else:
-                round_min = round_candidate
-                round_min_found = True
-
-        #print("\t\t->\t" + str(round_min) + "\t" + str(round_max))
-
-        # the main loop:
-        # * we have round_min (for which the probability of stopping is smaller than quant), and
-        # * we have round_max (for which the probability of stopping is larger than quant)
-        # we perform binary search to find a candidate (round_candidate) for the next round size
-        # It may happen that this value:
-        # * will not be the first round size that satisfied our requirement
-        # * it may(?)  be slightly below the quant (because of non-monotonicity)
-        while True:
-            round_candidate = round((round_max + round_min)/2)
-            new_round_schedule = round_schedule + [round_candidate]
-            result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-            prob_table = result["prob_sum"]
-            #print("\t%s\t%s\t%s\t%s\t%s" % (round_min, round_candidate, round_max, new_round_schedule, prob_table))
-
-
-            if self.relative_prob(prob_table) <= quant:
-                round_min = round_candidate
-            else:
-                round_max = round_candidate
-
-            # TODO: change "10" into something parametrized
-            if (self.relative_prob(prob_table) - quant > 0 and self.relative_prob(prob_table) - quant < .01) or round_max - round_min <= 1:
-                round_candidate = round_max
-                new_round_schedule = round_schedule + [round_candidate]
-                result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-                prob_table = result["prob_sum"]
-                #print("\t%s\t%s\t%s\t%s\t%s" % (round_min, round_candidate, round_max, new_round_schedule, prob_table))
-                break
-
-        good_candidate = round_candidate
-        good_pstop = prob_table[-1]
-
-        # we found a point for which the inequalities are met
-        # but maybe we may go down a little bit... one by one:
         while True:
             round_candidate = round_candidate - 1
+            #new_round_schedule = round_schedule + [round_candidate]
+            #result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
+            #prob_table = result["prob_sum"]
             new_round_schedule = round_schedule + [round_candidate]
+            draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
+            prob_table = fftconvolve(prob_table_prev, draws_dist)
             result = self.audit(audit_type, margin, alpha, delta, new_round_schedule)
-            prob_table = result["prob_sum"]
-            if self.relative_prob(prob_table) <= quant:
+            kmin = result["kmins"][-1]
+            stopping_probability = sum(prob_table[kmin:])
+
+            if stopping_probability <= quant:
                 break
             else:
                 good_candidate = round_candidate
-                good_pstop = prob_table[-1]
+                good_pstop = stopping_probability
 
 
         return {"size": good_candidate, "prob_stop": good_pstop}
+
 
     def find_next_round_sizes_next(self, audit_type, margin, alpha, delta, round_schedule, quants, observations_i, observations_j):
         '''
@@ -516,36 +416,6 @@ class AthenaAudit():
 
         return {"rounds" : rounds, "prob_stop" : prob_stop}
 
-
-    def find_next_round_sizes(self, audit_type, margin, alpha, delta, round_schedule, quants, observations=[]):
-        '''
-        For a given list of possible stopping probabilities (called quants e.g., quants = [.7, .8, .9]) returns a list of
-        next round sizes  for which probability of stoping is larger than quants
-
-        ...
-
-        Parameters
-        ----------
-        :param observations: 
-        :param margin: margin for given race
-        :param alpha: risk limit
-        :param round_schedule: round schedule (so far)
-        :param quants: list of desired stopping probabilities
-        :return: a list of expected round sizes
-        '''
-        rounds = []
-        prob_stop = []
-        for quant in quants:
-            #print("starting for: " + str(quant))
-            results = self.find_next_round_size(audit_type, margin, alpha, delta, round_schedule, quant, 1)
-            new_round = results["size"]
-            new_round_schedule = round_schedule + [new_round]
-            #print("\t" + str(quant) + "\t" + str(new_round_schedule))
-            round_candidate = results["size"]
-            rounds.append(round_candidate)
-            prob_stop.append(results["prob_stop"])
-
-        return {"rounds" : rounds, "prob_stop" : prob_stop}
 
     def relative_prob(self, prob_table):
         '''

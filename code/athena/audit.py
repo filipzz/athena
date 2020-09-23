@@ -184,11 +184,15 @@ class Audit():
             ballots_j = self.election.contests[contest_name].results[j]
             candidate_j = self.election.contests[contest_name].candidates[j]
 
-            #observations in the last round:
-            observations_i = self.observations[contest_name][i][-1]
-            #print("i -> " + str(observations_i))
-            observations_j = self.observations[contest_name][j][-1]
-            #print("j -> " + str(observations_j))
+            if len(self.observations[contest_name][i]) > 0:
+                #observations in the last round:
+                observations_i = self.observations[contest_name][i][-1]
+                #print("i -> " + str(observations_i))
+                observations_j = self.observations[contest_name][j][-1]
+                #print("j -> " + str(observations_j))
+            else:
+                observations_i = 0
+                observations_j = 0
 
             logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
             bc = ballots_i + ballots_j
@@ -226,59 +230,6 @@ class Audit():
 
         return {"detailed" : found_solutions, "future_round_sizes" : future_round_sizes}
 
-
-    def find_next_round_size(self, pstop_goals, contest_name = None):
-        if contest_name is None:
-            contest_name = self.active_contest
-        logging.info("setting round schedule")
-
-        found_solutions = {}
-        future_round_sizes = [0] * len(pstop_goals)
-        #future_prob_stop = [0] * len(pstop_goals)
-
-        for i, j in self.status[contest_name].audit_pairs:
-            #for i in self.election.declared_winners:
-            ballots_i = self.election.contests[contest_name].results[i]
-            candidate_i = self.election.contests[contest_name].candidates[i]
-            #for j in self.election.declared_losers:
-            ballots_j = self.election.contests[contest_name].results[j]
-            candidate_j = self.election.contests[contest_name].candidates[j]
-
-            logging.info("\n\n%s (%s) vs %s (%s)" % (candidate_i, (ballots_i), candidate_j, (ballots_j)))
-            bc = ballots_i + ballots_j
-            scalling_ratio = self.election.total_ballots / bc
-
-            winner = max(ballots_i, ballots_j)
-            logging.info("\tmargin:\t" + str((winner - min(ballots_i, ballots_j))/bc))
-            rs = []
-            #for x in self.round_schedule:
-            #    y = math.floor(x * bc / self.election.ballots_cast)
-            #    rs.append(y)
-            for rs_i, rs_j in zip(self.audit_observations[i], self.audit_observations[j]):
-                rs.append(rs_i + rs_j)
-
-
-            margin = (2 * winner - bc)/bc
-
-            audit_object = AthenaAudit()
-
-            #logging.info("\tpstop goals: " + str(pstop_goals))
-            logging.info("\tpairwise round schedule: " + str(rs))
-            rescaled = []
-            next_round_sizes = audit_object.find_next_round_sizes(self.audit_type, margin, self.alpha, self.delta, rs,
-                                                                  pstop_goals)
-            for k, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
-                rs = [] + self.round_schedule
-                next_round_rescaled = math.ceil(next_round * scalling_ratio)
-                rs.append(next_round_rescaled)
-                rescaled.append(next_round_rescaled)
-                future_round_sizes[k] = max(future_round_sizes[k], next_round_rescaled)
-                logging.info("\t\t%s:\t%s\t%s" % (pstop_goal, rs, prob_stop))
-                logging.info("\t\t\t\tnr: %s\trnr: %s\tsr: %s" % (next_round, next_round_rescaled, scalling_ratio))
-
-            found_solutions[candidate_i + "-" + candidate_j] = {"pstop_goal": pstop_goals, "next_round_sizes": rescaled, "prob_stop": next_round_sizes["prob_stop"]}
-
-        return {"detailed" : found_solutions, "future_round_sizes" : future_round_sizes}
 
     def find_risk(self, contest_name = None):#, audit_observations):
 
@@ -437,12 +388,7 @@ class Audit():
 
     def predict_round_sizes(self, pstop_goal):
 
-        if len(self.round_schedule) > 0:
-            x = self.find_next_round_size_next(pstop_goal)
-        #    below_kmin = 0 #max(required) - max(observed)
-        #    n_future_round_sizes =  list(map(lambda x: x - max(self.round_schedule) + 2 * below_kmin, future_round_sizes))
-        else:
-            x = self.find_next_round_size(pstop_goal)
+        x = self.find_next_round_size_next(pstop_goal)
 
         future_round_sizes = x["future_round_sizes"]
 
