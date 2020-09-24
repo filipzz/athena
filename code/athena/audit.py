@@ -20,7 +20,7 @@ class Status():
 
 
     def __repr__(self):
-        return f"""{{"round_number": {self.round_number}, "min_kmins": {self.min_kmins}, "risks": {self.risks}}}"""
+        return f"""{{"audit_passed": {self.audit_completed}, "min_kmins": {self.min_kmins}, "risks": {self.risks}, "round_number": {len(self.min_kmins)}}}"""
 
 
 class Audit():
@@ -244,7 +244,8 @@ class Audit():
         delta =[]
         smallest_margin = 1
         smallest_margin_id = ""
-        min_kmins = [0] * len(self.election.contests[contest_name].candidates)
+        #TODO: this approach works only for 2 candiates:
+        min_kmins = [0] * len(self.round_schedule) #len(self.election.contests[contest_name].candidates)
 
         audit_pairs_next = []
         for i, j in self.status[contest_name].audit_pairs:
