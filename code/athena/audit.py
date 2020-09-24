@@ -210,12 +210,12 @@ class Audit():
 
             margin = (2 * winner - bc)/bc
 
-            audit_object = AthenaAudit()
+            audit_object = AthenaAudit(self.audit_type, self.alpha, self.delta)
 
             #logging.info("\tpstop goals: " + str(pstop_goals))
             logging.info("\tpairwise round schedule: " + str(rs))
             rescaled = []
-            next_round_sizes = audit_object.find_next_round_sizes(self.audit_type, margin, self.alpha, self.delta, rs,
+            next_round_sizes = audit_object.find_next_round_sizes(margin, rs,
                                                                   pstop_goals, observations_i, observations_j)
             for k, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
                 rs = [] + self.round_schedule
@@ -280,7 +280,9 @@ class Audit():
 
             margin = (2 * winner - bc)/bc
 
-            audit_object = AthenaAudit()
+            audit_object = AthenaAudit(self.audit_type.lower(), self.alpha, self.delta)
+            audit_athena = audit_object.audit(margin, rs)
+            '''
             if self.audit_type.lower() == "bravo" or self.audit_type.lower() == "wald":
                 audit_athena = audit_object.bravo(margin, self.alpha, rs)
             elif self.audit_type.lower() == "arlo":
@@ -291,6 +293,7 @@ class Audit():
                 audit_athena = audit_object.metis(margin, self.alpha, rs)
             else:
                 audit_athena = audit_object.athena(margin, self.alpha, self.delta, rs)
+            '''
 
             #risk_goal = audit_athena["prob_tied_sum"]
             pairwise_audit_kmins = []
