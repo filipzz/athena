@@ -12,9 +12,9 @@ python -m pip install git+https://github.com/filipzz/athena.git
 # Usage
 
 ## As a library
-See [athena.ipynb](athena.ipynb)
+See [athena.ipynb](code/athena.ipynb) for examples of the API.
 
-## As a command line
+## From the command line
 
 ### Entering data from command line
 
@@ -34,16 +34,17 @@ The above call would return:
 [[0.9, 148], [0.95, 213]]
 ```
 
-which means that if *148* will be drawn the audit would stop (on average) with probability 90%
-while if *213* ballots are drawn then the probability of completing audit would be 95%.
+which means that if *148* ballots were drawn the audit would stop (on average) with probability 90%,
+assuming the reported results were correct.
+If *213* ballots were drawn, then the probability of completing the audit would be 95%.
 
-The above result may be obtained with shorter parameter names:
+The command also supports shorter parameter names, like this:
 
 ```bash
 python -m athena -n contestName -b 5000 3000 2000  -p .9
 ```
 
-since the default aduit type is Athena.
+Note that the default audit type is Athena.
 
 
 ### Reading data from a file
