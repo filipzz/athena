@@ -281,15 +281,21 @@ class AthenaAudit():
         draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
         prob_table = fftconvolve(self.prob_distribution_margin, draws_dist)
 
-        p = 0.5
-        draws_dist_tied = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
+        p0 = 0.5
+        draws_dist_tied = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p0)
         prob_table_tied = fftconvolve(self.prob_distribution_tied, draws_dist_tied)
 
         kmin_found = False
         kmin = 0
 
         #TODO: verify lower limit
-        kmin_candidate = math.floor(round_candidate / 2)
+        #kmin_candidate = math.floor(round_candidate / 2)
+        if self.audit_type.lower() in {"athena"}:
+            kmin_candidate = math.floor((.5 + p)/2 * round_candidate)
+        elif self.audit_type.lower() in {"bravo"}:
+            kmin_candidate = math.floor(p * round_candidate)
+        else:
+            kmin_candidate = math.ceil(round_candidate / 2)
 
         #TODO: verify upper limit
         while kmin_found is False and kmin_candidate <= math.ceil((1+2 * margin) * round_candidate/2):
@@ -313,8 +319,11 @@ class AthenaAudit():
 
         draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
         prob_table = fftconvolve(prob_table_prev, draws_dist)
-        result = self.audit(margin, new_round_schedule)
-        kmin = result["kmins"][-1]
+        #result = self.audit(margin, new_round_schedule)
+        #kmin = result["kmins"][-1]
+        result = self.find_next_round_kmin(margin, new_round_schedule)
+        kmin = result["kmin"]
+        #print(str(round_candidate) + "\t" + str(result))
         stopping_probability = sum(prob_table[kmin:])
         return stopping_probability
 
@@ -340,10 +349,11 @@ class AthenaAudit():
             * prob_stop - the probability of
         """
         #TODO: change the upper limit round_max into a parameter (or a value depending on the number of ballots cast)
-        if quant <= .9  and len(round_schedule) < 1:
-            round_max = math.ceil((18 * math.log(self.alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
-        else:
-            round_max = 100000 # * ballots_cast
+        #if quant <= .9  and len(round_schedule) < 1:
+        #    round_max = math.ceil((18 * math.log(self.alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
+        #else:
+        #    round_max = 100000 # * ballots_cast
+        round_max = 100000
         #upper_limit = 100000
         #round_max = upper_limit # * ballots_cast
 
@@ -371,7 +381,7 @@ class AthenaAudit():
         while round_min_found is False:
             new_round_schedule = round_schedule + [round_candidate]
             stopping_probability = self.find_stopping_probability(margin, new_round_schedule, prob_table_prev)
-
+            #print(str(round_candidate))
             if stopping_probability >= quant:
                 round_max = round_candidate
                 if len(round_schedule) > 0:
@@ -392,6 +402,7 @@ class AthenaAudit():
         # * it may(?)  be slightly below the quant (because of non-monotonicity)
         while True:
             round_candidate = round((round_max + round_min)/2)
+            #print("%s < %s < %s" % (round_min, round_candidate, round_max))
             new_round_schedule = round_schedule + [round_candidate]
             stopping_probability = self.find_stopping_probability(margin, new_round_schedule, prob_table_prev)
 
@@ -401,7 +412,7 @@ class AthenaAudit():
                 round_max = round_candidate
 
             # TODO: change "10" into something parametrized
-            if (0 < stopping_probability - quant < .01) or round_max - round_min <= 1:
+            if (0 < stopping_probability - quant < .0001) or round_max - round_min <= 1:
                 round_candidate = round_max
                 new_round_schedule = round_schedule + [round_candidate]
                 stopping_probability = self.find_stopping_probability(margin, new_round_schedule, prob_table_prev)
