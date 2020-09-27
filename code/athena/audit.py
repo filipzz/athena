@@ -245,7 +245,7 @@ class Audit():
         smallest_margin = 1
         smallest_margin_id = ""
         #TODO: this approach works only for 2 candiates:
-        min_kmins = [0] * len(self.round_schedule) #len(self.election.contests[contest_name].candidates)
+        min_kmins = [0] * len(self.election.contests[contest_name].candidates)
 
         audit_pairs_next = []
         for i, j in self.status[contest_name].audit_pairs:
