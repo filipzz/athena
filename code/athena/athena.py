@@ -54,6 +54,8 @@ class AthenaAudit():
         self.alpha = alpha
         self.delta = delta
         self.audit_type = audit_type
+        if self.audit_type.lower() in {"bravo", "wald", "arlo"}:
+            self.delta = self.alpha
         self.set_checks(audit_type)
 
         """Storing information about the probability distribution in the previous round of an audit"""
@@ -292,22 +294,32 @@ class AthenaAudit():
         #kmin_candidate = math.floor(round_candidate / 2)
         if self.audit_type.lower() in {"athena"}:
             kmin_candidate = math.floor((.5 + p)/2 * round_candidate)
-        elif self.audit_type.lower() in {"bravo"}:
-            kmin_candidate = math.floor(p * round_candidate)
+        elif self.audit_type.lower() in {"bravo", "arlo"}:
+            kmin_candidate = math.floor(p * round_candidate) - 2
         else:
             kmin_candidate = math.ceil(round_candidate / 2)
 
         #TODO: verify upper limit
         while kmin_found is False and kmin_candidate <= math.ceil((1+2 * margin) * round_candidate/2):
-            if self.check_delta * self.delta * sum(prob_table[kmin_candidate:]) >= self.check_delta * sum(prob_table_tied[kmin_candidate:]) \
+            if self.check_delta * self.delta * prob_table[kmin_candidate] >= self.check_delta * prob_table_tied[kmin_candidate] \
                     and self.check_sum * self.alpha * (sum(prob_table[kmin_candidate:]) + self.check_memory * sum(self.pstop_round)) >= \
                     self.check_sum * (sum(prob_table_tied[kmin_candidate:]) + self.check_memory * sum(self.pstop_tied_round)):
+                print("%s %s" % (prob_table[kmin_candidate], prob_table_tied[kmin_candidate]))
                 kmin_found = True
             else:
+                print("failed: " + str(kmin_candidate))
                 kmin_candidate = kmin_candidate + 1
 
 
-        return {"kmin": kmin_candidate, "prob_stop": sum(prob_table[kmin_candidate:]), "prob_stop_tied": sum(prob_table_tied[kmin_candidate:])}
+        return {
+            "kmin": kmin_candidate,
+            "prob_stop": sum(prob_table[kmin_candidate:]),
+            "prob_stop_tied": sum(prob_table_tied[kmin_candidate:]),
+            "prob_kmin": prob_table[kmin_candidate],
+            "prob_kmin_tied": prob_table_tied[kmin],
+            "delta": prob_table_tied[kmin]/prob_table[kmin_candidate],
+            "alpha": sum(prob_table_tied[kmin_candidate:])/sum(prob_table[kmin_candidate:])
+        }
 
     def find_stopping_probability(self, margin, new_round_schedule, prob_table_prev):
         round_candidate = new_round_schedule[-1]
@@ -319,10 +331,10 @@ class AthenaAudit():
 
         draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
         prob_table = fftconvolve(prob_table_prev, draws_dist)
-        #result = self.audit(margin, new_round_schedule)
-        #kmin = result["kmins"][-1]
-        result = self.find_next_round_kmin(margin, new_round_schedule)
-        kmin = result["kmin"]
+        result = self.audit(margin, new_round_schedule)
+        kmin = result["kmins"][-1]
+        #result = self.find_next_round_kmin(margin, new_round_schedule)
+        #kmin = result["kmin"]
         #print(str(round_candidate) + "\t" + str(result))
         stopping_probability = sum(prob_table[kmin:])
         return stopping_probability
@@ -459,9 +471,13 @@ class AthenaAudit():
         for quant in quants:
             #print("\n\tstarting for: " + str(quant))
             #print("\tround schedule: " + str(round_schedule))
-            results = self.find_next_round_size(margin, round_schedule, quant, 1, observations_i, observations_j)
-            new_round = results["size"]
-            new_round_schedule = round_schedule + [new_round]
+            if len(round_schedule) > 0:
+                results = self.find_next_round_size(margin, round_schedule, quant, round_schedule[-1] + 1, observations_i, observations_j)
+            else:
+                results = self.find_next_round_size(margin, round_schedule, quant, 1, observations_i, observations_j)
+
+            #new_round = results["size"]
+            #new_round_schedule = round_schedule + [new_round]
             #print("\t" + str(quant) + "\t" + str(new_round_schedule))
             round_candidate = results["size"]
             rounds.append(round_candidate)
@@ -586,3 +602,5 @@ class AthenaAudit():
 
         pos_l = [val for val in l if val > 0]
         return all(x <= (y + tol) for x, y in zip(pos_l, pos_l[1:]))
+
+
