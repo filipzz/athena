@@ -12,10 +12,12 @@ if __name__ == '__main__':
                 'There are two main use cases:\n' \
                 '\t(1) find out how many ballots need to be drawn at random to complete audit with e.g., 90%:\n' \
                 '\t\tpython -m athena --name contestName --ballots 5000 3000 --pstop .9\n' \
-                'where: --ballots 5000 3000 corresponds to number of ballots each canidate got, --pstop is the desired stopping probability' \
+                'where: --ballots 5000 3000 corresponds to number of ballots each candidate got, -' \
+                '-pstop is the desired stopping probability' \
                 '\t(2) when a certain number of ballots is drawn, evaluate the p-value:\n' \
                 '\t\tpython -m athena --name contestName --ballots 5000 3000 --rounds 120 --risk 70\n' \
-                'where --rounds 120 means that 120 relevant ballots were drawn and --risk 70 means that 70 of them were for the winner and one wants to evaluate the p-value'
+                'where --rounds 120 means that 120 relevant ballots were drawn and --risk 70 means that 70 of ' \
+                'them were for the winner and one wants to evaluate the p-value'
 
     parser = argparse.ArgumentParser(description=info_text)
     parser.add_argument("-v", "-V", "--version", help="shows program version", action="store_true")
@@ -26,13 +28,15 @@ if __name__ == '__main__':
                         help="Set logging level to debuglevel, expressed as an integer: "
                         "DEBUG=10, INFO=20, WARNING=30, ERROR=40, CRITICAL=50. "
                         "The default is %(default)s" )
-    parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+", type=int)
+    parser.add_argument("-e", "--risk", "--evaluate_risk", help="evaluate risk for given audit results", nargs="+",
+                        type=int)
     parser.add_argument("-f", "--file", help="read data from the file")
     parser.add_argument("-g", "--delta", help="set delta (upset limit) for the audit", type=float, default=1.0)
     parser.add_argument("-i", "--interactive", help="sets mode to interactive", const=1, default=0, nargs="?")
     parser.add_argument("-n", "--name", help="sets election name")
     parser.add_argument("-N", "--new", "--new", help="sets election name")
-    parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round (corresponding round schedule will be found)", nargs="+", type=float)
+    parser.add_argument("-p", "--pstop", help="set stopping probability goals for each round "
+                                              "(corresponding round schedule will be found)", nargs="+", type=float)
     parser.add_argument("-r", "--rounds", "--round_schedule", help="set the round schedule", nargs="+", type=int)
     parser.add_argument("-t", "--total", help="set the total number of ballots in given contest", type=int)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
@@ -44,6 +48,14 @@ if __name__ == '__main__':
 
     audit_type = "ATHENA"
     alpha = 0.1
+    mode = ""
+    ballots_cast = 0
+    candidates = []
+    results = []
+    contest_name = ""
+    winners = 1
+    mode_rounds = ""
+    name = ""
 
     if args.version:
         print("ATHENA version 0.5")
@@ -89,9 +101,8 @@ if __name__ == '__main__':
                     sys.exit(2)
             else:
                 ballots_cast = sum(results)
-        elif args.file and args.new:
+        elif args.file:
             file_name = args.file
-            contest_name = args.new
             mode = "read"
         else:
             print("Missing -b / --ballots argument")
@@ -172,11 +183,11 @@ if __name__ == '__main__':
 
     election = {}
     election["alpha"] = alpha
-    election["delta"] = delta
+    #election["delta"] = delta
     election["name"] = name
     election["model"] = model
-    election["pstop"] = pstop_goal
-    election["round_schedule"] = round_schedule
+    #election["pstop"] = pstop_goal
+    #election["round_schedule"] = round_schedule
     save_to = "elections/" + name
 
     if mode == "read":
