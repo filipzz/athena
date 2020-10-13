@@ -296,6 +296,7 @@ class AthenaAudit():
         if self.audit_type.lower() in {"athena", "bravo", "arlo"}:
             kmin_candidate = math.floor((.5 + p)/2 * round_candidate)
         else:
+            #TODO: find the correct lower bound for minerva/metis
             kmin_candidate = max(math.ceil(round_candidate / 2), math.floor((.5 + p)/2 * round_candidate) - 10)
 
         #TODO: verify upper limit
