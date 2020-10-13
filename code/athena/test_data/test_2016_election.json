@@ -1,7 +1,7 @@
 {
   "us" : {
     "contests" : {
-      "pres" : {
+      "presidential" : {
         "winners" : 1,
         "candidates" : ["Trump", "Clinton"],
         "results" : [62984828, 65853514],
@@ -568,26 +568,5 @@
         "ballots_cast" : 255849
       }
     }
-  },
-  "mercer2019" : {
-    "contests" : {
-      "contest1": {
-        "winners": 1,
-        "candidates": ["yes", "no"],
-        "results": [15038, 5274],
-        "ballots_cast": 23662
-      }
-    }
-  },
-  "mercer2019a" : {
-    "contests" : {
-      "contestNoScalling": {
-        "winners": 1,
-        "candidates": ["yes", "no"],
-        "results": [15038, 5274],
-        "ballots_cast": 20312
-      }
-    }
   }
-
 }

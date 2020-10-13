@@ -1,0 +1,184 @@
+{
+    "next_round_size" : {
+        "testDC10athena": {
+            "audit_type": "athena",
+            "election": "DistrictofColumbia",
+            "contest": "presidential",
+            "alpha": 0.1,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [4, 7, 7]
+            }
+        },
+        "testDC10minerva": {
+            "audit_type": "minerva",
+            "election": "DistrictofColumbia",
+            "contest": "presidential",
+            "alpha": 0.1,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [4, 7, 7]
+            }
+        },
+        "testDC10arlo": {
+            "audit_type": "arlo",
+            "election": "DistrictofColumbia",
+            "contest": "presidential",
+            "alpha": 0.1,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [4, 9, 14]
+            }
+        },
+        "testDC5athena": {
+            "audit_type": "athena",
+            "election": "DistrictofColumbia",
+            "contest": "presidential",
+            "alpha": 0.05,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [5, 8, 8]
+            }
+        },
+        "testDC5minerva": {
+            "audit_type": "minerva",
+            "election": "DistrictofColumbia",
+            "contest": "presidential",
+            "alpha": 0.05,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [5, 8, 8]
+            }
+        },
+        "testDC5arlo": {
+            "audit_type": "arlo",
+            "election": "DistrictofColumbia",
+            "contest": "presidential",
+            "alpha": 0.05,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [10, 10, 15]
+            }
+        },
+        "testArk5ath": {
+            "audit_type": "athena",
+            "election": "Arkansas",
+            "contest": "presidential",
+            "alpha": 0.05,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [75, 83, 113]
+            }
+        },
+        "testArk5min": {
+            "audit_type": "minerva",
+            "election": "Arkansas",
+            "contest": "presidential",
+            "alpha": 0.05,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [75, 83, 113]
+            }
+        },
+        "testArk5arl": {
+            "audit_type": "arlo",
+            "election": "Arkansas",
+            "contest": "presidential",
+            "alpha": 0.05,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [113, 143, 200]
+            }
+        },
+        "testArk10ath": {
+            "audit_type": "athena",
+            "election": "Arkansas",
+            "contest": "presidential",
+            "alpha": 0.1,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [52, 62, 86]
+            }
+        },
+        "testArk10min": {
+            "audit_type": "minerva",
+            "election": "Arkansas",
+            "contest": "presidential",
+            "alpha": 0.1,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [52, 62, 86]
+            }
+        },
+        "testArk10arl": {
+            "audit_type": "arlo",
+            "election": "Arkansas",
+            "contest": "presidential",
+            "alpha": 0.1,
+            "quants": [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates": [89, 120, 176]
+            }
+        },
+        "testCol10ath" : {
+            "audit_type": "athena",
+            "election" : "Colorado",
+            "contest" : "contest1",
+            "alpha" : 0.1,
+            "quants" : [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates" : [1417, 1756, 2421]
+            }
+        },
+        "testCol10min" : {
+            "audit_type": "minerva",
+            "election" : "Colorado",
+            "contest" : "contest1",
+            "alpha" : 0.1,
+            "quants" : [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates" : [1417, 1756, 2421]
+            }
+        },
+        "testCol10arlo" : {
+            "audit_type": "arlo",
+            "election" : "Colorado",
+            "contest" : "contest1",
+            "alpha" : 0.1,
+            "quants" : [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates" : [2603, 3434, 4981]
+            }
+        },
+        "testCol5ath" : {
+            "audit_type": "athena",
+            "election" : "Colorado",
+            "contest" : "contest1",
+            "alpha" : 0.05,
+            "quants" : [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates" : [1939, 2342, 3098]
+            }
+        },
+        "testCol5min" : {
+            "audit_type": "minerva",
+            "election" : "Colorado",
+            "contest" : "contest1",
+            "alpha" : 0.05,
+            "quants" : [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates" : [1939, 2342, 3098]
+            }
+        },
+        "testCol5arlo" : {
+            "audit_type": "arlo",
+            "election" : "Colorado",
+            "contest" : "contest1",
+            "alpha" : 0.05,
+            "quants" : [0.7, 0.8, 0.9],
+            "expected": {
+                "round_candidates" : [3178, 4053, 5650]
+            }
+        }
+    }
+}

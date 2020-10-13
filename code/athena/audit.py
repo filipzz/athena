@@ -46,7 +46,8 @@ class Audit():
     def __repr__(self):
         return f'audit type: {self.audit_type}\n' \
                f'alpha: {self.alpha}\n' \
-               f'observations: {self.audit_observations}\n' \
+               f'round_schedule: {self.round_schedule}\n' \
+               f'observations: {self.observations}\n' \
                f'status: {self.status!r}'
 
     def read_election_results(self, url):
@@ -614,3 +615,38 @@ class Audit():
         #return df.style.set_properties(subset = pd.IndexSlice[self.election.contests[contest_name].winners, :], **{'color' : 'blue'})
         self.data_frame[contest_name] = df.style.set_properties(subset = pd.IndexSlice[self.election.contests[contest_name].winners, :], **{'color' : 'blue'})
         return self.data_frame[contest_name]
+
+    def set_ele(self, results):
+        election = {}
+        # election["alpha"] = risk_limit
+        # election["delta"] = 1.0
+        election["name"] = "x"
+        contest_name = "x"
+        # election["round_schedule"] = round_schedule
+        ballots_cast = sum(results)
+        # election["ballots_cast"] = ballots_cast
+        election["total_ballots"] = ballots_cast
+        candidates = ["A", "B"]
+        # results = {1981473, 95369}
+        tally = {}
+        for can, votes in zip(candidates, results):
+            tally[can] = votes
+
+        # tallyj = json.dumps(tally)
+        # election["contests"] = f'{{"{contest_name}": {{"contest_ballots": {ballots_cast}, "tally": {tallyj}, "num_winners": {winners}, "reported_winners": ["A"]}} }}'
+        # election["data"] = f'{{"name": "x", "total_ballots": {ballots_cast}, "contests" : {election["contests"]}}}'
+        election["contests"] = {contest_name: {"contest_ballots": ballots_cast, "tally": tally, "num_winners": 1,
+                                               "reported_winners": ["A"]}}
+        election["data"] = {"name": "x", "total_ballots": ballots_cast, "contests": election["contests"]}
+        # print(election["contests"])
+        # json.loads(election["contests"])
+        # print(election["data"])
+        # print(election["data"])
+        election["candidates"] = candidates
+        election["results"] = results
+        # election["winners"] = ["A"]
+        # election_object = Contest(election["data"])
+        # return election_object
+        # print(str(election))
+        return election
+

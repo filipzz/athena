@@ -1,0 +1,7 @@
+{
+  "test1":
+  {
+    "election_file" : "test_data/test_2016_election.json",
+    "audit_file" : "test_data/test_2016_audit_next_round.json"
+  }
+}

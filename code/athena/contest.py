@@ -4,8 +4,8 @@ import json
 import requests
 from urllib import parse
 
-class Contest():
 
+class Contest:
 
     def __init__(self, contest = None):
         self.ballots_cast = 0 # to be removed -> contest_ballots
@@ -25,10 +25,6 @@ class Contest():
         self.data = None
         self.contest_type = ""
         if contest is not None:
-            #print(contest)
-            #if "contest_ballots" in contest:
-            #    self.ballots_cast = contest["contest_ballots"]
-            #    self.contest_ballots = contest["contest_ballots"]
 
             if "candidates" in contest: # to be removed
                 self.candidates = contest["candidates"]
@@ -55,8 +51,6 @@ class Contest():
 
             if "reported_winners" in contest:
                 self.reported_winners = contest["reported_winners"]
-
-
 
             if "contest_type" in contest:
                 self.contest_type = contest["contest_type"]
@@ -85,7 +79,6 @@ class Contest():
             raise Exception("Can't read the file")
         self.ballots_cast = self.data["total_ballots"]
 
-
     def load_contest_data(self, contest, data = None):
 
         if data is not None:
@@ -106,8 +99,6 @@ class Contest():
 
         self.find_winners()
 
-
-
     def find_winners(self):
         if len(self.results) > 0:
             self.min_to_win = min(heapq.nlargest(self.winners, self.results)) # this is the min number of votes to get to be a winner
@@ -127,8 +118,6 @@ class Contest():
             if len(self.declared_winners) > self.winners:
                 raise ValueError("Too many winners")
 
-
-
     def print_election(self):
         #print("Results of: " + self.name)
         #print("Number of contest ballots: " + str(self.print_number(self.ballots_cast)))
@@ -137,7 +126,6 @@ class Contest():
                 print("\t%s* %s\t%s" % (i, candidate, self.print_number(ballots)))
             else:
                 print("\t%s %s\t%s" % (i, candidate, self.print_number(ballots)))
-
 
     def print_election_info(self):
         print("Number of valid ballots: " + str(self.ballots_cast))
