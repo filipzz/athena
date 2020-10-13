@@ -186,7 +186,7 @@ class AthenaAudit():
         :param delta: (float 0<delta<1) risk limit for Wald's test
         :return:
         """
-        bkm = min(math.ceil(math.log(delta * pow(1 - margin, sample_size), (1-margin)/(1+margin))), sample_size + 1)
+        bkm = math.ceil(math.log(delta * math.pow(1 - margin, sample_size), (1-margin)/(1+margin)))
         #if bkm > sample_size:
         #    return 0
         #else:
@@ -218,6 +218,7 @@ class AthenaAudit():
         prob_tied_sum = [0] * number_of_rounds
         deltas = [0] * number_of_rounds
 
+        print(str(round_schedule))
 
 
         for round in range(1, number_of_rounds):
@@ -228,6 +229,7 @@ class AthenaAudit():
             kmin_candidate = math.floor(round_schedule[round]/2)
 
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
+                print("\t" + str(kmin_candidate))
                 if self.check_delta * self.delta * prob_table[kmin_candidate] >= self.check_delta * prob_tied_table[kmin_candidate] \
                         and self.check_sum * self.alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + self.check_memory * prob_sum[round - 1]) >= \
                             self.check_sum * (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + self.check_memory * prob_tied_sum[round - 1]):
@@ -288,55 +290,66 @@ class AthenaAudit():
         prob_table_tied = fftconvolve(self.prob_distribution_tied, draws_dist_tied)
 
         kmin_found = False
-        kmin = 0
 
         #TODO: verify lower limit
         #kmin_candidate = math.floor(round_candidate / 2)
-        if self.audit_type.lower() in {"athena"}:
+        if self.audit_type.lower() in {"athena", "bravo", "arlo"}:
             kmin_candidate = math.floor((.5 + p)/2 * round_candidate)
-        elif self.audit_type.lower() in {"bravo", "arlo"}:
-            kmin_candidate = math.floor(p * round_candidate) - 2
         else:
-            kmin_candidate = math.ceil(round_candidate / 2)
+            kmin_candidate = max(math.ceil(round_candidate / 2), math.floor((.5 + p)/2 * round_candidate) - 10)
 
         #TODO: verify upper limit
-        while kmin_found is False and kmin_candidate <= math.ceil((1+2 * margin) * round_candidate/2):
+        while kmin_found is False and kmin_candidate <= math.ceil((1+2 * margin) * round_candidate/2) and kmin_candidate <= new_round_schedule[-1]:
             if self.check_delta * self.delta * prob_table[kmin_candidate] >= self.check_delta * prob_table_tied[kmin_candidate] \
                     and self.check_sum * self.alpha * (sum(prob_table[kmin_candidate:]) + self.check_memory * sum(self.pstop_round)) >= \
                     self.check_sum * (sum(prob_table_tied[kmin_candidate:]) + self.check_memory * sum(self.pstop_tied_round)):
-                print("%s %s" % (prob_table[kmin_candidate], prob_table_tied[kmin_candidate]))
                 kmin_found = True
             else:
-                print("failed: " + str(kmin_candidate))
                 kmin_candidate = kmin_candidate + 1
 
+        if kmin_found:
+            if prob_table[kmin_candidate] > 0:
+                delta = prob_table_tied[kmin_candidate]/prob_table[kmin_candidate]
+            else:
+                delta = None
+            return {
+                "kmin": kmin_candidate,
+                "prob_stop": sum(prob_table[kmin_candidate:]),
+                "prob_stop_tied": sum(prob_table_tied[kmin_candidate:]),
+                "prob_kmin": prob_table[kmin_candidate],
+                "prob_kmin_tied": prob_table_tied[kmin_candidate],
+                "delta": delta,
+                "alpha": sum(prob_table_tied[kmin_candidate:])/sum(prob_table[kmin_candidate:])
+            }
+        else:
+            return {
+                "kmin": None,
+                "prob_stop": 0.0,
+                "prob_stop_tied": 0.0,
+                "prob_kmin": None,
+                "prob_kmin_tied": None,
+                "delta": None,
+                "alpha": None
+            }
 
-        return {
-            "kmin": kmin_candidate,
-            "prob_stop": sum(prob_table[kmin_candidate:]),
-            "prob_stop_tied": sum(prob_table_tied[kmin_candidate:]),
-            "prob_kmin": prob_table[kmin_candidate],
-            "prob_kmin_tied": prob_table_tied[kmin],
-            "delta": prob_table_tied[kmin]/prob_table[kmin_candidate],
-            "alpha": sum(prob_table_tied[kmin_candidate:])/sum(prob_table[kmin_candidate:])
-        }
 
     def find_stopping_probability(self, margin, new_round_schedule, prob_table_prev):
-        round_candidate = new_round_schedule[-1]
-        if len(new_round_schedule) > 1:
-            round_size_prev = new_round_schedule[-2]
-        else:
-            round_size_prev = 0
-        p = (1+margin)/2
+        #round_candidate = new_round_schedule[-1]
+        #if len(new_round_schedule) > 1:
+        #    round_size_prev = new_round_schedule[-2]
+        #else:
+        #    round_size_prev = 0
+        #p = (1+margin)/2
 
-        draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
-        prob_table = fftconvolve(prob_table_prev, draws_dist)
-        result = self.audit(margin, new_round_schedule)
-        kmin = result["kmins"][-1]
-        #result = self.find_next_round_kmin(margin, new_round_schedule)
+
+        #draws_dist = binom.pmf(range(0, (round_candidate - round_size_prev) + 1), (round_candidate - round_size_prev), p)
+        #prob_table = fftconvolve(prob_table_prev, draws_dist)
+        #result = self.audit(margin, new_round_schedule)
+        #kmin = result["kmins"][-1]
+        #stopping_probability = sum(prob_table[kmin:])
+        result = self.find_next_round_kmin(margin, new_round_schedule)
         #kmin = result["kmin"]
-        #print(str(round_candidate) + "\t" + str(result))
-        stopping_probability = sum(prob_table[kmin:])
+        stopping_probability = result["prob_stop"]
         return stopping_probability
 
 
@@ -383,23 +396,24 @@ class AthenaAudit():
 
 
         if len(round_schedule) > 0:
-            round_candidate = round_schedule[-1] + math.floor(( round_max)/2)
+            round_candidate = round_schedule[-1] + math.floor((round_max)/2)
         else:
             round_candidate = math.floor((round_max)/2)
 
         round_min_found = False
 
 
-        while round_min_found is False:
+        while round_min_found is False and round_max > 1:
             new_round_schedule = round_schedule + [round_candidate]
             stopping_probability = self.find_stopping_probability(margin, new_round_schedule, prob_table_prev)
-            #print(str(round_candidate))
             if stopping_probability >= quant:
                 round_max = round_candidate
                 if len(round_schedule) > 0:
                     round_candidate = round_schedule[-1] + math.floor((round_max - round_schedule[-1])/2)
+                elif round_max > 30:
+                    round_candidate = math.ceil((round_max)/2)
                 else:
-                    round_candidate = math.floor((round_max)/2)
+                    round_candidate = round_max - 1
             else:
                 round_min = round_candidate
                 round_min_found = True
@@ -414,7 +428,6 @@ class AthenaAudit():
         # * it may(?)  be slightly below the quant (because of non-monotonicity)
         while True:
             round_candidate = round((round_max + round_min)/2)
-            #print("%s < %s < %s" % (round_min, round_candidate, round_max))
             new_round_schedule = round_schedule + [round_candidate]
             stopping_probability = self.find_stopping_probability(margin, new_round_schedule, prob_table_prev)
 
@@ -469,8 +482,6 @@ class AthenaAudit():
         rounds = []
         prob_stop = []
         for quant in quants:
-            #print("\n\tstarting for: " + str(quant))
-            #print("\tround schedule: " + str(round_schedule))
             if len(round_schedule) > 0:
                 results = self.find_next_round_size(margin, round_schedule, quant, round_schedule[-1] + 1, observations_i, observations_j)
             else:
@@ -567,7 +578,7 @@ class AthenaAudit():
 
 
 
-            if prob_table[kmins[round]] is not 0 and round < len(audit_observations):
+            if prob_table[kmins[round]] != 0 and round < len(audit_observations):
                 if prob_table[audit_observations[round]] > 0:
                     deltas.append(abs(prob_tied_table[audit_observations[round]] / prob_table[audit_observations[round]]))
                 else:
@@ -604,3 +615,25 @@ class AthenaAudit():
         return all(x <= (y + tol) for x, y in zip(pos_l, pos_l[1:]))
 
 
+class Athena(AthenaAudit):
+
+    def __init__(self, alpha):
+        AthenaAudit.__init__(self, "athena", alpha, 1.0)
+
+
+class Arlo(AthenaAudit):
+
+    def __init__(self, alpha):
+        AthenaAudit.__init__(self, "arlo", alpha, alpha)
+
+
+class Minerva(AthenaAudit):
+
+    def __init__(self, alpha):
+        AthenaAudit.__init__(self, "minerva", alpha, alpha)
+
+
+class Metis(AthenaAudit):
+
+    def __init__(self, alpha):
+        AthenaAudit.__init__(self, "metis", alpha, alpha)
