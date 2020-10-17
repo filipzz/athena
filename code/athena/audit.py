@@ -21,6 +21,9 @@ class Status():
     def get_status(self):
         return self.audit_completed
 
+    def get_pval(self):
+        return self.risks[-1]
+
     def __repr__(self):
         return f"""{{"audit_passed": {self.audit_completed}, "min_kmins": {self.min_kmins}, "risks": {self.risks}, "round_number": {len(self.min_kmins)}}}"""
 
@@ -54,6 +57,9 @@ class Audit():
 
     def get_status(self, contest_name):
         return self.status[contest_name].get_status()
+
+    def get_pval(self, contest_name):
+        return self.status[contest_name].get_pval()
 
     def read_election_results(self, url):
         self.election_data_file = url

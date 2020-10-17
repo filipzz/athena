@@ -111,7 +111,6 @@ if __name__ == '__main__':
             print("Missing -b / --ballots argument")
             sys.exit(2)
 
-
         if args.candidates:
             candidates = args.candidates
             if len(args.candidates) != len(args.ballots):
@@ -127,9 +126,9 @@ if __name__ == '__main__':
             if args.rounds:
                 round_schedule = args.rounds
                 pstop_goal = []
-                #if max(round_schedule) > ballots_cast:
-                #    print("Round schedule is incorrect")
-                #    sys.exit(2)
+                if max(round_schedule) > ballots_cast:
+                    print("Round schedule is incorrect")
+                    sys.exit(2)
 
             mode_rounds = "pstop"
             pstop_goal = args.pstop
@@ -379,7 +378,7 @@ if __name__ == '__main__':
             #w.present_state()
             #print(w.status)
 
-        print(w.status)
+        print(w.get_pval(contest_name))
         #x = w.find_risk(actual_kmins)
         #x = w.find_risk()
         #print(str(x))
