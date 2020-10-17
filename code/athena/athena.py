@@ -154,41 +154,6 @@ class AthenaAudit():
         return prob_table
 
 
-    def athena(self, margin, round_schedule):
-        """
-        Sets audit_type to **athena** and calls audit(...) method
-        """
-        return self.audit("athena", margin, round_schedule)
-
-    def metis(self, margin, round_schedule):
-        """
-        Sets audit_type to **metis** and calls audit(...) method
-        """
-        return self.audit("metis", margin, round_schedule)
-
-    def minerva(self, margin, round_schedule):
-        """
-        Sets audit_type to **minerva** and calls audit(...) method
-        """
-        return self.audit("minerva", margin, round_schedule)
-
-    def bravo(self, margin, round_schedule):
-        """
-        Function simply calls athena(...) method but as a round schedule a list of [1, 2, 3, ..., max] is given.
-        For more info, see athena(...) method.
-
-        Parameters
-        ----------
-        :param round_schedule: is a list of increasing natural numbers that correspond to number of relevant votes drawn
-        """
-        return self.athena(margin, list(range(1, round_schedule[-1] + 1)))
-
-    def arlo(self, margin, round_schedule):
-        """
-        Sets audit type to **arlo** and calls audit(...) method
-        """
-        return self.audit("arlo", margin, round_schedule)
-
 
     def wald_k_min(self, sample_size, margin, delta):
         """
