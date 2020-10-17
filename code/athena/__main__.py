@@ -3,8 +3,11 @@ import argparse
 import string
 import logging
 import json
+import math
+
 from athena.contest import Contest
 from athena.audit import Audit
+from athena.athena import AthenaAudit
 
 if __name__ == '__main__':
 
@@ -124,9 +127,9 @@ if __name__ == '__main__':
             if args.rounds:
                 round_schedule = args.rounds
                 pstop_goal = []
-                if max(round_schedule) > ballots_cast:
-                    print("Round schedule is incorrect")
-                    sys.exit(2)
+                #if max(round_schedule) > ballots_cast:
+                #    print("Round schedule is incorrect")
+                #    sys.exit(2)
 
             mode_rounds = "pstop"
             pstop_goal = args.pstop
@@ -226,7 +229,9 @@ if __name__ == '__main__':
 
         #print("Candidates: ", candidates)
 
-        election_object = Contest(election["data"])
+        election_object = Contest(election)
+        #election_object.load_contest_data("x", election["data"])
+
         #tools.print_election(election)
 
     #for election[""]
@@ -238,9 +243,16 @@ if __name__ == '__main__':
     #print("Round schedule: " + str(round_schedule))
 
     if mode_rounds == "rounds":
+        #w = Audit(audit_type, alpha)
+        #w.add_election(w.set_ele())
+        #print(str(election))
+        #print(election_object)
+
+        w = AthenaAudit(audit_type.lower(), alpha, delta)
+        #print(str(w))
         #for i in range(len(candidates)):
-        print("option temporary unavailable")
-        """ # temporary commented out
+        #print("option temporary unavailable")
+        """ # temporary commented out """
         for i in election_object.declared_winners:
             ballots_i = results[i]
             candidate_i = candidates[i]
@@ -261,17 +273,10 @@ if __name__ == '__main__':
 
                 margin = (2 * winner - bc)/bc
 
-                audit_object = AthenaAudit()
-                if audit_type.lower() in {"bravo", "wald"}:
-                    audit_athena = audit_object.bravo(margin, alpha, rs)
-                elif audit_type.lower() == "arlo":
-                    audit_athena = audit_object.arlo(margin, alpha, rs)
-                elif audit_type.lower() == "minerva":
-                    audit_athena = audit_object.minerva(margin, alpha, rs)
-                elif audit_type.lower() == "metis":
-                    audit_athena = audit_object.metis(margin, alpha, delta, rs)
-                else:
-                    audit_athena = audit_object.athena(margin, alpha, delta, rs)
+                audit_object = AthenaAudit(audit_type.lower(), alpha, delta)
+                audit_athena = audit_object.audit(margin, rs)
+
+                #print(str(audit_object))
                 kmins = audit_athena["kmins"]
                 prob_sum = audit_athena["prob_sum"]
                 prob_tied_sum = audit_athena["prob_tied_sum"]
@@ -300,7 +305,7 @@ if __name__ == '__main__':
                     else:
                         true_risk.append(pt/p)
                 print("\t%s ratio:\t%s" % (audit_type, str(true_risk)))
-            """
+            """ """
 
     elif mode_rounds == "pstop":
 

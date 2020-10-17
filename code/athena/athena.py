@@ -58,6 +58,8 @@ class AthenaAudit():
             self.delta = self.alpha
         self.set_checks(audit_type)
 
+        self.margin = 0.0
+
         """Storing information about the probability distribution in the previous round of an audit"""
         self.prob_distribution_margin = [1.0]
         self.prob_distribution_tied = [1.0]
@@ -65,6 +67,16 @@ class AthenaAudit():
         """Storing information about the probabilities of stopping in a given round"""
         self.pstop_round = [0.0]
         self.pstop_tied_round = [0.0]
+
+    def __repr__(self):
+        return f"""{{
+            "audit_type": {self.audit_type}, 
+            "alpha": {self.alpha},
+            "delta": {self.delta},
+            "margin": {self.margin},
+            "pstop_round": {self.pstop_round},
+            "pstop_tied_round": {self.pstop_tied_round}
+        }}"""
 
 
     def set_checks(self, audit_type):
@@ -142,25 +154,25 @@ class AthenaAudit():
         return prob_table
 
 
-    def athena(self, margin, alpha, delta, round_schedule):
+    def athena(self, margin, round_schedule):
         """
         Sets audit_type to **athena** and calls audit(...) method
         """
-        return self.audit("athena", margin, alpha, delta, round_schedule)
+        return self.audit("athena", margin, round_schedule)
 
-    def metis(self, margin, alpha, delta, round_schedule):
+    def metis(self, margin, round_schedule):
         """
         Sets audit_type to **metis** and calls audit(...) method
         """
-        return self.audit("metis", margin, alpha, delta, round_schedule)
+        return self.audit("metis", margin, round_schedule)
 
-    def minerva(self, margin, alpha, round_schedule):
+    def minerva(self, margin, round_schedule):
         """
         Sets audit_type to **minerva** and calls audit(...) method
         """
-        return self.audit("minerva", margin, alpha, alpha, round_schedule)
+        return self.audit("minerva", margin, round_schedule)
 
-    def bravo(self, margin, alpha, round_schedule):
+    def bravo(self, margin, round_schedule):
         """
         Function simply calls athena(...) method but as a round schedule a list of [1, 2, 3, ..., max] is given.
         For more info, see athena(...) method.
@@ -169,13 +181,13 @@ class AthenaAudit():
         ----------
         :param round_schedule: is a list of increasing natural numbers that correspond to number of relevant votes drawn
         """
-        return self.athena(margin, alpha, alpha, list(range(1, round_schedule[-1] + 1)))
+        return self.athena(margin, list(range(1, round_schedule[-1] + 1)))
 
-    def arlo(self, margin, alpha, round_schedule):
+    def arlo(self, margin, round_schedule):
         """
         Sets audit type to **arlo** and calls audit(...) method
         """
-        return self.audit("arlo", margin, alpha, alpha, round_schedule)
+        return self.audit("arlo", margin, round_schedule)
 
 
     def wald_k_min(self, sample_size, margin, delta):
@@ -218,7 +230,7 @@ class AthenaAudit():
         prob_tied_sum = [0] * number_of_rounds
         deltas = [0] * number_of_rounds
 
-        print(str(round_schedule))
+        #print(str(round_schedule))
 
 
         for round in range(1, number_of_rounds):
@@ -229,7 +241,6 @@ class AthenaAudit():
             kmin_candidate = math.floor(round_schedule[round]/2)
 
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
-                print("\t" + str(kmin_candidate))
                 if self.check_delta * self.delta * prob_table[kmin_candidate] >= self.check_delta * prob_tied_table[kmin_candidate] \
                         and self.check_sum * self.alpha * (sum(prob_table[kmin_candidate:len(prob_table)]) + self.check_memory * prob_sum[round - 1]) >= \
                             self.check_sum * (sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + self.check_memory * prob_tied_sum[round - 1]):
@@ -313,6 +324,11 @@ class AthenaAudit():
                 delta = prob_table_tied[kmin_candidate]/prob_table[kmin_candidate]
             else:
                 delta = None
+
+            if sum(prob_table[kmin_candidate:]) > 0:
+                alpha = sum(prob_table_tied[kmin_candidate:])/sum(prob_table[kmin_candidate:])
+            else:
+                alpha = None
             return {
                 "kmin": kmin_candidate,
                 "prob_stop": sum(prob_table[kmin_candidate:]),
@@ -320,7 +336,7 @@ class AthenaAudit():
                 "prob_kmin": prob_table[kmin_candidate],
                 "prob_kmin_tied": prob_table_tied[kmin_candidate],
                 "delta": delta,
-                "alpha": sum(prob_table_tied[kmin_candidate:])/sum(prob_table[kmin_candidate:])
+                "alpha": alpha
             }
         else:
             return {
@@ -379,7 +395,7 @@ class AthenaAudit():
         #    round_max = math.ceil((18 * math.log(self.alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
         #else:
         #    round_max = 100000 # * ballots_cast
-        round_max = 100000
+        round_max = 1000000
         #upper_limit = 100000
         #round_max = upper_limit # * ballots_cast
 

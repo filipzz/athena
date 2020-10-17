@@ -18,6 +18,8 @@ class Status():
         self.audit_completed = False
         self.ballots_sampled = []
 
+    def get_status(self):
+        return self.audit_completed
 
     def __repr__(self):
         return f"""{{"audit_passed": {self.audit_completed}, "min_kmins": {self.min_kmins}, "risks": {self.risks}, "round_number": {len(self.min_kmins)}}}"""
@@ -49,6 +51,9 @@ class Audit():
                f'round_schedule: {self.round_schedule}\n' \
                f'observations: {self.observations}\n' \
                f'status: {self.status!r}'
+
+    def get_status(self, contest_name):
+        return self.status[contest_name].get_status()
 
     def read_election_results(self, url):
         self.election_data_file = url
@@ -157,11 +162,12 @@ class Audit():
             if x["passed"] == 1:
                 self.status[contest_name].audit_completed = True
                 logging.info("\n\n\tAudit Successfully completed!")
-                logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
+                #logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
+                logging.info("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
                 logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
             else:
                 logging.info("\n\n\tRound: %s audit failed" % (self.status[contest_name].round_number))
-                logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
+                #logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
                 logging.info("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
                 logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
                 logging.info("\tboth conditions are required to be satisfied.")
