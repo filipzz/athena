@@ -360,30 +360,35 @@ class AthenaAudit():
         #    round_max = math.ceil((18 * math.log(self.alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
         #else:
         #    round_max = 100000 # * ballots_cast
-        round_max = 1000000
+        round_max = 10000
         #upper_limit = 100000
         #round_max = upper_limit # * ballots_cast
 
-        round_size_prev = observations_i + observations_j
+        #round_size_prev = observations_i + observations_j
 
         prob_table_prev = [0] * (observations_i + 1)
         prob_table_prev[observations_i] = 1.0
-        new_round_schedule = round_schedule + [round_max]
-        stopping_probability_max = self.find_stopping_probability(margin, new_round_schedule, prob_table_prev)
 
-        if stopping_probability_max < quant:
-            logging.warning("FULL RECOUNT is suggested! (upper_limit = %s)" % (round_max))
-            logging.warning("Probability of stopping at: %s is %s" % (new_round_schedule, stopping_probability_max))
-            return {"size": round_max, "prob_stop": stopping_probability_max}
+        found_max = False
 
+        while found_max is False:
+            new_round_schedule = round_schedule + [round_max]
+            stopping_probability_max = self.find_stopping_probability(margin, new_round_schedule, prob_table_prev)
+
+            if stopping_probability_max < quant:
+                round_max = 2 * round_max
+                #    logging.warning("FULL RECOUNT is suggested! (upper_limit = %s)" % (round_max))
+                #    logging.warning("Probability of stopping at: %s is %s" % (new_round_schedule, stopping_probability_max))
+                #return {"size": round_max, "prob_stop": stopping_probability_max}
+            else:
+                found_max = True
 
         if len(round_schedule) > 0:
-            round_candidate = round_schedule[-1] + math.floor((round_max)/2)
+            round_candidate = round_schedule[-1] + math.floor(round_max/2)
         else:
-            round_candidate = math.floor((round_max)/2)
+            round_candidate = math.floor(round_max/2)
 
         round_min_found = False
-
 
         while round_min_found is False and round_max > 1:
             new_round_schedule = round_schedule + [round_candidate]
