@@ -40,12 +40,22 @@ def test_next_rounds():
             else:
                 w = Audit(info["audit_type"], info["alpha"])
 
-            w.add_election(elections[info["election"]]["contests"][info["contest"]])
+            #w.add_election(elections[info["election"]]["contests"][info["contest"]])
+            ele_info = elections[info["election"]]["contests"][info["contest"]]
+            print(str(ele_info["results"]))
+            print(str(ele_info["ballots_cast"]))
+            #w.add_election(w.set_ele(ele_info["results"], ele_info["ballots_cast"]))
+            contest = w.set_ele(ele_info["results"], ele_info["ballots_cast"])
+            print(str(contest))
+            w.add_contest(contest)
 
             if "round_schedule" in info:
                 w.add_round_schedule(info["round_schedule"])
                 w.add_observations(info["round_observations"])
 
+            x = w.predict_round_sizes(info["quants"])
+            print(str(w.election))
+            print(str(x))
             x = w.find_next_round_size(info["quants"])
             print(str(x))
 
@@ -118,7 +128,7 @@ def test_evaluate_risk():
             # TODO: check values of risk_goal/prob_stop
             #for rg_com, rg_exp in zip(risk_goal, expected_risk_expended):
             assert np.abs(x["delta"] - delta) < error_level, 's_w failed: got {}, expected {}'.format(x["delta"], delta)
-            assert np.abs(x["risk"] - pvalue) < error_level, 's_w failed: got {}, expected {}'.format(x["risk"], risk)
+            assert np.abs(x["risk"] - pvalue) < error_level, 's_w failed: got {}, expected {}'.format(x["risk"], pvalue)
 
             del w
 
