@@ -70,7 +70,7 @@
             "alpha": 0.05,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [75, 83, 113]
+                "round_candidates": [68, 83, 113]
             }
         },
         "testArk5min": {
@@ -80,7 +80,7 @@
             "alpha": 0.05,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [75, 83, 113]
+                "round_candidates": [68, 83, 113]
             }
         },
         "testArk5arl": {
@@ -90,7 +90,7 @@
             "alpha": 0.05,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [113, 143, 200]
+                "round_candidates": [106, 136, 190]
             }
         },
         "testArk10ath": {
@@ -100,7 +100,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [52, 62, 86]
+                "round_candidates": [54, 69, 86]
             }
         },
         "testArk10min": {
@@ -110,7 +110,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [52, 62, 86]
+                "round_candidates": [54, 69, 86]
             }
         },
         "testArk10arl": {
@@ -120,7 +120,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [89, 120, 176]
+                "round_candidates": [94, 117, 164]
             }
         },
         "testCol10ath" : {
@@ -130,7 +130,7 @@
             "alpha" : 0.1,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [1417, 1756, 2421]
+                "round_candidates" : [1431, 1801, 2423]
             }
         },
         "testCol10min" : {
@@ -140,7 +140,7 @@
             "alpha" : 0.1,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [1417, 1756, 2421]
+                "round_candidates" : [1431, 1801, 2423]
             }
         },
         "testCol10arlo" : {
@@ -150,7 +150,7 @@
             "alpha" : 0.1,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [2603, 3434, 4981]
+                "round_candidates" : [2618, 3434, 4938]
             }
         },
         "testCol5ath" : {
@@ -160,7 +160,7 @@
             "alpha" : 0.05,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [1939, 2342, 3098]
+                "round_candidates" : [1939, 2342, 3102]
             }
         },
         "testCol5min" : {
@@ -170,7 +170,7 @@
             "alpha" : 0.05,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [1939, 2342, 3098]
+                "round_candidates" : [1939, 2342, 3102]
             }
         },
         "testCol5arlo" : {
@@ -180,7 +180,7 @@
             "alpha" : 0.05,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [3178, 4053, 5650]
+                "round_candidates" : [3180, 4078, 5650]
             }
         }
     }
