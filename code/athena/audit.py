@@ -229,7 +229,7 @@ class Audit():
             logging.info("\tpairwise round schedule: " + str(rs))
             rescaled = []
             next_round_sizes = audit_object.find_next_round_sizes(margin, rs,
-                                                                  pstop_goals, observations_i, observations_j)
+                                                                  pstop_goals, observations_i)
             for k, pstop_goal, next_round, prob_stop in zip(range(len(pstop_goals)), pstop_goals, next_round_sizes["rounds"], next_round_sizes["prob_stop"]):
                 rs = [] + self.round_schedule
                 next_round_rescaled = math.ceil(next_round * scalling_ratio)
@@ -628,14 +628,19 @@ class Audit():
         self.data_frame[contest_name] = df.style.set_properties(subset = pd.IndexSlice[self.election.contests[contest_name].winners, :], **{'color' : 'blue'})
         return self.data_frame[contest_name]
 
-    def set_ele(self, results):
+    def set_ele(self, results, ballots_cast=None):
         election = {}
         # election["alpha"] = risk_limit
         # election["delta"] = 1.0
         election["name"] = "x"
         contest_name = "x"
         # election["round_schedule"] = round_schedule
-        ballots_cast = sum(results)
+        if ballots_cast is None:
+            ballots_cast = sum(results)
+        else:
+            if ballots_cast < sum(results):
+                Exception("wrong number of ballots cast")
+
         # election["ballots_cast"] = ballots_cast
         election["total_ballots"] = ballots_cast
         candidates = ["A", "B"]
@@ -644,11 +649,17 @@ class Audit():
         for can, votes in zip(candidates, results):
             tally[can] = votes
 
+
+        reported_winner = ["A"]
+
+        if results[1] > results[0]:
+            reported_winner = ["B"]
+
         # tallyj = json.dumps(tally)
         # election["contests"] = f'{{"{contest_name}": {{"contest_ballots": {ballots_cast}, "tally": {tallyj}, "num_winners": {winners}, "reported_winners": ["A"]}} }}'
         # election["data"] = f'{{"name": "x", "total_ballots": {ballots_cast}, "contests" : {election["contests"]}}}'
         election["contests"] = {contest_name: {"contest_ballots": ballots_cast, "tally": tally, "num_winners": 1,
-                                               "reported_winners": ["A"]}}
+                                               "reported_winners": reported_winner}}
         election["data"] = {"name": "x", "total_ballots": ballots_cast, "contests": election["contests"]}
         # print(election["contests"])
         # json.loads(election["contests"])

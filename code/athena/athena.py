@@ -335,7 +335,7 @@ class AthenaAudit():
         return stopping_probability
 
 
-    def find_next_round_size(self, margin, round_schedule, quant, round_min, observations_i, observations_j):
+    def find_next_round_size(self, margin, round_schedule, quant, round_min, observations_i):
         """
         For given audit parameters, computes the expected size of the next round.
 
@@ -346,7 +346,6 @@ class AthenaAudit():
         :param quant: desired probability of stopping in the next round
         :param round_min: min size of the next round
         :param observations_i: number of ballots drawn for the winner (so far) in the audit
-        :param observations_j: number of ballots drawn for the loser (so far) in the audit
         :return:
 
             * size - the size of the next round
@@ -395,7 +394,7 @@ class AthenaAudit():
                 if len(round_schedule) > 0:
                     round_candidate = round_schedule[-1] + math.floor((round_max - round_schedule[-1])/2)
                 elif round_max > 30:
-                    round_candidate = math.ceil((round_max)/2)
+                    round_candidate = round_max // 2
                 else:
                     round_candidate = round_max - 1
             else:
@@ -447,7 +446,7 @@ class AthenaAudit():
         return {"size": good_candidate, "prob_stop": good_pstop}
 
 
-    def find_next_round_sizes(self, margin, round_schedule, quants, observations_i, observations_j):
+    def find_next_round_sizes(self, margin, round_schedule, quants, observations_i):
         '''
         For a given list of possible stopping probabilities (called quants e.g., quants = [.7, .8, .9]) returns a list of
         next round sizes  for which probability of stoping is larger than quants
@@ -467,9 +466,9 @@ class AthenaAudit():
         prob_stop = []
         for quant in quants:
             if len(round_schedule) > 0:
-                results = self.find_next_round_size(margin, round_schedule, quant, round_schedule[-1] + 1, observations_i, observations_j)
+                results = self.find_next_round_size(margin, round_schedule, quant, round_schedule[-1] + 1, observations_i)
             else:
-                results = self.find_next_round_size(margin, round_schedule, quant, 1, observations_i, observations_j)
+                results = self.find_next_round_size(margin, round_schedule, quant, 1, observations_i)
 
             #new_round = results["size"]
             #new_round_schedule = round_schedule + [new_round]
