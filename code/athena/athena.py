@@ -341,10 +341,7 @@ class AthenaAudit():
 
         Parameters
         ----------
-        :param observations:
         :param margin: margin for that race
-        :param alpha: risk limit
-        :param delta: delta parameter
         :param round_schedule: round schedule
         :param quant: desired probability of stopping in the next round
         :param round_min: min size of the next round
