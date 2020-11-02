@@ -11,6 +11,16 @@
             "quants": [0.7, 0.8, 0.9],
             "expected": {
                 "round_candidates": [4, 7, 7]
+            },
+            "rounds": {
+                "1": {
+                    "ballots": 120,
+                    "relevant": 100,
+                    "observations": [55, 45],
+                    "expected": {
+                        "round_candidates": [200, 300, 400]
+                    }
+                }
             }
         },
         "testDC10minerva": {

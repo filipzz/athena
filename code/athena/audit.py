@@ -224,6 +224,8 @@ class Audit():
             margin = (2 * winner - bc)/bc
 
             audit_object = AthenaAudit(self.audit_type, self.alpha, self.delta)
+            #print("---------" + str(rs))
+            #audit_object.audit(margin, rs)
 
             #logging.info("\tpstop goals: " + str(pstop_goals))
             logging.info("\tpairwise round schedule: " + str(rs))
@@ -295,6 +297,7 @@ class Audit():
             margin = (2 * winner - bc)/bc
 
             audit_object = AthenaAudit(self.audit_type.lower(), self.alpha, self.delta)
+            #TODO: check this call
             audit_athena = audit_object.audit(margin, rs)
             '''
             if self.audit_type.lower() == "bravo" or self.audit_type.lower() == "wald":
