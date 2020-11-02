@@ -347,10 +347,12 @@ class AthenaAudit():
         #kmin = result["kmin"]
         #print("\n\n" + str(new_round_schedule))
         #print(str(result))
-        #print(str(self.pstop_round))
+        print("\n" + str(new_round_schedule))
+        print(str(self.pstop_round))
         #print(str(self.pstop_tied_round))
         #print(str(self.kmins))
         stopping_probability = result["prob_stop"] / (1 - self.pstop_round[-1])
+        print(str(stopping_probability))
         return stopping_probability
 
     def find_next_round_size(self, margin, round_schedule, quant, round_min, observations_i):
@@ -407,10 +409,13 @@ class AthenaAudit():
         while round_min_found is False and round_max > 1:
             new_round_schedule = round_schedule + [round_min]
             stopping_probability = self.find_stopping_probability(margin, new_round_schedule, prob_table_prev)
+            print("round_min hunt " + str(new_round_schedule) + " = " + str(stopping_probability))
             if stopping_probability >= quant:
                 return "problem"
-            else:
+            elif stopping_probability > 0.0 and stopping_probability < quant:
                 round_min_found = True
+            else:
+                round_min = round_min + 1
 
 
         # the main loop:
@@ -431,11 +436,27 @@ class AthenaAudit():
                 round_max = round_candidate
 
             # TODO: change "10" into something parametrized
-            if (0 < stopping_probability - quant < .0001) or round_max - round_min <= 1:
+            if (0 <= stopping_probability - quant <= .0001) or round_max - round_min <= 1:
                 round_candidate = round_max
                 new_round_schedule = round_schedule + [round_candidate]
                 stopping_probability = self.find_stopping_probability(margin, new_round_schedule, prob_table_prev)
                 break
+
+
+        # we found a point for which the inequalities are met
+        # but maybe we may go down a little bit... one by one:
+        while True:
+            round_candidate = round_candidate - 1
+            new_round_schedule = round_schedule + [round_candidate]
+            stopping_probability = self.find_stopping_probability(margin, new_round_schedule, prob_table_prev)
+
+            if stopping_probability <= quant:
+                break
+            else:
+                good_candidate = round_candidate
+                good_pstop = stopping_probability
+
+
 
         good_candidate = round_candidate
         good_pstop = stopping_probability #prob_table[-1]
@@ -504,10 +525,11 @@ class AthenaAudit():
         for audit_k, actual_k in zip(audit_kmins, actual_kmins):
             if audit_k <= actual_k and audit_k > 0:
                 test_passed = 1
+            print("\t%s %s %s" % (audit_k, actual_k, test_passed))
 
         for i in range(len(actual_kmins)-1):
             if rewrite_on == 1:
-                if audit_kmins[i] <= actual_kmins[i]:
+                if audit_kmins[i] > 0 and audit_kmins[i] <= actual_kmins[i]:
                     kmins_goal_real.append(actual_kmins[i])
                     rewrite_on = 0
                 else:
@@ -515,6 +537,10 @@ class AthenaAudit():
 
         if rewrite_on == 1:
             kmins_goal_real.append(actual_kmins[len(actual_kmins)-1])
+
+        print(str(audit_kmins))
+        print(str(actual_kmins))
+        print(str(kmins_goal_real))
 
         return {"kmins" : kmins_goal_real, "passed": test_passed}
 
