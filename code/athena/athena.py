@@ -525,7 +525,7 @@ class AthenaAudit():
         for audit_k, actual_k in zip(audit_kmins, actual_kmins):
             if audit_k <= actual_k and audit_k > 0:
                 test_passed = 1
-            print("\t%s %s %s" % (audit_k, actual_k, test_passed))
+            #print("\t%s %s %s" % (audit_k, actual_k, test_passed))
 
         for i in range(len(actual_kmins)-1):
             if rewrite_on == 1:
@@ -538,14 +538,97 @@ class AthenaAudit():
         if rewrite_on == 1:
             kmins_goal_real.append(actual_kmins[len(actual_kmins)-1])
 
-        print(str(audit_kmins))
-        print(str(actual_kmins))
-        print(str(kmins_goal_real))
-
-        return {"kmins" : kmins_goal_real, "passed": test_passed}
+        return {"kmins": kmins_goal_real, "passed": test_passed}
 
 
     def estimate_risk(self, margin, kmins, round_schedule, audit_observations):
+        """
+        Parameters
+        ----------
+        :param kmins: list of kmins
+        :param round_schedule: is a list of increasing natural numbers that correspond to number of relevant votes drawn
+        :return:
+            * prob_tied_sum - list of stopping probabilities for tied elections (risk)
+        """
+
+
+
+        round_schedule = [0] + round_schedule
+        kmins = [0] + kmins
+        audit_observations = [0] + audit_observations
+        number_of_rounds = min(len(audit_observations), len(round_schedule))
+        prob_table_prev = [1]
+        prob_sum = [0] * number_of_rounds
+        prob_tied_table_prev = [1]
+        prob_tied_sum = [0] * number_of_rounds
+        audit_round_pstop = [0] * number_of_rounds
+        audit_round_risk = [1.0] * number_of_rounds
+        audit_ratio = [0] * number_of_rounds
+        pvalue = [1.0] * number_of_rounds
+
+        deltas = []#0] * (number_of_rounds + 1)
+
+        for round in range(1, number_of_rounds):
+            #print("round: %s (%s)" % (round, kmins[round]))
+            prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], prob_table_prev)
+            prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], prob_tied_table_prev)
+
+            if kmins[round] > 0:
+                prob_sum[round] = sum(prob_table[kmins[round]:len(prob_table)]) + prob_sum[round - 1]
+                prob_tied_sum[round] = sum(prob_tied_table[kmins[round]:len(prob_tied_table)]) + prob_tied_sum[round - 1]
+
+                audit_round_pstop[round] = sum(prob_table[audit_observations[round]:len(prob_table)])
+                audit_round_risk[round] = sum(prob_tied_table[audit_observations[round]:len(prob_tied_table)])
+                #if audit_round_pstop[round] > 0:
+                #    audit_ratio[round] = audit_round_risk[round] / audit_round_pstop[round]
+                #else:
+                #    audit_ratio[round] = 0.0
+
+                if round < len(audit_observations) - 1:
+                    pvalue[round] = prob_tied_sum[round] / prob_sum[round]
+                else:
+                    pvalue[round] = (prob_tied_sum[round - 1] + sum(prob_tied_table[audit_observations[round]:])) / (prob_sum[round - 1] + sum(prob_table[audit_observations[round]:]))
+
+            if round < len(audit_observations):
+                deltas.append(1.0)
+                if prob_table[round] > 0:
+                    audit_ratio[round] = sum(prob_tied_table[kmins[round]:]) /sum(prob_table[kmins[round]:])
+                else:
+                    audit_ratio[round] = 0.0
+            else:
+                audit_ratio[round] = sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
+
+            # cleaning prob_table/prob_tied_table
+            if kmins[round] > 0:
+                for i in range(kmins[round], round_schedule[round] + 1):
+                    prob_table[i] = 0
+                    prob_tied_table[i] = 0
+
+
+            prob_table_prev = prob_table
+            prob_tied_table_prev = prob_tied_table
+
+
+        ratio = []
+        for i, p, pt in zip(range(len(prob_sum)), prob_sum[1:len(prob_sum)], prob_tied_sum[1:len(prob_tied_sum)]):
+            if p > 0:
+                ratio.append(pt / p)
+            else:
+                ratio.append(0)
+
+        #print("pvalue: " + str(pvalue[1:]))
+
+        return {
+            "pvalue": pvalue,
+            "prob_sum": prob_sum[1:len(prob_sum)],
+            "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)],
+            "audit_ratio": pvalue[1:len(audit_ratio)],
+            "ratio": ratio,
+            "deltas": deltas
+        }
+
+
+    def estimate_risk_old(self, margin, kmins, round_schedule, audit_observations):
         """
         Parameters
         ----------

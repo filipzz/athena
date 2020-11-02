@@ -317,12 +317,16 @@ class Audit():
             #self.audit_kmins = audit_athena["kmins"]
             pairwise_audit_kmins = audit_athena["kmins"]
 
+            #print(str(audit_object.prob_distribution_margin))
+            #print(str(audit_object.prob_distribution_tied))
+
             logging.info(str(audit_athena))
 
             #test_info = audit_object.find_kmins_for_risk(self.audit_kmins, self.audit_observations[winner_pos])
             #test_info = audit_object.find_kmins_for_risk(pairwise_audit_kmins, self.audit_observations[winner_pos])
             test_info = audit_object.find_kmins_for_risk(pairwise_audit_kmins, self.observations[contest_name][winner_pos])
 
+            #print(str(test_info))
             logging.info("find_kmins_for_risk")
             logging.info(str(test_info))
 
@@ -346,6 +350,7 @@ class Audit():
             #w = audit_object.estimate_risk(margin, test_info["kmins"], self.round_schedule, audit_observations)
             #w = audit_object.estimate_risk(margin, self.audit_kmins, self.round_schedule, audit_observations)
             #w = audit_object.estimate_risk(margin, pairwise_audit_kmins, rs, self.audit_observations[winner_pos])
+            #print("pairwise kmins: " + str(pairwise_audit_kmins))
             w = audit_object.estimate_risk(margin, pairwise_audit_kmins, rs, self.observations[contest_name][winner_pos])
             #logging.info(str(w))
             #ratio = w["ratio"]
