@@ -2,6 +2,7 @@ import logging
 from scipy.stats import binom
 from scipy.signal import fftconvolve
 from math import log, ceil, floor
+import sys
 
 
 class AthenaAudit():
@@ -260,7 +261,7 @@ class AthenaAudit():
     def find_next_round_kmin(self, margin, new_round_schedule):
         """For a given new_round_schedule finds the kmin for the last round."""
         """Uses binary search to find kmin"""
-        #print("\n\tFind next round kmins" + str(new_round_schedule))
+        #print("\n\tFind next round kmins for %s (margin: %s)" % (new_round_schedule, margin))
         # print("\t\t" + str(self.kmins))
         # print("\t\t" + str(self.prob_distribution_tied))
         # print("\t\t" + str(self.prob_distribution_margin))
@@ -301,17 +302,16 @@ class AthenaAudit():
             #if self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] \
             #        and self.check_sum * self.alpha * (sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= \
             #        self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round)):
-            #check_mid = self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] and self.check_sum * self.alpha * (
-            #            sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round))
-            #check_kmin = self.check_delta * self.delta * prob_table[mid-1] >= self.check_delta * prob_table_tied[mid-1] and self.check_sum * self.alpha * (
-            #            sum(prob_table[mid-1:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid-1:]) + self.check_memory * sum(self.pstop_tied_round))
-            check_mid = self.check_sum * self.alpha * (
+            check_mid = self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] and self.check_sum * self.alpha * (
                         sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round))
-            check_kmin = self.check_sum * self.alpha * (
-                        sum(prob_table[mid-1:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid-1:]) + self.check_memory * sum(self.pstop_tied_round))
+            check_kmin = self.check_delta * self.delta * prob_table[mid-1] >= self.check_delta * prob_table_tied[mid-1] and self.check_sum * self.alpha * (
+                       sum(prob_table[mid-1:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid-1:]) + self.check_memory * sum(self.pstop_tied_round))
+            #check_mid = self.check_sum * self.alpha * (sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round))
+            #check_kmin = self.check_sum * self.alpha * (sum(prob_table[mid-1:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid-1:]) + self.check_memory * sum(self.pstop_tied_round))
+
 
             if check_mid and not check_kmin:
-                #print("\t\t\tmid + not kmin")
+                #print("\t\t\tmid + not kmin -> kmin found at %s" % (mid))
                 """kmin found: holds for mid but not for mid-1"""
                 kmin_found = True
                 kmin_candidate = mid
@@ -322,10 +322,12 @@ class AthenaAudit():
                 mid = (left + right) // 2
             elif not check_mid:
                 #print("\t\t\tnot mid %s" % (check_mid))
-                left = mid
+                left = mid + 1
                 mid = (left + right) // 2
             else:
+                #print("\t\t\tfailed?")
                 kmin_found = False
+
 
         if kmin_found:
             #print("!!!!!!!!!!!!!!!!! %s: " % (kmin_candidate))
@@ -372,18 +374,21 @@ class AthenaAudit():
 
             kmin = result["kmin"]
 
-            """We compute what is the probability that we end at or above the kmin"""
-            round_size_prev = new_round_schedule[-2]
-            number_of_ballots_drawn = round_candidate - round_size_prev
-            steps = 1 + observation + number_of_ballots_drawn - kmin
+            if kmin is not None:
+                """kmin None means that there is no chance of stopping for new_round_Schedule (kmin does not exits)"""
 
-            if steps > 0:
-                p = (1 + margin) / 2
-                stopping_probability = 1 - binom.cdf(
-                    number_of_ballots_drawn - steps,
-                    number_of_ballots_drawn,
-                    p
-                )
+                """We compute what is the probability that we end at or above the kmin"""
+                round_size_prev = new_round_schedule[-2]
+                number_of_ballots_drawn = round_candidate - round_size_prev
+                steps = 1 + observation + number_of_ballots_drawn - kmin
+
+                if steps > 0:
+                    p = (1 + margin) / 2
+                    stopping_probability = 1 - binom.cdf(
+                        number_of_ballots_drawn - steps,
+                        number_of_ballots_drawn,
+                        p
+                    )
 
 
         else:
