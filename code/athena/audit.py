@@ -17,6 +17,8 @@ class Status():
         self.audit_pairs = []
         self.audit_completed = False
         self.ballots_sampled = []
+        self.observations = []
+        self.rs = []
 
     def get_status(self):
         return self.audit_completed
@@ -25,7 +27,12 @@ class Status():
         return self.risks[-1]
 
     def __repr__(self):
-        return f"""{{"audit_passed": {self.audit_completed}, "min_kmins": {self.min_kmins}, "risks": {self.risks}, "round_number": {len(self.min_kmins)}}}"""
+        return f"""{{"audit_passed": {self.audit_completed}, 
+            "min_kmins": {self.min_kmins}, 
+            "risks": {self.risks}, 
+            "rs": {self.rs},
+            "observations": {self.observations},
+            "round_number": {len(self.min_kmins)}}}"""
 
 
 class Audit():
@@ -465,9 +472,12 @@ class Audit():
         logging.debug("predicted round size: %s" % (predicted_round_sizes))
 
         print("\nSelect round size: ")
+        #print(str(predicted_round_sizes))
+        #print(str(self.status))
+
         for prs in predicted_round_sizes:
             p, rs = prs
-            print("Complete with prob. %s when you sample %s more ballots." % (p, rs))
+            print("Complete with prob. %s for the total number of ballots: %s." % (p, rs))
 
 
         ###del w
@@ -529,6 +539,8 @@ class Audit():
         self.status[contest_name].risks.append(x["risk"])
         self.status[contest_name].deltas.append(x["delta"])
         self.status[contest_name].ballots_sampled.append(new_valid_ballots)
+        self.status[contest_name].observations.append(round_observation)
+        self.status[contest_name].rs.append(sum(round_observation))
 
         if x["passed"] == 1:
             self.status[contest_name].audit_completed = True
