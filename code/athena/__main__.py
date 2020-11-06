@@ -61,7 +61,7 @@ if __name__ == '__main__':
     name = ""
 
     if args.version:
-        print("ATHENA-RLA version 0.6")
+        print("ATHENA-RLA version 0.7.1")
     if (args.new is not None) or (args.name is not None):
         mode = "new"
         if args.new:
