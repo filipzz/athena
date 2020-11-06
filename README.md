@@ -31,7 +31,7 @@ where:
 The above call would return:
 
 ```bash
-[[0.9, 148], [0.95, 213]]
+[[0.9, 145], [0.95, 222]]
 ```
 
 which means that if *148* ballots were drawn the audit would stop (on average) with probability 90%,
@@ -103,54 +103,14 @@ python -m athena -n asd -b 60000 40000 --pstop .7 .8 .9
 returns:
 
 ```bash
-[0.7, 0.8, 0.9]
-Results of: asd
-Number of valid ballots: 100 000
-	1 A	60 000
-	2 B	40 000
-
-Parameters: 
-Alpha:  0.1
-Gamma:  1.0
-Model:  bin
-Round schedule: []
-setting round schedule
-
-
-A (60 000) vs B (40 000)
-	margin:	0.2
-pstop goal: [0.7, 0.8, 0.9]
-round schedule: []
-	0.7	[112]
-	0.8	[132]
-	0.9	[180]
-
+[[0.7, 111], [0.8, 138], [0.9, 179]]
 ```
 
 If one want to estimate round sizes for the next round, round_schedule parameter needs to be added
 
 ```bash
 python -m athena -n asd -b 60000 40000 --pstop .5 .8  --rounds 132
-[0.5, 0.8]
-Results of: asd
-Number of valid ballots: 100 000
-	1 A	60 000
-	2 B	40 000
-
-Parameters: 
-Alpha:  0.1
-Gamma:  1.0
-Model:  bin
-Round schedule: [132]
-setting round schedule
-
-
-A (60 000) vs B (40 000)
-	margin:	0.2
-pstop goal: [0.5, 0.8]
-round schedule: [132]
-	0.5	[132, 226]
-	0.8	[132, 302]
+[[0.5, 75], [0.8, 138]]
 ```
 
 To get obtain detailed information about a selected round schedule (e.g., [132, 297])
@@ -158,54 +118,34 @@ one needs to call it without **--pstop** parameter.
 
 ```bash
 python3 -m athena -n asd -b 60000 40000 --rounds 132 297
-Results of: asd
-Number of valid ballots: 100000
-	1 A	60000
-	2 B	40000
-
-Parameters: 
-Alpha:  0.1
-Gamma:  1.0
-Model:  bin
-Round schedule: [132, 297]
-
-
 A (60000) vs B (40000)
 	margin:	0.2
 
 	Approx round schedule:	[132, 297]
-	ATHENA kmins:		[75, 165]
-	ATHENA pstop (audit):	[0.798620073240586, 0.9604763404354486]
-	ATHENA pstop (tied): 	[0.06933400321906039, 0.08488117767255865]
-	ATHENA gammas ():	[0.3848374142119376, 0.5336003665053669]
-	ATHENA true risk:	[0.0868172558419695, 0.08837404327323284]
+	athena kmins:		[75, 165]
+	athena pstop cumul (audit):	[0.798620073240586, 0.9604763404354484]
+	athena pstop cumul (tied): 	[0.06933400321906029, 0.08488117767255868]
+	athena pstop round (audit):	[0.798620073240586, 0.16185626719486235]
+	athena pstop round (tied): 	[0.06933400321906029, 0.015547174453498389]
+	athena deltas ():	[0.38483741421193757, 0.5336003665053679]
+	athena ratio:	[0.08681725584196939, 0.08837404327323288]
 ```
 
 At the end we may want to check how, for that round schedule Arlo audit would work
 
 ```bash
 python3 -m athena -n asd -b 60000 40000 --rounds 132 297 --type arlo
-Results of: asd
-Number of valid ballots: 100000
-	1 A	60000
-	2 B	40000
-
-Parameters: 
-Alpha:  0.1
-Gamma:  1.0
-Model:  bin
-Round schedule: [132, 297]
-
-
 A (60000) vs B (40000)
 	margin:	0.2
 
 	Approx round schedule:	[132, 297]
-	ARLO kmins:		[79, 170]
-	ARLO pstop (audit):	[0.5517707405988953, 0.8681144359578333]
-	ARLO pstop (tied): 	[0.014585813499702702, 0.019495722498663794]
-	ARLO gammas ():	[0.07601726700482742, 0.07026836102128296]
-	ARLO true risk:	[0.02643455411186025, 0.022457549017893253]
+	arlo kmins:		[79, 170]
+	arlo pstop cumul (audit):	[0.5517707405988952, 0.8681144359578332]
+	arlo pstop cumul (tied): 	[0.014585813499702633, 0.01949572249866391]
+	arlo pstop round (audit):	[0.5517707405988952, 0.316343695358938]
+	arlo pstop round (tied): 	[0.014585813499702633, 0.004909908998961276]
+	arlo deltas ():	[0.07601726700482737, 0.07026836102128318]
+	arlo ratio:	[0.026434554111860128, 0.02245754901789339]
 ```
 
 ## Wald's sequential test
