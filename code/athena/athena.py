@@ -292,7 +292,7 @@ class AthenaAudit():
         mid = (right + left) // 2
         #mid = right
 
-        while right > left:
+        while right >= left:
             #print("\t\t%s %s %s" % (left, mid, right))
             #print("\t\t\t%s >= %s\t%s >= %s" %
             #      (self.check_delta * self.delta * prob_table[mid],
@@ -389,6 +389,8 @@ class AthenaAudit():
                         number_of_ballots_drawn,
                         p
                     )
+            else:
+                print("kmin none!?")
 
 
         else:
@@ -462,14 +464,15 @@ class AthenaAudit():
             stopping_probability = self.find_stopping_probability(margin, new_round_schedule, observations_i)
             #print("\t\t\t%s - %s" % (new_round_schedule[-1], stopping_probability))
 
+
             if round_max - round_min <= 1:
                 round_candidate = round_max
                 new_round_schedule = round_schedule + [round_candidate]
                 stopping_probability = self.find_stopping_probability(margin, new_round_schedule, observations_i)
-                #print("\t\t\t\t%s -----------> %s" % (round_candidate, stopping_probability))
+                #print("\t\t%s -> %s" % (round_candidate, stopping_probability))
                 break
 
-            if stopping_probability < quant:
+            if stopping_probability <= quant:
                 round_min = round_candidate
             else:
                 round_max = round_candidate
