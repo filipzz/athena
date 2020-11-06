@@ -156,6 +156,15 @@ class AthenaAudit():
         return prob_table
 
 
+    def round_size_approx(self, margin, alpha, quant):
+        """
+        Returns approximate round size for small margins
+        :param margin:
+        :param alpha:
+        :param quant:
+        :return:
+        """
+        return ceil((6 * log(alpha)) / (margin * (log(1 - margin) - log(1 + margin))))
 
     def wald_k_min(self, sample_size, margin, delta):
         """
@@ -416,11 +425,12 @@ class AthenaAudit():
             * size - the size of the next round
             * prob_stop - the probability of
         """
-        #TODO: change the upper limit round_max into a parameter (or a value depending on the number of ballots cast)
-        #if quant <= .9  and len(round_schedule) < 1:
-        #    round_max = ceil((18 * math.log(self.alpha))/(margin *  (math.log(1 - margin) - math.log(1 + margin))))
-        #else:
-        #    round_max = 100000 # * ballots_cast
+
+        """For really small margins we return approximate round size"""
+        if margin < .001:
+            good_candidate = self.round_size_approx(margin, self.alpha, quant)
+            return {"size": good_candidate, "prob_stop": 0.9}
+
         round_max = 10000
         #upper_limit = 100000
         #round_max = upper_limit # * ballots_cast
