@@ -1,7 +1,7 @@
 import logging
 from scipy.stats import binom, norm
 from scipy.signal import fftconvolve
-from math import log, ceil, floor, sqrt
+from math import log, ceil, floor, sqrt, inf
 import sys
 
 
@@ -278,12 +278,15 @@ class AthenaAudit():
         # print("\t\t" + str(self.prob_distribution_tied))
         # print("\t\t" + str(self.prob_distribution_margin))
         round_candidate = new_round_schedule[-1]
+        #print(str(new_round_schedule) + " -> " + str(round_candidate))
         if len(new_round_schedule) > 1:
+            #print(str(new_round_schedule))
             round_size_prev = new_round_schedule[-2]
         else:
             round_size_prev = 0
 
         p = (1 + margin) / 2
+        #print("\n%s %s %s %s" % (round_size_prev, round_candidate, p, new_round_schedule))
         draws_dist = binom.pmf(
                         range(0, (round_candidate - round_size_prev) + 1),
                         (round_candidate - round_size_prev),
@@ -296,7 +299,7 @@ class AthenaAudit():
                                     (round_candidate - round_size_prev), p0)
         prob_table_tied = fftconvolve(self.prob_distribution_tied, draws_dist_tied)
 
-        #print("%s %s %s %s" % (round_size_prev, round_candidate, p, new_round_schedule))
+        #print("size of dist: %s %s %s" % (len(self.prob_distribution_margin), len(prob_table), len(draws_dist)))
 
         kmin_found = False
         right = min(self.wald_k_min(round_candidate, margin, self.alpha), round_candidate)
@@ -430,12 +433,17 @@ class AthenaAudit():
             * prob_stop - the probability of
         """
 
-        """For really small margins we return approximate round size"""
-        if margin < .001:
+        """For really small margins (smaller than approximation_threshold) we return approximate round size"""
+        # TODO: review approximation_threshold
+        approximation_treshold = .005
+        if margin < approximation_treshold:
             good_candidate = self.round_size_approx(margin, self.alpha, quant)
             return {"size": good_candidate, "prob_stop": 0.9}
 
-        round_max = 10000
+        if len(round_schedule) == 0 or round_schedule[-1] < 10000:
+            round_max = 10000
+        else:
+            round_max = 2 * round_schedule[-1]
         #upper_limit = 100000
         #round_max = upper_limit # * ballots_cast
 
@@ -478,7 +486,6 @@ class AthenaAudit():
             stopping_probability = self.find_stopping_probability(margin, new_round_schedule, observations_i)
             #print("\t\t\t%s - %s" % (new_round_schedule[-1], stopping_probability))
 
-
             if round_max - round_min <= 1:
                 round_candidate = round_max
                 new_round_schedule = round_schedule + [round_candidate]
@@ -518,7 +525,11 @@ class AthenaAudit():
         prob_stop = []
         for quant in quants:
             if len(round_schedule) > 0:
-                self.audit(margin, round_schedule)
+                #print("----> rs: %s, len(dist): %s" % (round_schedule, len(self.prob_distribution_margin)))
+                #it means that we do the update to round schedule, distributions and kmins
+                if round_schedule[-1] + 1 > len(self.prob_distribution_margin):
+                    self.audit(margin, round_schedule)
+                #print("----> rs: %s, len(dist): %s" % (round_schedule, len(self.prob_distribution_margin)))
                 results = self.find_next_round_size(margin, round_schedule, quant, round_schedule[-1] + 1, observations_i)
             else:
                 results = self.find_next_round_size(margin, round_schedule, quant, 1, observations_i)
@@ -608,8 +619,8 @@ class AthenaAudit():
             prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], prob_tied_table_prev)
 
             if kmins[round] > 0:
-                prob_sum[round] = sum(prob_table[kmins[round]:len(prob_table)]) + prob_sum[round - 1]
-                prob_tied_sum[round] = sum(prob_tied_table[kmins[round]:len(prob_tied_table)]) + prob_tied_sum[round - 1]
+                prob_sum[round] = sum(prob_table[kmins[round]:len(prob_table)]) #+ prob_sum[round - 1]
+                prob_tied_sum[round] = sum(prob_tied_table[kmins[round]:len(prob_tied_table)]) #+ prob_tied_sum[round - 1]
 
                 audit_round_pstop[round] = sum(prob_table[audit_observations[round]:len(prob_table)])
                 audit_round_risk[round] = sum(prob_tied_table[audit_observations[round]:len(prob_tied_table)])
@@ -617,8 +628,15 @@ class AthenaAudit():
                 #    audit_ratio[round] = audit_round_risk[round] / audit_round_pstop[round]
                 #else:
                 #    audit_ratio[round] = 0.0
-
-                pvalue[round] = sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
+                if sum(prob_table[audit_observations[round]:]) > 0:
+                    pvalue[round] = sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
+                else:
+                    # it means that the computed stopping probability is so small it is computed to 0
+                    # we check if the observation is above kmin
+                    if kmins[round] < audit_observations[round]:
+                        pvalue[round] = 0.0
+                    else:
+                        pvalue[round] = inf
 
             if round < len(audit_observations):
                 deltas.append(1.0)
