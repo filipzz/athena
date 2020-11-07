@@ -403,6 +403,7 @@ class AthenaAudit():
                     )
             else:
                 # the returned stopping probability will be 0
+                pass
 
 
         else:
