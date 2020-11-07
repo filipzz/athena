@@ -402,7 +402,7 @@ class AthenaAudit():
                         p
                     )
             else:
-                print("kmin none!?")
+                # the returned stopping probability will be 0
 
 
         else:
