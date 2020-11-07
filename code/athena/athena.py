@@ -1,7 +1,7 @@
 import logging
-from scipy.stats import binom
+from scipy.stats import binom, norm
 from scipy.signal import fftconvolve
-from math import log, ceil, floor
+from math import log, ceil, floor, sqrt
 import sys
 
 
@@ -159,12 +159,15 @@ class AthenaAudit():
     def round_size_approx(self, margin, alpha, quant):
         """
         Returns approximate round size for small margins
-        :param margin:
-        :param alpha:
-        :param quant:
-        :return:
+        :param margin: margin of victory (float in [0, 1])
+        :param alpha: risk limit
+        :param quant: desired probability of stopping in the next round
+        :return: the next round size computed under a normal approximation to the binomial
         """
-        return ceil((6 * log(alpha)) / (margin * (log(1 - margin) - log(1 + margin))))
+        z_a = norm.isf(quant)
+        z_b = norm.isf(alpha * quant)
+        p = (1 + margin) / 2
+        return ceil(((z_a * sqrt(p * (1 - p)) - .5 * z_b) / (p - .5)) ** 2)
 
     def wald_k_min(self, sample_size, margin, delta):
         """
