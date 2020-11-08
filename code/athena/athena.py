@@ -611,7 +611,7 @@ class AthenaAudit():
         prob_tied_sum = [0] * number_of_rounds
         audit_round_pstop = [0] * number_of_rounds
         audit_round_risk = [1.0] * number_of_rounds
-        audit_ratio = [0] * number_of_rounds
+        audit_ratio = [1.0] * number_of_rounds
         pvalue = [1.0] * number_of_rounds
 
         deltas = []#0] * (number_of_rounds + 1)
@@ -633,20 +633,22 @@ class AthenaAudit():
                 #else:
                 #    audit_ratio[round] = 0.0
                 if sum(prob_table[audit_observations[round]:]) > 0:
-                    pvalue[round] = prob_tied_sum[round] / prob_sum[round] # sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
+                    #pvalue[round] = prob_tied_sum[round] / prob_sum[round] # sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
                     audit_ratio[round] = sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
                 else:
                     # it means that the computed stopping probability is so small it is computed to 0
                     # we check if the observation is above kmin
                     if kmins[round] < audit_observations[round]:
-                        pvalue[round] = 0.0
+                        #pvalue[round] = 0.0
                         audit_ratio[round] = 0.0
                     else:
-                        pvalue[round] = inf
+                        #pvalue[round] = inf
                         audit_ratio[round] = inf
             else:
                 audit_ratio[round] = inf
-                pvalue[round] = inf
+                #pvalue[round] = inf
+
+            pvalue[round] = min(audit_ratio)
 
             deltas.append(1.0)
 
@@ -683,10 +685,10 @@ class AthenaAudit():
         #print("pvalue: " + str(pvalue[1:]))
 
         return {
-            "pvalue": pvalue,
-            "prob_sum": prob_sum[1:len(prob_sum)],
-            "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)],
-            "audit_ratio": audit_ratio,
+            "pvalue": pvalue[1:],
+            "prob_sum": prob_sum[1],
+            "prob_tied_sum": prob_tied_sum[1],
+            "audit_ratio": audit_ratio[1:],
             "ratio": ratio,
             "deltas": deltas
         }
