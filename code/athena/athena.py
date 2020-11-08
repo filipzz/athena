@@ -1,6 +1,6 @@
 import logging
 from scipy.stats import binom, norm
-from scipy.signal import fftconvolve
+from scipy.signal import fftconvolve, convolve
 from math import log, ceil, floor, sqrt, inf
 import sys
 
@@ -131,7 +131,8 @@ class AthenaAudit():
 
         p = (1+margin)/2
         draws_dist = binom.pmf(range(0, (round_size - round_size_prev) + 1), (round_size - round_size_prev), p)
-        return fftconvolve(prob_table_prev, draws_dist)
+        #return fftconvolve(prob_table_prev, draws_dist)
+        return convolve(prob_table_prev, draws_dist, method='direct')
 
 
     def next_round_prob_bravo(self, margin, round_size_prev, round_size, kmin_first, kmin, prob_table_prev):
@@ -292,12 +293,14 @@ class AthenaAudit():
                         (round_candidate - round_size_prev),
                         p
                     )
-        prob_table = fftconvolve(self.prob_distribution_margin, draws_dist)
+        #prob_table = fftconvolve(self.prob_distribution_margin, draws_dist)
+        prob_table = convolve(self.prob_distribution_margin, draws_dist, method='direct')
 
         p0 = 0.5
         draws_dist_tied = binom.pmf(range(0, (round_candidate - round_size_prev) + 1),
                                     (round_candidate - round_size_prev), p0)
-        prob_table_tied = fftconvolve(self.prob_distribution_tied, draws_dist_tied)
+        #prob_table_tied = fftconvolve(self.prob_distribution_tied, draws_dist_tied)
+        prob_table_tied = convolve(self.prob_distribution_tied, draws_dist_tied, method='direct')
 
         #print("size of dist: %s %s %s" % (len(self.prob_distribution_margin), len(prob_table), len(draws_dist)))
 
