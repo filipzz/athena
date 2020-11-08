@@ -176,14 +176,14 @@ class Audit():
                 self.status[contest_name].audit_completed = True
                 logging.info("\n\n\tAudit Successfully completed!")
                 #logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
-                logging.info("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
+                #logging.info("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
                 logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
             else:
                 logging.info("\n\n\tRound: %s audit failed" % (self.status[contest_name].round_number))
                 #logging.info("\tLR:\t\t%s\t[needs to be > %s]" % (1/x["delta"], self.delta))
-                logging.info("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
+                #logging.info("\tDelta:\t\t%s\t[needs to be < %s]" % (x["delta"], self.delta))
                 logging.info("\tp-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
-                logging.info("\tboth conditions are required to be satisfied.")
+                #logging.info("\tboth conditions are required to be satisfied.")
 
             self.status[contest_name].round_number = self.status[contest_name].round_number + 1
             self.status[contest_name].params.append(x)
@@ -225,6 +225,7 @@ class Audit():
             #    y = math.floor(x * bc / self.election.ballots_cast)
             #    rs.append(y)
             for rs_i, rs_j in zip(self.audit_observations[i], self.audit_observations[j]):
+                #print("%s %s" % (rs_i, rs_j))
                 rs.append(rs_i + rs_j)
 
 
@@ -372,7 +373,7 @@ class Audit():
             else:
                 logging.info("\t\tdelta [needs to be > %s]:\t\t\tinf." % (self.delta))
             logging.info("\t\tLR [needs to be < %s]:\t\t%s" % (self.delta, deltas[-1]))
-            logging.info("\t\tATHENA risk [needs to be <= %s]:\t%s" % (self.alpha, audit_risk))
+            logging.info("\t\tp-value [needs to be <= %s]:\t%s" % (self.alpha, audit_risk))
 
             if test_info["passed"] != 1:
                 test_passed = False

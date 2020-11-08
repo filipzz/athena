@@ -619,8 +619,9 @@ class AthenaAudit():
             prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], prob_tied_table_prev)
 
             if kmins[round] > 0:
-                prob_sum[round] = sum(prob_table[kmins[round]:len(prob_table)]) #+ prob_sum[round - 1]
-                prob_tied_sum[round] = sum(prob_tied_table[kmins[round]:len(prob_tied_table)]) #+ prob_tied_sum[round - 1]
+                # this means that the probability of stopping in that round >0 and so a kmin exists
+                prob_sum[round] = sum(prob_table[kmins[round]:len(prob_table)]) + prob_sum[round - 1]
+                prob_tied_sum[round] = sum(prob_tied_table[kmins[round]:len(prob_tied_table)]) + prob_tied_sum[round - 1]
 
                 audit_round_pstop[round] = sum(prob_table[audit_observations[round]:len(prob_table)])
                 audit_round_risk[round] = sum(prob_tied_table[audit_observations[round]:len(prob_tied_table)])
@@ -629,30 +630,41 @@ class AthenaAudit():
                 #else:
                 #    audit_ratio[round] = 0.0
                 if sum(prob_table[audit_observations[round]:]) > 0:
-                    pvalue[round] = sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
+                    pvalue[round] = prob_tied_sum[round] / prob_sum[round] # sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
+                    audit_ratio[round] = sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
                 else:
                     # it means that the computed stopping probability is so small it is computed to 0
                     # we check if the observation is above kmin
                     if kmins[round] < audit_observations[round]:
                         pvalue[round] = 0.0
+                        audit_ratio[round] = 0.0
                     else:
                         pvalue[round] = inf
-
-            if round < len(audit_observations):
-                deltas.append(1.0)
-                if prob_table[round] > 0:
-                    audit_ratio[round] = sum(prob_tied_table[kmins[round]:]) /sum(prob_table[kmins[round]:])
-                else:
-                    audit_ratio[round] = 0.0
+                        audit_ratio[round] = inf
             else:
-                audit_ratio[round] = sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
+                audit_ratio[round] = inf
+                pvalue[round] = inf
+
+            deltas.append(1.0)
+
+            #if round <= len(audit_observations):
+            #    deltas.append(1.0)
+            #    if sum(prob_table[audit_observations[round]:]) > 0:
+            #        #audit_ratio[round] = sum(prob_tied_table[kmins[round]:]) /sum(prob_table[kmins[round]:])
+            #        audit_ratio[round] = sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
+            #    else:
+            #        if 0 < kmins[round] < audit_observations[round]:
+            #            audit_ratio[round] = 0.0
+            #        else:
+            #            audit_ratio[round] = inf
+            #else:
+            #    audit_ratio[round] = sum(prob_tied_table[audit_observations[round]:]) / sum(prob_table[audit_observations[round]:])
 
             # cleaning prob_table/prob_tied_table
             if kmins[round] > 0:
                 for i in range(kmins[round], round_schedule[round] + 1):
                     prob_table[i] = 0
                     prob_tied_table[i] = 0
-
 
             prob_table_prev = prob_table
             prob_tied_table_prev = prob_tied_table
@@ -671,7 +683,7 @@ class AthenaAudit():
             "pvalue": pvalue,
             "prob_sum": prob_sum[1:len(prob_sum)],
             "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)],
-            "audit_ratio": pvalue[1:len(audit_ratio)],
+            "audit_ratio": audit_ratio,
             "ratio": ratio,
             "deltas": deltas
         }
