@@ -438,7 +438,7 @@ class AthenaAudit():
         approximation_treshold = .005
         if margin < approximation_treshold:
             good_candidate = self.round_size_approx(margin, self.alpha, quant)
-            return {"size": good_candidate, "prob_stop": 0.9}
+            return {"size": good_candidate, "prob_stop": quant}
 
         if len(round_schedule) == 0 or round_schedule[-1] < 10000:
             round_max = 10000
