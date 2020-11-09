@@ -44,6 +44,7 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--total", help="set the total number of ballots in given contest", type=int)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
     parser.add_argument("--type", help="set the audit type (athena/bravo/arlo/minerva/metis)", default="athena")
+    parser.add_argument("--conv", help="sets method for convolutions either default or fft", default='direct')
 
     args, args_unknown = parser.parse_known_args()
 
@@ -175,6 +176,11 @@ if __name__ == '__main__':
                 print("Current version supports only 2-candidate race for risk estimation")
                 sys.exit(2)
 
+        convolve_method = 'direct'
+        if args.conv:
+            if args.conv == 'fft':
+                convolve_method = 'fft'
+
     #elif args.load:
     #    mode = "read"
     else:
@@ -248,6 +254,7 @@ if __name__ == '__main__':
         #print(election_object)
 
         w = AthenaAudit(audit_type.lower(), alpha, delta)
+        w.set_convolve_method(convolve_method)
         #print(str(w))
         #for i in range(len(candidates)):
         #print("option temporary unavailable")
@@ -273,6 +280,7 @@ if __name__ == '__main__':
                 margin = (2 * winner - bc)/bc
 
                 audit_object = AthenaAudit(audit_type.lower(), alpha, delta)
+                audit_object.set_convolve_method(convolve_method)
                 audit_athena = audit_object.audit(margin, rs)
 
                 #print(str(audit_object))
@@ -310,6 +318,7 @@ if __name__ == '__main__':
 
         if mode == "read":
             w = Audit(audit_type, alpha)
+            w.set_colvolve_method(convolve_method)
             w.read_election_results(file_name)
             w.load_contest(contest_name)
             #print("ele-d", w.election.data)
@@ -320,6 +329,7 @@ if __name__ == '__main__':
             print(w.predict_round_sizes(pstop_goal))
         else:
             w = Audit(audit_type, alpha, delta)
+            w.set_colvolve_method(convolve_method)
             #print(election)
             w.add_election(election)
             w.load_contest(contest_name)
@@ -339,10 +349,12 @@ if __name__ == '__main__':
 
         if mode == "read":
             w = Audit(audit_type)
+            w.set_colvolve_method(convolve_method)
             w.read_election_results(file_name)
             w.load_contest(contest_name)
         else:
             w = Audit(audit_type, alpha, delta)
+            w.set_colvolve_method(convolve_method)
             w.add_election(election)
             w.load_contest(contest_name)
             w.add_round_schedule(round_schedule)
@@ -353,10 +365,12 @@ if __name__ == '__main__':
 
         if mode == "read":
             w = Audit(audit_type)
+            w.set_colvolve_method(convolve_method)
             w.read_election_results(file_name)
             w.load_contest(contest_name)
         else:
             w = Audit(audit_type, alpha, delta)
+            w.set_colvolve_method(convolve_method)
             w.add_election(election)
             w.load_contest(contest_name)
 

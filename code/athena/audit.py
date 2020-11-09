@@ -54,6 +54,7 @@ class Audit():
         self.contests = []
         self.contest_list = []
         self.data_frame = {}
+        self.convolve_method = 'direct'
 
     def __repr__(self):
         return f'audit type: {self.audit_type}\n' \
@@ -61,6 +62,10 @@ class Audit():
                f'round_schedule: {self.round_schedule}\n' \
                f'observations: {self.observations}\n' \
                f'status: {self.status!r}'
+
+    """Sets convolve method to: method"""
+    def set_colvolve_method(self, method):
+        self.convolve_method = method
 
     def get_status(self, contest_name):
         return self.status[contest_name].get_status()
@@ -232,6 +237,7 @@ class Audit():
             margin = (2 * winner - bc)/bc
 
             audit_object = AthenaAudit(self.audit_type, self.alpha, self.delta)
+            audit_object.set_convolve_method(self.convolve_method)
             #print("---------" + str(rs))
             #audit_object.audit(margin, rs)
 
@@ -305,6 +311,7 @@ class Audit():
             margin = (2 * winner - bc)/bc
 
             audit_object = AthenaAudit(self.audit_type.lower(), self.alpha, self.delta)
+            audit_object.set_convolve_method(self.convolve_method)
             #TODO: check this call
             audit_athena = audit_object.audit(margin, rs)
             '''

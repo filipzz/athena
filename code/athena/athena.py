@@ -70,6 +70,9 @@ class AthenaAudit():
         self.pstop_tied_round = [0.0]
         self.kmins = []
 
+        """Switch for convolve mode direct/fft"""
+        self.convolve_method = 'direct'
+
     def __repr__(self):
         return f"""{{
             "audit_type": {self.audit_type}, 
@@ -101,6 +104,8 @@ class AthenaAudit():
 
         #print("delta check: %s\nsum check: %s\nmemory check: %s" % (self.check_delta, self.check_sum, self.check_memory))
 
+    def set_convolve_method(self, method):
+        self.convolve_method = method
 
     def next_round_prob(self, margin, round_size_prev, round_size, prob_table_prev):
         """
@@ -132,7 +137,7 @@ class AthenaAudit():
         p = (1+margin)/2
         draws_dist = binom.pmf(range(0, (round_size - round_size_prev) + 1), (round_size - round_size_prev), p)
         #return fftconvolve(prob_table_prev, draws_dist)
-        return convolve(prob_table_prev, draws_dist, method='direct')
+        return convolve(prob_table_prev, draws_dist, method=self.convolve_method)
 
 
     def next_round_prob_bravo(self, margin, round_size_prev, round_size, kmin_first, kmin, prob_table_prev):
@@ -178,7 +183,11 @@ class AthenaAudit():
         :param delta: (float 0<delta<1) risk limit for Wald's test
         :return:
         """
-        bkm = ceil((sample_size * log(1 - margin) + log(delta))/(log(1 - margin) - log( 1 + margin)))
+        if 0 < margin < 1:
+            bkm = ceil((sample_size * log(1 - margin) + log(delta))/(log(1 - margin) - log(1 + margin)))
+        else:
+            raise ValueError("Margin needs to be different than 0 or 1")
+
         return bkm
 
 
@@ -230,7 +239,7 @@ class AthenaAudit():
                     prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
                     prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
                     if prob_table[kmin_candidate] > 0:
-                        deltas[round] = prob_tied_table[kmin_candidate] /  prob_table[kmin_candidate]
+                        deltas[round] = prob_tied_table[kmin_candidate] / prob_table[kmin_candidate]
                 else:
                     kmin_candidate = kmin_candidate + 1
 
@@ -294,13 +303,13 @@ class AthenaAudit():
                         p
                     )
         #prob_table = fftconvolve(self.prob_distribution_margin, draws_dist)
-        prob_table = convolve(self.prob_distribution_margin, draws_dist, method='direct')
+        prob_table = convolve(self.prob_distribution_margin, draws_dist, method=self.convolve_method)
 
         p0 = 0.5
         draws_dist_tied = binom.pmf(range(0, (round_candidate - round_size_prev) + 1),
                                     (round_candidate - round_size_prev), p0)
         #prob_table_tied = fftconvolve(self.prob_distribution_tied, draws_dist_tied)
-        prob_table_tied = convolve(self.prob_distribution_tied, draws_dist_tied, method='direct')
+        prob_table_tied = convolve(self.prob_distribution_tied, draws_dist_tied, method=self.convolve_method)
 
         #print("size of dist: %s %s %s" % (len(self.prob_distribution_margin), len(prob_table), len(draws_dist)))
 
@@ -686,8 +695,8 @@ class AthenaAudit():
 
         return {
             "pvalue": pvalue[1:],
-            "prob_sum": prob_sum[1],
-            "prob_tied_sum": prob_tied_sum[1],
+            "prob_sum": prob_sum[1:],
+            "prob_tied_sum": prob_tied_sum[1:],
             "audit_ratio": audit_ratio[1:],
             "ratio": ratio,
             "deltas": deltas
