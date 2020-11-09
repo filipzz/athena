@@ -185,6 +185,58 @@ python -m athena -n 2016_Minnesota  -b 1367825 1323232  --rounds 14880 32138   -
 
 ```
 
+## Efficiency vs accuracy
+
+The default method of computing probability distributions uses **scipy.convolve** function with its
+default **method='direct'** option. For tight margins audit requires large round sizes. For such a case, a speed up
+may be achieved by switching the default  method to **method='direct'**, it is achieved by adding a flag
+**--conv fft** to the call.
+
+
+```
+time python -m athena -n Convolve --conv fft --ballots 5050 4950 --rounds 30000 150000 --type minerva 
+
+
+A (5050) vs B (4950)
+	margin:	0.01
+
+	Approx round schedule:	[30000, 150000]
+	minerva kmins:		[15139, 75308]
+	minerva pstop cumul (audit):	[0.5528304495551454, 0.9902384020897739]
+	minerva pstop cumul (tied): 	[0.05488062600183151, 0.0986169006106063]
+	minerva pstop round (audit):	[0.5528304495551454, 0.4374079525346285]
+	minerva pstop round (tied): 	[0.05488062600183151, 0.043736274608774786]
+	minerva deltas ():	[0.2780323883486859, 3.819691573156511]
+	minerva ratio:	[0.09927207527369947, 0.09958904886185761]
+
+real	0m7,983s
+user	0m8,826s
+sys	0m1,028s
+```
+
+The speed up is larger as the round sizes grow
+
+```
+time python -m athena -n Convolve --conv direct --ballots 5050 4950 --rounds 30000 150000 --type minerva 
+
+
+A (5050) vs B (4950)
+	margin:	0.01
+
+	Approx round schedule:	[30000, 150000]
+	minerva kmins:		[15139, 75308]
+	minerva pstop cumul (audit):	[0.5528304495551454, 0.9902384020897737]
+	minerva pstop cumul (tied): 	[0.05488062600183151, 0.09861690061060624]
+	minerva pstop round (audit):	[0.5528304495551454, 0.4374079525346283]
+	minerva pstop round (tied): 	[0.05488062600183151, 0.04373627460877473]
+	minerva deltas ():	[0.2780323883486859, 3.8196915731565126]
+	minerva ratio:	[0.09927207527369947, 0.09958904886185758]
+
+real	0m10,637s
+user	0m25,301s
+sys	0m15,916s
+```
+
 ## Help
 
 ```
