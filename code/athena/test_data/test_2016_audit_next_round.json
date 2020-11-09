@@ -10,7 +10,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [4, 7, 7]
+                "round_candidates": [4, 4, 7]
             },
             "rounds": {
                 "1": {
@@ -30,7 +30,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [4, 7, 7]
+                "round_candidates": [4, 4, 7]
             }
         },
         "testDC10arlo": {
@@ -40,7 +40,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [4, 9, 14]
+                "round_candidates": [4, 4, 9]
             }
         },
         "testDC5athena": {
@@ -50,7 +50,7 @@
             "alpha": 0.05,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [5, 8, 8]
+                "round_candidates": [5, 5, 8]
             }
         },
         "testDC5minerva": {
@@ -60,17 +60,7 @@
             "alpha": 0.05,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [5, 8, 8]
-            }
-        },
-        "testDC5arlo": {
-            "audit_type": "arlo",
-            "election": "DistrictofColumbia",
-            "contest": "presidential",
-            "alpha": 0.05,
-            "quants": [0.7, 0.8, 0.9],
-            "expected": {
-                "round_candidates": [10, 10, 15]
+                "round_candidates": [5, 5, 8]
             }
         },
         "testArk5ath": {
@@ -80,7 +70,7 @@
             "alpha": 0.05,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [68, 83, 113]
+                "round_candidates": [75, 83, 111]
             }
         },
         "testArk5min": {
@@ -90,7 +80,7 @@
             "alpha": 0.05,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [68, 83, 113]
+                "round_candidates": [75, 83, 111]
             }
         },
         "testArk5arl": {
@@ -100,7 +90,7 @@
             "alpha": 0.05,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [106, 136, 190]
+                "round_candidates": [106, 143, 197]
             }
         },
         "testArk10ath": {
@@ -110,7 +100,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [54, 69, 86]
+                "round_candidates": [52, 67, 86]
             }
         },
         "testArk10min": {
@@ -120,7 +110,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [54, 69, 86]
+                "round_candidates": [52, 67, 86]
             }
         },
         "testArk10arl": {
@@ -130,7 +120,7 @@
             "alpha": 0.1,
             "quants": [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates": [94, 117, 164]
+                "round_candidates": [94, 120, 164]
             }
         },
         "testCol10ath" : {
@@ -140,7 +130,7 @@
             "alpha" : 0.1,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [1431, 1801, 2423]
+                "round_candidates" : [1413, 1801, 2399]
             }
         },
         "testCol10min" : {
@@ -150,7 +140,7 @@
             "alpha" : 0.1,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [1431, 1801, 2423]
+                "round_candidates" : [1413, 1801, 2399]
             }
         },
         "testCol10arlo" : {
@@ -160,7 +150,7 @@
             "alpha" : 0.1,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [2618, 3434, 4938]
+                "round_candidates" : [2624, 3444, 4919]
             }
         },
         "testCol5ath" : {
@@ -170,7 +160,7 @@
             "alpha" : 0.05,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [1939, 2342, 3102]
+                "round_candidates" : [1921, 2385, 3118]
             }
         },
         "testCol5min" : {
@@ -180,7 +170,7 @@
             "alpha" : 0.05,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [1939, 2342, 3102]
+                "round_candidates" : [1921, 2385, 3118]
             }
         },
         "testCol5arlo" : {
@@ -190,7 +180,7 @@
             "alpha" : 0.05,
             "quants" : [0.7, 0.8, 0.9],
             "expected": {
-                "round_candidates" : [3180, 4078, 5650]
+                "round_candidates" : [3196, 4094, 5652]
             }
         }
     }
