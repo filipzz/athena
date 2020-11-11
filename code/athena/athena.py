@@ -449,7 +449,7 @@ class AthenaAudit():
 
         """For really small margins (smaller than approximation_threshold) we return approximate round size"""
         # TODO: review approximation_threshold
-        approximation_treshold = .005
+        approximation_treshold = .015
         if margin < approximation_treshold:
             good_candidate = self.round_size_approx(margin, self.alpha, quant)
             return {"size": good_candidate, "prob_stop": quant}
