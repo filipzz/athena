@@ -324,8 +324,13 @@ class AthenaAudit():
         #print("size of dist: %s %s %s" % (len(self.prob_distribution_margin), len(prob_table), len(draws_dist)))
 
         kmin_found = False
-        right = min(self.wald_k_min(round_candidate, margin, self.alpha), round_candidate)
+        bkm = self.wald_k_min(round_candidate, margin, self.alpha)
+        middle_p = (.5 + p) * round_candidate // 2
+        #diff = bkm - middle_p
+        right = min(bkm, round_candidate)
+        #left = max(middle_p - diff, round_candidate //2)
         left = round_candidate // 2
+        #left = max()
         mid = (right + left) // 2
         #mid = right
 
