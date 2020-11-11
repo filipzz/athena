@@ -73,6 +73,11 @@ class AthenaAudit():
         """Switch for convolve mode direct/fft"""
         self.convolve_method = 'direct'
 
+        """Approximation threshold level"""
+        """Below the threshold, approximate round size will be returned"""
+        """Above the threshold, the result of binary search for round size is returned"""
+        self.approximation_threshold = 0.015
+
     def __repr__(self):
         return f"""{{
             "audit_type": {self.audit_type}, 
@@ -106,6 +111,10 @@ class AthenaAudit():
 
     def set_convolve_method(self, method):
         self.convolve_method = method
+
+    def set_approximation_threshold(self, threshold):
+        if 0 < threshold < 1:
+            self.approximation_threshold = threshold
 
     def next_round_prob(self, margin, round_size_prev, round_size, prob_table_prev):
         """
@@ -448,11 +457,11 @@ class AthenaAudit():
         """
 
         """For really small margins (smaller than approximation_threshold) we return approximate round size"""
-        # TODO: review approximation_threshold
-        approximation_treshold = .015
-        if margin < approximation_treshold:
+        if margin < self.approximation_threshold:
             good_candidate = self.round_size_approx(margin, self.alpha, quant)
             return {"size": good_candidate, "prob_stop": quant}
+
+        print("%s %s" % (margin, self.approximation_threshold))
 
         if len(round_schedule) == 0 or round_schedule[-1] < 10000:
             round_max = 10000

@@ -55,6 +55,7 @@ class Audit():
         self.contest_list = []
         self.data_frame = {}
         self.convolve_method = 'direct'
+        self.approximation_threshold = 0.015
 
     def __repr__(self):
         return f'audit type: {self.audit_type}\n' \
@@ -66,6 +67,11 @@ class Audit():
     """Sets convolve method to: method"""
     def set_colvolve_method(self, method):
         self.convolve_method = method
+
+    """Sets approximation threshold to: threshold (to speed up finding round sizes)"""
+    def set_approximation_threshold(self, threshold):
+        if 0 < threshold < 1:
+            self.approximation_threshold = threshold
 
     def get_status(self, contest_name):
         return self.status[contest_name].get_status()
@@ -238,6 +244,7 @@ class Audit():
 
             audit_object = AthenaAudit(self.audit_type, self.alpha, self.delta)
             audit_object.set_convolve_method(self.convolve_method)
+            audit_object.set_approximation_threshold(self.approximation_threshold)
             #print("---------" + str(rs))
             #audit_object.audit(margin, rs)
 
@@ -312,6 +319,7 @@ class Audit():
 
             audit_object = AthenaAudit(self.audit_type.lower(), self.alpha, self.delta)
             audit_object.set_convolve_method(self.convolve_method)
+            audit_object.set_approximation_threshold(self.approximation_threshold)
             #TODO: check this call
             audit_athena = audit_object.audit(margin, rs)
             '''

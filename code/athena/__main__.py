@@ -45,6 +45,7 @@ if __name__ == '__main__':
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
     parser.add_argument("--type", help="set the audit type (athena/bravo/arlo/minerva/metis)", default="athena")
     parser.add_argument("--conv", help="sets method for convolutions either default or fft", default='direct')
+    parser.add_argument("--approx", help="sets approximation threshold for binary search/approximation for next round size", type=float, default=0.015)
 
     args, args_unknown = parser.parse_known_args()
 
@@ -181,6 +182,11 @@ if __name__ == '__main__':
             if args.conv == 'fft':
                 convolve_method = 'fft'
 
+        if 0.0 < args.approx < 1.0:
+            approximation_threshold = args.approx
+        else:
+            approximation_threshold = 0.015
+
     #elif args.load:
     #    mode = "read"
     else:
@@ -255,6 +261,7 @@ if __name__ == '__main__':
 
         w = AthenaAudit(audit_type.lower(), alpha, delta)
         w.set_convolve_method(convolve_method)
+        w.set_approximation_threshold(approximation_threshold)
         #print(str(w))
         #for i in range(len(candidates)):
         #print("option temporary unavailable")
@@ -281,6 +288,7 @@ if __name__ == '__main__':
 
                 audit_object = AthenaAudit(audit_type.lower(), alpha, delta)
                 audit_object.set_convolve_method(convolve_method)
+                audit_object.set_approximation_threshold(approximation_threshold)
                 audit_athena = audit_object.audit(margin, rs)
 
                 #print(str(audit_object))
@@ -320,6 +328,7 @@ if __name__ == '__main__':
         if mode == "read":
             w = Audit(audit_type, alpha)
             w.set_colvolve_method(convolve_method)
+            w.set_approximation_threshold(approximation_threshold)
             w.read_election_results(file_name)
             w.load_contest(contest_name)
             #print("ele-d", w.election.data)
@@ -331,6 +340,7 @@ if __name__ == '__main__':
         else:
             w = Audit(audit_type, alpha, delta)
             w.set_colvolve_method(convolve_method)
+            w.set_approximation_threshold(approximation_threshold)
             #print(election)
             w.add_election(election)
             w.load_contest(contest_name)
@@ -351,11 +361,13 @@ if __name__ == '__main__':
         if mode == "read":
             w = Audit(audit_type)
             w.set_colvolve_method(convolve_method)
+            w.set_approximation_threshold(approximation_threshold)
             w.read_election_results(file_name)
             w.load_contest(contest_name)
         else:
             w = Audit(audit_type, alpha, delta)
             w.set_colvolve_method(convolve_method)
+            w.set_approximation_threshold(approximation_threshold)
             w.add_election(election)
             w.load_contest(contest_name)
             w.add_round_schedule(round_schedule)
@@ -367,11 +379,13 @@ if __name__ == '__main__':
         if mode == "read":
             w = Audit(audit_type)
             w.set_colvolve_method(convolve_method)
+            w.set_approximation_threshold(approximation_threshold)
             w.read_election_results(file_name)
             w.load_contest(contest_name)
         else:
             w = Audit(audit_type, alpha, delta)
             w.set_colvolve_method(convolve_method)
+            w.set_approximation_threshold(approximation_threshold)
             w.add_election(election)
             w.load_contest(contest_name)
 
