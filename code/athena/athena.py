@@ -238,7 +238,7 @@ class AthenaAudit():
                     kmins[round] = kmin_candidate
                     prob_sum[round] = sum(prob_table[kmin_candidate:len(prob_table)]) + prob_sum[round - 1]
                     prob_tied_sum[round] = sum(prob_tied_table[kmin_candidate:len(prob_tied_table)]) + prob_tied_sum[round - 1]
-                    if prob_table[kmin_candidate] > 0:
+                    if self.check_delta and prob_table[kmin_candidate] > 0:
                         deltas[round] = prob_tied_table[kmin_candidate] / prob_table[kmin_candidate]
                 else:
                     kmin_candidate = kmin_candidate + 1
@@ -287,6 +287,7 @@ class AthenaAudit():
         # print("\t\t" + str(self.kmins))
         # print("\t\t" + str(self.prob_distribution_tied))
         # print("\t\t" + str(self.prob_distribution_margin))
+        delta = None
         round_candidate = new_round_schedule[-1]
         #print(str(new_round_schedule) + " -> " + str(round_candidate))
         if len(new_round_schedule) > 1:
@@ -358,10 +359,11 @@ class AthenaAudit():
 
         if kmin_found:
             #print("!!!!!!!!!!!!!!!!! %s: " % (kmin_candidate))
-            if prob_table[kmin_candidate] > 0:
-                delta = prob_table_tied[kmin_candidate] / prob_table[kmin_candidate]
-            else:
-                delta = None
+            if self.check_delta:
+                if prob_table[kmin_candidate] > 0:
+                    delta = prob_table_tied[kmin_candidate] / prob_table[kmin_candidate]
+                else:
+                    delta = None
 
             if sum(prob_table[kmin_candidate:]) > 0:
                 alpha = sum(prob_table_tied[kmin_candidate:]) / sum(prob_table[kmin_candidate:])

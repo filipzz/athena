@@ -1,0 +1,111 @@
+{
+	"name": "Arlo 2020",
+	"total_ballots": 4899634,
+	"contests": {
+		"contest_c3": {
+			"contest_ballots": 1200,
+			"tally": {
+				"A": 600,
+				"B": 400,
+				"C": 100
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"A"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"contest_d1": {
+			"contest_ballots": 900,
+			"tally": {
+				"A": 600,
+				"B": 200,
+				"C": 100
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"A"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"contest_d2": {
+			"contest_ballots": 101,
+			"tally": {
+				"A": 100,
+				"B": 1
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"A"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"contest_d4": {
+			"contest_ballots": 1000,
+			"tally": {
+				"A": 300,
+				"B": 200,
+				"C": 200
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"A"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"contest_d22": {
+			"contest_ballots": 1100,
+			"tally": {
+				"A": 400,
+				"B": 400,
+				"C": 200,
+				"D": 100
+			},
+			"num_winners": 2,
+			"reported_winners": [
+				"A",
+				"B"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"contest_c32": {
+			"contest_ballots": 1200,
+			"tally": {
+				"A": 600,
+				"B": 400,
+				"C": 100
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"A"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"contest_c0": {
+			"contest_ballots": 100,
+			"tally": {
+				"A": 100,
+				"B": 0
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"A"
+			],
+			"contest_type": "PLURALITY"
+		},
+		"contest_multi": {
+			"contest_ballots": 4899634,
+			"tally": {
+				"A": 1611843,
+				"B": 1270029,
+				"C": 978058
+			},
+			"num_winners": 2,
+			"reported_winners": [
+				"A",
+				"B"
+			],
+			"contest_type": "PLURALITY"
+		}
+	}
+}
