@@ -287,7 +287,7 @@ class AthenaAudit():
         # print("\t\t" + str(self.kmins))
         # print("\t\t" + str(self.prob_distribution_tied))
         # print("\t\t" + str(self.prob_distribution_margin))
-        delta = None
+        delta = 0.0
         round_candidate = new_round_schedule[-1]
         #print(str(new_round_schedule) + " -> " + str(round_candidate))
         if len(new_round_schedule) > 1:

@@ -375,11 +375,12 @@ class Audit():
             audit_risk = w["audit_ratio"][-1]
             #logging.info(str(w))
             #logging.info("Risk spent:\t%s" % (ratio[-1]))
-            if deltas[-1] > 0:
-                logging.info("\t\tdelta [needs to be > %s]:\t\t\t%s" % (self.delta, 1/deltas[-1]))
-            else:
-                logging.info("\t\tdelta [needs to be > %s]:\t\t\tinf." % (self.delta))
-            logging.info("\t\tLR [needs to be < %s]:\t\t%s" % (self.delta, deltas[-1]))
+            if self.audit_type.lower in {"bravo", "athena", "arlo"}:
+                if deltas[-1] > 0:
+                    logging.info("\t\tdelta [needs to be > %s]:\t\t\t%s" % (self.delta, 1/deltas[-1]))
+                else:
+                    logging.info("\t\tdelta [needs to be > %s]:\t\t\tinf." % (self.delta))
+                logging.info("\t\tLR [needs to be < %s]:\t\t%s" % (self.delta, deltas[-1]))
             logging.info("\t\tp-value [needs to be <= %s]:\t%s" % (self.alpha, audit_risk))
 
             if test_info["passed"] != 1:
@@ -404,7 +405,7 @@ class Audit():
         self.status[contest_name].audit_pairs = audit_pairs_next
 
         logging.debug("risks: %s" % (risks))
-        logging.debug("delta: %s" % (delta))
+        #logging.debug("delta: %s" % (delta))
 
         return {"risk": max(risks),
                 "delta": max(delta),
@@ -561,10 +562,11 @@ class Audit():
             print("\n\n\tRound: %s audit failed" % (self.status[contest_name].round_number))
             #print("\tAudit failed")
             #print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
-            print("\tLR:\t\t%s\t[needs to be > %s]" % (x["delta"], self.delta))
+            if self.audit_type.lower in {"arlo", "bravo", "athena"}:
+                print("\tLR:\t\t%s\t[needs to be > %s]" % (x["delta"], self.delta))
             #print("\tDelta:\t\t%s\t[needs to be < %s]" % (1/x["delta"], self.delta))
-            print("\tATHENA risk:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
-            print("\tboth conditions are required to be satisfied.")
+            print("\tP-value:\t%s\t[needs to be <= %s]" % (x["risk"], self.alpha))
+            #print("\tboth conditions are required to be satisfied.")
             #print("P-value:\t%s\n" % (x["risk"]))
 
             #round_number = round_number + 1
@@ -626,7 +628,8 @@ class Audit():
                     else:
                         r.append(self.observations[contest_name][i][rd])
                 r.append(str(self.status[contest_name].ballots_sampled[rd]))
-                r.append("{:.4f}".format(1/self.status[contest_name].deltas[rd]))
+                #r.append("{:.4f}".format(1/self.status[contest_name].deltas[rd]))
+                r.append(" ")
                 r.append("{:.4f}".format(self.status[contest_name].risks[rd]))
                 df[col_caption] = r
 
