@@ -90,6 +90,7 @@
     }
   },
   "DistrictofColumbia" : {
+    "total_ballots" : 311268,
     "contests" : {
       "presidential" : {
         "winners" : 1,
