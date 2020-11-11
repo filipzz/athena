@@ -302,16 +302,17 @@ if __name__ == '__main__':
                 prob_tied_sum_round = [(prob_tied_sum_ex[i+1]-prob_tied_sum_ex[i]) for i in range(len(prob_tied_sum))]
                 print("\t%s pstop round (audit):\t%s" % (audit_type, str(prob_sum_round)))
                 print("\t%s pstop round (tied): \t%s" % (audit_type, str(prob_tied_sum_round)))
-                print("\t%s deltas ():\t%s" % (audit_type, str(deltas)))
 
+                if w.audit_type.lower in {"arlo", "bravo", "athena"}:
+                    true_risk = []
+                    for p, pt in zip(prob_sum, prob_tied_sum):
+                        if p == 0:
+                            true_risk.append(0.0)
+                        else:
+                            true_risk.append(pt/p)
 
-                true_risk = []
-                for p, pt in zip(prob_sum, prob_tied_sum):
-                    if p == 0:
-                        true_risk.append(0.0)
-                    else:
-                        true_risk.append(pt/p)
-                print("\t%s ratio:\t%s" % (audit_type, str(true_risk)))
+                    print("\t%s deltas ():\t%s" % (audit_type, str(deltas)))
+                    print("\t%s ratio:\t%s" % (audit_type, str(true_risk)))
             """ """
 
     elif mode_rounds == "pstop":
