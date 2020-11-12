@@ -54,7 +54,7 @@ class Audit():
         self.contests = []
         self.contest_list = []
         self.data_frame = {}
-        self.convolve_method = 'direct'
+        self.convolve_method = 'fft'
         self.approximation_threshold = 0.015
 
     def __repr__(self):

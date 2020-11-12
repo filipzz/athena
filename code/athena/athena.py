@@ -68,10 +68,10 @@ class AthenaAudit():
         """Storing information about the probabilities of stopping in a given round"""
         self.pstop_round = [0.0]
         self.pstop_tied_round = [0.0]
-        self.kmins = []
+        self.kmins = [0] * 20
 
         """Switch for convolve mode direct/fft"""
-        self.convolve_method = 'direct'
+        self.convolve_method = 'fft'
 
         """Approximation threshold level"""
         """Below the threshold, approximate round size will be returned"""
@@ -234,7 +234,7 @@ class AthenaAudit():
 
         self.pstop_round  = []
         self.pstop_tied_round = []
-        self.kmins = []
+        #self.kmins = []
 
 
         for round in range(1, number_of_rounds):
@@ -270,6 +270,7 @@ class AthenaAudit():
                 kmin_candidate = result["kmin"]
                 kmin_found = True
                 kmins[round] = kmin_candidate
+                self.kmins[round] = kmin_candidate
                 prob_sum[round] = result["prob_stop"] + prob_sum[round - 1]
                 prob_tied_sum[round] = result["prob_stop_tied"] + prob_tied_sum[round - 1]
                 if self.check_delta and prob_table[kmin_candidate] > 0:
@@ -293,7 +294,7 @@ class AthenaAudit():
 
             self.pstop_round.append(1 - sum(prob_table_prev))
             self.pstop_tied_round.append(1 - sum(prob_tied_sum))
-            self.kmins.append(kmins)
+            #self.kmins.append(kmins[round])
 
             self.prob_distribution_margin = prob_table_prev
             self.prob_distribution_tied = prob_tied_table_prev
@@ -316,6 +317,7 @@ class AthenaAudit():
     def find_next_round_kmin(self, margin, new_round_schedule):
         self.calls_made = self.calls_made + 1
         #print("\nfind_next_round_kmin(%s, %s)" % (margin, new_round_schedule))
+
         """For a given new_round_schedule finds the kmin for the last round."""
         """Uses binary search to find kmin"""
         ##print("\n\tFind next round kmins for %s (margin: %s)" % (new_round_schedule, margin))
@@ -346,6 +348,21 @@ class AthenaAudit():
                                     (round_candidate - round_size_prev), p0)
         # prob_table_tied = fftconvolve(self.prob_distribution_tied, draws_dist_tied)
         prob_table_tied = convolve(self.prob_distribution_tied, draws_dist_tied, method=self.convolve_method)
+
+        """
+        ##print("\t\t\t\t\t%s" % (self.kmins))
+        ##print("\t\t\t\t\t%s" % (self.kmins[len(new_round_schedule)-1]))
+
+        if self.kmins[len(new_round_schedule)-1] > 0:
+            kmin_candidate = self.kmins[len(new_round_schedule)-1]
+            return {
+                "kmin": self.kmins[len(new_round_schedule)],
+                "prob_stop": sum(prob_table[kmin_candidate:]),
+                "prob_stop_tied": sum(prob_table_tied[kmin_candidate:]),
+                "prob_kmin": prob_table[kmin_candidate],
+                "prob_kmin_tied": prob_table_tied[kmin_candidate],
+            }
+        """
 
         ##print("size of dist: %s %s %s" % (len(self.prob_distribution_margin), len(prob_table), len(draws_dist)))
 
