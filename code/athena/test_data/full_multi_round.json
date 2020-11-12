@@ -1,0 +1,81 @@
+{
+  "test1_ga": {
+    "audit_type": "minerva",
+    "alpha": 0.1,
+    "election": {
+      "name": "contest_1",
+      "total_ballots": 100000,
+      "contests": {
+          "contest_1": {
+              "contest_ballots": 100000,
+              "tally": {
+                  "A": 50500,
+                  "B": 49500
+              },
+              "num_winners": 1,
+              "reported_winners": [
+                  "A"
+              ],
+              "contest_type": "PLURALITY"
+          }
+      }
+    },
+    "rounds": {
+      "1": {
+        "pvalue": {
+          "contest": "contest_1",
+          "observations": [
+            13165, 13209
+          ],
+          "expected": {
+            "pvalue": 0.6271058601310551
+          }
+        }
+      },
+      "2": {
+        "pvalue": {
+          "contest": "contest_1",
+          "observations": [
+            19824, 19737
+          ],
+          "expected": {
+            "pvalue": 0.7670547441449894
+          }
+        }
+      },
+      "3": {
+        "pvalue": {
+          "contest": "contest_1",
+          "observations": [
+            29741, 29600
+          ],
+          "expected": {
+            "pvalue": 1.5919573303645684
+          }
+        }
+      },
+      "4": {
+        "pvalue": {
+          "contest": "contest_1",
+          "observations": [
+            44817, 44195
+          ],
+          "expected": {
+            "pvalue": 0.5780927080437686
+          }
+        }
+      },
+      "5": {
+        "pvalue": {
+          "contest": "contest_1",
+          "observations": [
+            67273, 66245
+          ],
+          "expected": {
+            "pvalue": 0.033646901689231574
+          }
+        }
+      }
+    }
+  }
+}
