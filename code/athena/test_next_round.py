@@ -1,8 +1,8 @@
-import json
-import os
+from json import load
+from os import path
 
 from athena.audit import Audit
-from athena.contest import Contest
+#from athena.contest import Contest
 
 
 def test_first_round_sizes():
@@ -10,18 +10,18 @@ def test_first_round_sizes():
     error_level = 0.0001
 
     # file with the definition of test
-    with open(os.path.join(os.path.dirname(__file__),'test_def_next_round.json'), 'r') as f:
-        test_info = json.load(f)
+    with open(path.join(path.dirname(__file__),'test_def_next_round.json'), 'r') as f:
+        test_info = load(f)
 
     for test_list in test_info:
         election_file = test_info[test_list]["election_file"]
         audit_file = test_info[test_list]["audit_file"]
 
-        with open(os.path.join(os.path.dirname(__file__),election_file), 'r') as f:
-            elections = json.load(f)
+        with open(path.join(path.dirname(__file__),election_file), 'r') as f:
+            elections = load(f)
 
-        with open(os.path.join(os.path.dirname(__file__),audit_file), 'r') as f:
-            tests = json.load(f)
+        with open(path.join(path.dirname(__file__),audit_file), 'r') as f:
+            tests = load(f)
 
 
         type_of_test = "next_round_size"
@@ -94,18 +94,18 @@ def test_first_round_sizes():
     error_level = 0.0001
 
     # file with the definition of test
-    with open(os.path.join(os.path.dirname(__file__),'test_def_next_round.json'), 'r') as f:
-        test_info = json.load(f)
+    with open(path.join(path.dirname(__file__),'test_def_next_round.json'), 'r') as f:
+        test_info = load(f)
 
     for test_list in test_info:
         election_file = test_info[test_list]["election_file"]
         audit_file = test_info[test_list]["audit_file"]
 
-        with open(os.path.join(os.path.dirname(__file__),election_file), 'r') as f:
-            elections = json.load(f)
+        with open(path.join(path.dirname(__file__),election_file), 'r') as f:
+            elections = load(f)
 
-        with open(os.path.join(os.path.dirname(__file__),audit_file), 'r') as f:
-            tests = json.load(f)
+        with open(path.join(path.dirname(__file__),audit_file), 'r') as f:
+            tests = load(f)
 
 
         type_of_test = "next_round_size"
@@ -162,6 +162,7 @@ def test_first_round_sizes():
                 computed = []
                 for t in results:
                     computed.append(t[-1])
+
 
 
                 #assert x["future_round_sizes"] == expected_round_sizes, 's_w failed: got {}, expected {}'.format(x["future_round_sizes"], expected_round_sizes)

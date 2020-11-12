@@ -1,7 +1,7 @@
 {
     "next_round_size" : {
         "params": {
-            "round_max": 100000
+            "round_max": 10000
         },
         "testDC10athena": {
             "audit_type": "athena",

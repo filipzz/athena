@@ -1,10 +1,10 @@
-import json
-import os
+from json import load
+from os import path
 
-from athena.audit import Audit
+#from athena.audit import Audit
 from athena.athena import AthenaAudit
 
-import numpy as np
+from numpy import abs
 
 def set_ele(results):
     election = {}
@@ -43,9 +43,9 @@ def test_find_kmins():
 
     error_level = 0.0001
 
-    with open(os.path.join(os.path.dirname(__file__),'test_athena.json'), 'r') as f:
+    with open(path.join(path.dirname(__file__),'test_athena.json'), 'r') as f:
     #with open('athena/test_data.json', 'r') as f:
-        tests = json.load(f)
+        tests = load(f)
 
     type_of_test = "find_kmins"
     #for type_of_test in tests.keys():
@@ -92,11 +92,13 @@ def test_find_kmins():
         #kmins = computed['kmin_new']
         risk_goal = prob_tied_sum #computed['risk_spent']
 
+        del(audit_object)
+
         assert kmins == expected_kmins, 's_w failed: got {}, expected {}'.format(kmins, expected_kmins)
 
         # TODO: check values of risk_goal/prob_stop
         for rg_com, rg_exp in zip(risk_goal, expected_risk_expended):
-            assert np.abs(rg_com - rg_exp) < error_level, 's_w failed: got {}, expected {}'.format(rg_com, rg_exp)
+            assert abs(rg_com - rg_exp) < error_level, 's_w failed: got {}, expected {}'.format(rg_com, rg_exp)
 
 
 

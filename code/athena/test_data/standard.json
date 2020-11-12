@@ -1,0 +1,18 @@
+{
+	"name": "Local Elections 2020",
+	"total_ballots": 8000,
+	"contests": {
+		"contest_1": {
+			"contest_ballots": 8000,
+			"tally": {
+				"A": 5000,
+				"B": 3000
+			},
+			"num_winners": 1,
+			"reported_winners": [
+				"A"
+			],
+			"contest_type": "PLURALITY"
+		}
+    }
+}

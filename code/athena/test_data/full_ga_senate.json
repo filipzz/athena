@@ -1,0 +1,76 @@
+{
+  "test1_ga": {
+    "audit_type": "minerva",
+    "alpha": 0.1,
+    "election": {
+      "name": "GA_Senate_2020",
+      "total_ballots": 4927219,
+      "contests": {
+          "GA_Senate_2020": {
+              "contest_ballots": 4927219,
+              "tally": {
+                  "A": 2453876,
+                  "B": 2358432
+              },
+              "num_winners": 1,
+              "reported_winners": [
+                  "A"
+              ],
+              "contest_type": "PLURALITY"
+          }
+      }
+    },
+    "rounds": {
+      "0": {
+        "find_next_round_sizes": {
+          "contest": "GA_Senate_2020",
+          "quants": [
+            0.7,
+            0.8,
+            0.9
+          ],
+          "expected": {
+            "round_candidates": [
+              10486,
+              13205,
+              18005
+            ]
+          }
+        }
+      },
+      "1": {
+        "pvalue": {
+          "contest": "GA_Senate_2020",
+          "observations": [
+            4950, 4953
+          ],
+          "expected": {
+            "pvalue": 0.5276381895989495
+          }
+        }
+      },
+      "2": {
+        "pvalue": {
+          "contest": "GA_Senate_2020",
+          "observations": [
+            6950, 7147
+          ],
+          "expected": {
+            "pvalue": 2.6633583092949507
+          }
+        }
+      },
+      "3": {
+        "pvalue": {
+          "contest": "GA_Senate_2020",
+          "observations": [
+            12100, 9500
+          ],
+          "expected": {
+            "pvalue": 1.3603373970937863e-17
+          }
+        }
+      }
+    }
+  }
+}
