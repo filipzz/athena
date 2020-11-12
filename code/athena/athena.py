@@ -78,6 +78,9 @@ class AthenaAudit():
         """Above the threshold, the result of binary search for round size is returned"""
         self.approximation_threshold = 0.015
 
+        self.checks_made = 0
+        self.calls_made = 0
+
     def __repr__(self):
         return f"""{{
             "audit_type": {self.audit_type}, 
@@ -117,6 +120,7 @@ class AthenaAudit():
             self.approximation_threshold = threshold
 
     def next_round_prob(self, margin, round_size_prev, round_size, prob_table_prev):
+        print("next_round_prob(%s, %s, %s, %s)" % (margin, round_size_prev, round_size, len(prob_table_prev)))
         """
         Parameters
         ----------
@@ -185,6 +189,7 @@ class AthenaAudit():
         return ceil(((z_a * sqrt(p * (1 - p)) - .5 * z_b) / (p - .5)) ** 2)
 
     def wald_k_min(self, sample_size, margin, delta):
+        print("wald_k_min(%s, %s, %s)" % (sample_size, margin, delta))
         """
         Returns Bravo/Wald's kmin for the sample size m, margin x and risk alpha
         :param sample_size: (integer) number of ballots drawn during the audit so far
@@ -202,6 +207,7 @@ class AthenaAudit():
 
     #def audit(self, audit_type, margin, alpha, delta, round_schedule):
     def audit(self, margin, round_schedule):
+        print("audit(%s, %s)" % (margin, round_schedule))
         """
         Parameters
         ----------
@@ -238,6 +244,7 @@ class AthenaAudit():
 
             kmin_found = False
             kmin_candidate = floor(round_schedule[round]/2)
+            #kmin_candidate = floor((1 + margin)*(round_schedule[round] // 2, margin, self.alpha))
 
             while kmin_found is False and kmin_candidate <= round_schedule[round]:
                 if self.check_delta * self.delta * prob_table[kmin_candidate] >= self.check_delta * prob_tied_table[kmin_candidate] \
@@ -290,6 +297,8 @@ class AthenaAudit():
         return {"kmins": kmins[1:len(kmins)], "prob_sum": prob_sum[1:len(prob_sum)], "prob_tied_sum": prob_tied_sum[1:len(prob_tied_sum)], "deltas": deltas[1:len(kmins)]}
 
     def find_next_round_kmin(self, margin, new_round_schedule):
+        self.calls_made = self.calls_made + 1
+        print("\nfind_next_round_kmin(%s, %s)" % (margin, new_round_schedule))
         """For a given new_round_schedule finds the kmin for the last round."""
         """Uses binary search to find kmin"""
         #print("\n\tFind next round kmins for %s (margin: %s)" % (new_round_schedule, margin))
@@ -306,36 +315,101 @@ class AthenaAudit():
             round_size_prev = 0
 
         p = (1 + margin) / 2
-        #print("\n%s %s %s %s" % (round_size_prev, round_candidate, p, new_round_schedule))
+        # print("\n%s %s %s %s" % (round_size_prev, round_candidate, p, new_round_schedule))
         draws_dist = binom.pmf(
-                        range(0, (round_candidate - round_size_prev) + 1),
-                        (round_candidate - round_size_prev),
-                        p
-                    )
-        #prob_table = fftconvolve(self.prob_distribution_margin, draws_dist)
+            range(0, (round_candidate - round_size_prev) + 1),
+            (round_candidate - round_size_prev),
+            p
+        )
+        # prob_table = fftconvolve(self.prob_distribution_margin, draws_dist)
         prob_table = convolve(self.prob_distribution_margin, draws_dist, method=self.convolve_method)
 
         p0 = 0.5
         draws_dist_tied = binom.pmf(range(0, (round_candidate - round_size_prev) + 1),
                                     (round_candidate - round_size_prev), p0)
-        #prob_table_tied = fftconvolve(self.prob_distribution_tied, draws_dist_tied)
+        # prob_table_tied = fftconvolve(self.prob_distribution_tied, draws_dist_tied)
         prob_table_tied = convolve(self.prob_distribution_tied, draws_dist_tied, method=self.convolve_method)
 
         #print("size of dist: %s %s %s" % (len(self.prob_distribution_margin), len(prob_table), len(draws_dist)))
 
         kmin_found = False
-        bkm = self.wald_k_min(round_candidate, margin, self.alpha)
-        middle_p = (.5 + p) * round_candidate // 2
-        #diff = bkm - middle_p
+        bkm = floor(self.wald_k_min(round_candidate, margin, self.alpha))
+        middle_p = floor((.5 + p) * round_candidate // 2)
+        diff = bkm - middle_p
         right = min(bkm, round_candidate)
-        #left = max(middle_p - diff, round_candidate //2)
+        #first_right = right
+        #right_sum = sum(prob_table[first_right:])
+        #right_sum_tied = sum(prob_table_tied[first_right:])
         left = round_candidate // 2
         #left = max()
         mid = (right + left) // 2
+        print("\t%s %s %s %s %s" % (right - left, left, mid, right, round_candidate))
+        print("\t\tkmin search:")
         #mid = right
 
-        while right >= left:
-            #print("\t\t%s %s %s" % (left, mid, right))
+        #go = 5
+        #right = bkm
+        """
+        go = diff // 5
+        print("\t\t\t\tdiff %s" % (go))
+
+        first_right = right
+        right_sum = sum(prob_table[first_right:])
+        right_sum_tied = sum(prob_table_tied[first_right:])
+
+        check_right = False
+        while not check_right:
+            print("\t\tfind right: %s" % (right))
+            check_right = self.check_delta * self.delta * prob_table[right] >= self.check_delta * prob_table_tied[right] \
+                          and self.check_sum * self.alpha * (
+                                  sum(prob_table[right:first_right]) + right_sum) + self.check_memory * sum(
+                self.pstop_round) \
+                          >= self.check_sum * (
+                                  sum(prob_table_tied[right:first_right]) + right_sum_tied) + self.check_memory * sum(
+                self.pstop_tied_round)
+            self.checks_made = self.checks_made + 1
+            if not check_right:
+                #go = 2 * go
+                right = right + go
+            else:
+                # we need to go to the previous value of right
+                #go = go // 2
+                #right = middle_p + go
+                right = right - go
+        print("\t\t->find right: %s" % (right))
+        """
+
+        # mid = (right + left) // 2
+
+        checks = 0
+        checks_cond = 0
+        first_right = right
+        right_sum = sum(prob_table[first_right:])
+        right_sum_tied = sum(prob_table_tied[first_right:])
+
+        """
+        left = middle_p
+        check_left = True
+        go = 5
+        while check_left:
+            print("\t\tfind left: %s" % (left))
+            check_left = self.check_delta * self.delta * prob_table[left] >= self.check_delta * prob_table_tied[left] \
+                        and self.check_sum * self.alpha * (
+                                    sum(prob_table[left:first_right]) + right_sum) + self.check_memory * sum(
+                self.pstop_round) \
+                        >= self.check_sum * (
+                                    sum(prob_table_tied[left:first_right]) + right_sum_tied) + self.check_memory * sum(
+                self.pstop_tied_round)
+            self.checks_made = self.checks_made + 1
+            if check_left:
+                go = 2 * go
+                left = middle_p - go
+        """
+
+        mid = (right + left) // 2
+
+        while right > left:
+            print("\t\t%s %s %s" % (left, mid, right))
             #print("\t\t\t%s >= %s\t%s >= %s" %
             #      (self.check_delta * self.delta * prob_table[mid],
             #       self.check_delta * prob_table_tied[mid],
@@ -344,24 +418,41 @@ class AthenaAudit():
             #if self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] \
             #        and self.check_sum * self.alpha * (sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= \
             #        self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round)):
-            check_mid = self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] and self.check_sum * self.alpha * (
-                        sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round))
-            check_kmin = self.check_delta * self.delta * prob_table[mid-1] >= self.check_delta * prob_table_tied[mid-1] and self.check_sum * self.alpha * (
-                       sum(prob_table[mid-1:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid-1:]) + self.check_memory * sum(self.pstop_tied_round))
-            #check_mid = self.check_sum * self.alpha * (sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round))
-            #check_kmin = self.check_sum * self.alpha * (sum(prob_table[mid-1:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid-1:]) + self.check_memory * sum(self.pstop_tied_round))
+            #check_mid = self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] and self.check_sum * self.alpha * (
+            #            sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round))
+            check_mid = self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] \
+                        and self.check_sum * self.alpha * (sum(prob_table[mid:first_right]) + right_sum) + self.check_memory * sum(self.pstop_round) \
+                        >= self.check_sum * (sum(prob_table_tied[mid:first_right]) + right_sum_tied) + self.check_memory * sum(self.pstop_tied_round)
+            checks = checks + 1
 
 
-            if check_mid and not check_kmin:
-                #print("\t\t\tmid + not kmin -> kmin found at %s" % (mid))
-                """kmin found: holds for mid but not for mid-1"""
-                kmin_found = True
-                kmin_candidate = mid
-                left = right + 1
-            elif check_mid:
-                #print("\t\t\tmid %s" % (check_mid))
-                right = mid
-                mid = (left + right) // 2
+            if check_mid:
+                check_kmin = self.check_delta * self.delta * prob_table[mid-1] >= self.check_delta * prob_table_tied[mid-1] \
+                            and self.check_sum * self.alpha * (
+                                        sum(prob_table[mid-1:first_right]) + right_sum) + self.check_memory * sum(
+                    self.pstop_round) \
+                            >= self.check_sum * (sum(
+                    prob_table_tied[mid-1:first_right]) + right_sum_tied) + self.check_memory * sum(self.pstop_tied_round)
+                checks_cond = checks_cond + 1
+                #check_kmin = self.check_delta * self.delta * prob_table[mid - 1] >= self.check_delta * prob_table_tied[
+                #    mid - 1] and self.check_sum * self.alpha * (
+                #                     sum(prob_table[mid - 1:]) + self.check_memory * sum(
+                #                 self.pstop_round)) >= self.check_sum * (
+                #                         sum(prob_table_tied[mid - 1:]) + self.check_memory * sum(
+                #                     self.pstop_tied_round))
+                if not check_kmin:
+                    #print("\t\t\tmid + not kmin -> kmin found at %s" % (mid))
+                    """kmin found: holds for mid but not for mid-1"""
+                    kmin_found = True
+                    kmin_candidate = mid
+                    left = right + 1
+                else:
+                    #print("\t\t\tmid %s" % (check_mid))
+                    right_sum_tied = right_sum_tied + sum(prob_table_tied[mid:first_right])
+                    right_sum = right_sum + sum(prob_table[mid:first_right])
+                    first_right = mid
+                    right = mid
+                    mid = (left + right) // 2
             elif not check_mid:
                 #print("\t\t\tnot mid %s" % (check_mid))
                 left = mid + 1
@@ -383,6 +474,9 @@ class AthenaAudit():
                 alpha = sum(prob_table_tied[kmin_candidate:]) / sum(prob_table[kmin_candidate:])
             else:
                 alpha = None
+
+            print("\t\t\t\t%s -> %s  %s" % (round_candidate // 2 - bkm, checks, checks_cond))
+            self.checks_made = self.checks_made + checks + checks_cond
             return {
                 "kmin": kmin_candidate,
                 "prob_stop": sum(prob_table[kmin_candidate:]),
@@ -405,6 +499,7 @@ class AthenaAudit():
 
 
     def find_stopping_probability(self, margin, new_round_schedule, observation):
+        print("find_stopping_probability(%s, %s, %s)" % (margin, new_round_schedule, observation))
         """Finds the probability that we finish in new_round_schedule starting from observation"""
         if len(new_round_schedule) > 1:
             """This part is for 2nd, ... rounds"""
@@ -445,6 +540,7 @@ class AthenaAudit():
         return stopping_probability
 
     def find_next_round_size(self, margin, round_schedule, quant, round_min, observations_i):
+        print("find_next_round_size(%s, %s, %s, %s, %s" % (margin, round_schedule, quant, round_min, observations_i))
         """
         For given audit parameters, computes the expected size of the next round.
 
@@ -469,7 +565,7 @@ class AthenaAudit():
         #print("%s %s" % (margin, self.approximation_threshold))
 
         if len(round_schedule) == 0 or round_schedule[-1] < 10000:
-            round_max = 10000
+            round_max = floor(1.01 * self.round_size_approx(margin, self.alpha, quant))
         else:
             round_max = 2 * round_schedule[-1]
         #upper_limit = 100000
@@ -534,6 +630,7 @@ class AthenaAudit():
 
 
     def find_next_round_sizes(self, margin, round_schedule, quants, observations_i):
+        print("find_next_round_sizes(%s, %s, %s, %s)" % (margin, round_schedule, quants, observations_i))
         '''
         For a given list of possible stopping probabilities (called quants e.g., quants = [.7, .8, .9]) returns a list of
         next round sizes  for which probability of stoping is larger than quants
@@ -569,10 +666,13 @@ class AthenaAudit():
             rounds.append(round_candidate)
             prob_stop.append(results["prob_stop"])
 
-        return {"rounds" : rounds, "prob_stop" : prob_stop}
+        print("calls: %s\tchecks: %s" % (self.calls_made, self.checks_made))
+
+        return {"rounds": rounds, "prob_stop": prob_stop}
 
 
     def relative_prob(self, prob_table):
+        print("relative_prob(%s)" % (prob_table))
         '''
         Helper function, returning the conditional probability of the last round success, from a list representing
         cumulative probability
@@ -590,6 +690,7 @@ class AthenaAudit():
             return prob_gain / prob_total
 
     def find_kmins_for_risk(self, audit_kmins, actual_kmins):
+        print("find_kmins_for_risk(%s, %s)" % (audit_kmins, actual_kmins))
 
         kmins_goal_real = []
         rewrite_on = 1
@@ -615,6 +716,7 @@ class AthenaAudit():
 
 
     def estimate_risk(self, margin, kmins, round_schedule, audit_observations):
+        print("estimate_risk(%s, %s, %s, %s)" % (margin, kmins, round_schedule, audit_observations))
         """
         Parameters
         ----------
