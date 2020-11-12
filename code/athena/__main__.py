@@ -331,6 +331,7 @@ if __name__ == '__main__':
             w.set_approximation_threshold(approximation_threshold)
             w.read_election_results(file_name)
             w.load_contest(contest_name)
+            w.add_round_schedule(round_schedule)
             #print("ele-d", w.election.data)
             #print(w.data)
             #print(w.contests)
