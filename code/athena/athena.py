@@ -71,7 +71,7 @@ class AthenaAudit():
         self.kmins = [0] * 20
 
         """Switch for convolve mode direct/fft"""
-        self.convolve_method = 'fft'
+        self.convolve_method = 'direct'
 
         """Approximation threshold level"""
         """Below the threshold, approximate round size will be returned"""
@@ -442,7 +442,7 @@ class AthenaAudit():
 
         mid = (right + left) // 2
 
-        while right >= left:
+        while right > left:
             #print("\t\t%s %s %s" % (left, mid, right))
             ##print("\t\t\t%s >= %s\t%s >= %s" %
             #      (self.check_delta * self.delta * prob_table[mid],

@@ -177,10 +177,10 @@ if __name__ == '__main__':
                 print("Current version supports only 2-candidate race for risk estimation")
                 sys.exit(2)
 
-        convolve_method = 'fft'
+        convolve_method = 'direct'
         if args.conv:
-            if args.conv == 'direct':
-                convolve_method = 'direct'
+            if args.conv == 'fft':
+                convolve_method = 'fft'
 
         if 0.0 < args.approx < 1.0:
             approximation_threshold = args.approx

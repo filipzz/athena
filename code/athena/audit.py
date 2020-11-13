@@ -2,12 +2,11 @@ import logging
 import math
 import sys
 
-
-
 from .athena import AthenaAudit
 from .election import Election
 
-class Status():
+
+class Status:
     def __init__(self):
         self.round_number = 1
         self.params = []
@@ -31,16 +30,18 @@ class Status():
             "min_kmins": {self.min_kmins}, 
             "risks": {self.risks}, 
             "rs": {self.rs},
+            "audit_pairs": {self.audit_pairs},
             "observations": {self.observations},
-            "round_number": {len(self.min_kmins)}}}"""
+            "round_number": {self.round_number}}}"""
 
 
-class Audit():
+class Audit:
 
     def __init__(self, audit_type, alpha = 0.1, delta = 1):
         self.election = Election()
         self.active_contest = None
         self.observations = {}
+        self.audit_observations = []
         self.status = {}
         self.audit_type = audit_type
         #self.election = Contest()
@@ -54,7 +55,7 @@ class Audit():
         self.contests = []
         self.contest_list = []
         self.data_frame = {}
-        self.convolve_method = 'fft'
+        self.convolve_method = 'direct'
         self.approximation_threshold = 0.015
 
     def __repr__(self):
@@ -84,7 +85,6 @@ class Audit():
         election_data = self.election.read_election_data(url)
         self.add_election(election_data)
 
-
     def add_election(self, election):
         new_election = Election(election) # Contest(election["data"])
         self.election = new_election
@@ -93,7 +93,7 @@ class Audit():
         first_contest = True
         for contest_name in self.election.contests:
             self.contest_list.append(contest_name)
-            self.observations[contest_name] = [[] for j in range((self.election.contests[contest_name].num_candidates))]
+            self.observations[contest_name] = [[] for j in range(self.election.contests[contest_name].num_candidates)]
             self.status[contest_name] = Status()
             if first_contest is True:
                 self.active_contest = contest_name
@@ -118,16 +118,21 @@ class Audit():
 
         #return list(self.data["contests"].keys())
 
-
     def load_contest(self, contest_name):
         self.active_contest = contest_name
         self.audit_observations = self.observations[contest_name] # to be removed
 
         self.status[contest_name].audit_pairs = []
 
+        #print(str(self.election.contests[contest_name].declared_winners))
+        #print(str(self.election.contests[contest_name].declared_losers))
         for winner in self.election.contests[contest_name].declared_winners:
             for loser in self.election.contests[contest_name].declared_losers:
+                #print("[%s, %s]" % (winner, loser))
                 self.status[contest_name].audit_pairs.append([winner, loser])
+
+        #print(str(self.status[contest_name].audit_pairs))
+        #print(str(self.election.contests[contest_name].au))
 
     def add_round_schedule(self, round_schedule):
         self.round_schedule = round_schedule
@@ -166,13 +171,12 @@ class Audit():
         if contest_name is None:
             contest_name = self.active_contest
 
-        if self.status[contest_name].audit_completed == True:
+        if self.status[contest_name].audit_completed:
             raise ValueError("Audit already completed")
         else:
 
             if new_valid_ballots > new_ballots or sum(round_observation) > new_valid_ballots:
                 raise ValueError("Incorrect number of valid ballots entered")
-
 
             self.add_observations(round_observation, contest_name)
             x = self.find_risk() #actual_kmins)
@@ -206,6 +210,8 @@ class Audit():
         found_solutions = {}
         future_round_sizes = [0] * len(pstop_goals)
         #future_prob_stop = [0] * len(pstop_goals)
+
+        print("audit pairs: %s" % (self.status[contest_name].audit_pairs))
 
         for i, j in self.status[contest_name].audit_pairs:
             #for i in self.election.declared_winners:
