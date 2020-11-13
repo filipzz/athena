@@ -1,0 +1,20 @@
+{
+	"name": "ArloContest",
+	"total_ballots": 159,
+	"contests": {
+		"contest_1": {
+			"contest_ballots": 159,
+			"tally": {
+				"A": 83,
+				"B": 64,
+                "C": 10,
+                "D": 2
+			},
+			"num_winners": 3,
+			"reported_winners": [
+				"A", "B", "C"
+			],
+			"contest_type": "PLURALITY"
+		}
+    }
+}

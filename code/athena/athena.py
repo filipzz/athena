@@ -278,9 +278,11 @@ class AthenaAudit():
                     deltas[round] = prob_tied_table[kmin_candidate] / prob_table[kmin_candidate]
 
                 # cleaning prob_table/prob_tied_table - there are no walks at and above kmin
-                for i in range(kmin_candidate, round_schedule[round] + 1):
-                    prob_table[i] = 0
-                    prob_tied_table[i] = 0
+                #for i in range(kmin_candidate, round_schedule[round] + 1):
+                #    prob_table[i] = 0
+                #    prob_tied_table[i] = 0
+                prob_table[kmin_candidate:round_schedule[round]+1] = 0
+                prob_tied_table[kmin_candidate:round_schedule[round]+1] = 0
 
 
             # this means that there are 0 chance of stopping in the given round -- the kmin is unreachable
@@ -443,7 +445,7 @@ class AthenaAudit():
 
         mid = (right + left) // 2
 
-        while right > left:
+        while right >= left:
             #print("\t\t%s %s %s" % (left, mid, right))
             ##print("\t\t\t%s >= %s\t%s >= %s" %
             #      (self.check_delta * self.delta * prob_table[mid],
