@@ -326,34 +326,40 @@ class AthenaAudit():
 
         """For a given new_round_schedule finds the kmin for the last round."""
         """Uses binary search to find kmin"""
-        ##print("\n\tFind next round kmins for %s (margin: %s)" % (new_round_schedule, margin))
-        # #print("\t\t" + str(self.kmins))
-        # #print("\t\t" + str(self.prob_distribution_tied))
-        # #print("\t\t" + str(self.prob_distribution_margin))
         delta = 0.0
         round_candidate = new_round_schedule[-1]
-        ##print(str(new_round_schedule) + " -> " + str(round_candidate))
+
         if len(new_round_schedule) > 1:
-            ##print(str(new_round_schedule))
             round_size_prev = new_round_schedule[-2]
         else:
             round_size_prev = 0
 
         p = (1 + margin) / 2
-        # #print("\n%s %s %s %s" % (round_size_prev, round_candidate, p, new_round_schedule))
-        draws_dist = binom.pmf(
-            range(0, (round_candidate - round_size_prev) + 1),
-            (round_candidate - round_size_prev),
-            p
-        )
-        # prob_table = fftconvolve(self.prob_distribution_margin, draws_dist)
-        prob_table = convolve(self.prob_distribution_margin, draws_dist, method=self.convolve_method)
-
         p0 = 0.5
-        draws_dist_tied = binom.pmf(range(0, (round_candidate - round_size_prev) + 1),
-                                    (round_candidate - round_size_prev), p0)
-        # prob_table_tied = fftconvolve(self.prob_distribution_tied, draws_dist_tied)
-        prob_table_tied = convolve(self.prob_distribution_tied, draws_dist_tied, method=self.convolve_method)
+
+        if len(new_round_schedule) > 1:
+            draws_dist = binom.pmf(
+                range(0, (round_candidate - round_size_prev) + 1),
+                (round_candidate - round_size_prev),
+                p
+            )
+            prob_table = convolve(self.prob_distribution_margin, draws_dist, method=self.convolve_method)
+
+            draws_dist_tied = binom.pmf(range(0, (round_candidate - round_size_prev) + 1),
+                                        (round_candidate - round_size_prev), p0)
+            prob_table_tied = convolve(self.prob_distribution_tied, draws_dist_tied, method=self.convolve_method)
+        else:
+            prob_table = binom.pmf(
+                range(0, (round_candidate - round_size_prev) + 1),
+                (round_candidate - round_size_prev),
+                p
+            )
+
+            prob_table_tied = binom.pmf(range(0, (round_candidate - round_size_prev) + 1),
+                                        (round_candidate - round_size_prev), p0)
+
+
+
 
         """
         ##print("\t\t\t\t\t%s" % (self.kmins))
@@ -488,9 +494,10 @@ class AthenaAudit():
                     left = right + 1
                 else:
                     ##print("\t\t\tmid %s" % (check_mid))
-                    right_sum_tied = right_sum_tied + sum(prob_table_tied[mid:first_right])
-                    right_sum = right_sum + sum(prob_table[mid:first_right])
-                    first_right = mid
+                    if right - left > 20:
+                        right_sum_tied = right_sum_tied + sum(prob_table_tied[mid:first_right])
+                        right_sum = right_sum + sum(prob_table[mid:first_right])
+                        first_right = mid
                     right = mid
                     mid = (left + right) // 2
             elif not check_mid:
