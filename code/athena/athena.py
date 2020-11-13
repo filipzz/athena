@@ -149,8 +149,11 @@ class AthenaAudit():
 
         p = (1+margin)/2
         draws_dist = binom.pmf(range(0, (round_size - round_size_prev) + 1), (round_size - round_size_prev), p)
-        #return fftconvolve(prob_table_prev, draws_dist)
-        return convolve(prob_table_prev, draws_dist, method=self.convolve_method)
+        if len(prob_table_prev) == 1:
+            return draws_dist
+        else:
+            #return fftconvolve(prob_table_prev, draws_dist)
+            return convolve(prob_table_prev, draws_dist, method=self.convolve_method)
 
 
     def next_round_prob_bravo(self, margin, round_size_prev, round_size, kmin_first, kmin, prob_table_prev):
