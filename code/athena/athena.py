@@ -241,7 +241,8 @@ class AthenaAudit():
             prob_table = self.next_round_prob(margin, round_schedule[round - 1], round_schedule[round], prob_table_prev)
             prob_tied_table = self.next_round_prob(0, round_schedule[round - 1], round_schedule[round], prob_tied_table_prev)
 
-            kmin_candidate = 0
+            #kmin_candidate = 0
+            kmin_candidate = floor(round_schedule[round] / 2)
 
             """
             kmin_found = False
@@ -276,6 +277,10 @@ class AthenaAudit():
                 if self.check_delta and prob_table[kmin_candidate] > 0:
                     deltas[round] = prob_tied_table[kmin_candidate] / prob_table[kmin_candidate]
 
+                # cleaning prob_table/prob_tied_table - there are no walks at and above kmin
+                for i in range(kmin_candidate, round_schedule[round] + 1):
+                    prob_table[i] = 0
+                    prob_tied_table[i] = 0
 
 
             # this means that there are 0 chance of stopping in the given round -- the kmin is unreachable
@@ -284,10 +289,6 @@ class AthenaAudit():
                     prob_tied_sum[round] = prob_tied_sum[round - 1]
 
 
-            # cleaning prob_table/prob_tied_table - there are no walks at and above kmin
-            for i in range(kmin_candidate, round_schedule[round] + 1):
-                prob_table[i] = 0
-                prob_tied_table[i] = 0
 
             prob_table_prev = prob_table
             prob_tied_table_prev = prob_tied_table
