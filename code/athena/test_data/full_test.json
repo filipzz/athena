@@ -1,6 +1,6 @@
 {
   "files":
   [
-   "full_montgomery.json", "full_ga_senate.json", "full_multi_round.json"
+   "full_multi_cand.json", "full_montgomery.json", "full_ga_senate.json", "full_multi_round.json"
   ]
 }
