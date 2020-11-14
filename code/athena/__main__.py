@@ -44,7 +44,7 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--total", help="set the total number of ballots in given contest", type=int)
     parser.add_argument("-w", "--winners", help="set number of winners for the given race", type=int, default=1)
     parser.add_argument("--type", help="set the audit type (athena/bravo/arlo/minerva/metis)", default="athena")
-    parser.add_argument("--conv", help="sets method for convolutions either default or fft", default='fft')
+    parser.add_argument("--conv", help="sets method for convolutions either default or fft", default='direct')
     parser.add_argument("--approx", help="sets approximation threshold for binary search/approximation for next round size", type=float, default=0.015)
 
     args, args_unknown = parser.parse_known_args()
