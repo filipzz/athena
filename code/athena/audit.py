@@ -18,9 +18,14 @@ class Status:
         self.ballots_sampled = []
         self.observations = []
         self.rs = []
+        self.pairwise = []
+        self.results = []
 
     def get_status(self):
         return self.audit_completed
+
+    def get_pairwise(self):
+        return self.pairwise
 
     def get_pval(self):
         return self.risks[-1]
@@ -32,6 +37,7 @@ class Status:
             "rs": {self.rs},
             "audit_pairs": {self.audit_pairs},
             "observations": {self.observations},
+            "pairwise": {self.pairwise},
             "round_number": {self.round_number}}}"""
 
 
@@ -182,10 +188,12 @@ class Audit:
             x = self.find_risk() #actual_kmins)
             #observed = x["observed"]
             #required = x["required"]
+            #print("asd: " + str(x))
             self.status[contest_name].min_kmins = x["min_kmins"]
             self.status[contest_name].risks.append(x["risk"])
             self.status[contest_name].deltas.append(x["delta"])
             self.status[contest_name].ballots_sampled.append(new_valid_ballots)
+            self.status[contest_name].pairwise.append(x["pairwise"])
 
             if x["passed"] == 1:
                 self.status[contest_name].audit_completed = True
@@ -211,7 +219,7 @@ class Audit:
         future_round_sizes = [0] * len(pstop_goals)
         #future_prob_stop = [0] * len(pstop_goals)
 
-        print("audit pairs: %s" % (self.status[contest_name].audit_pairs))
+        #print("audit pairs: %s" % (self.status[contest_name].audit_pairs))
 
         for i, j in self.status[contest_name].audit_pairs:
             #for i in self.election.declared_winners:
@@ -327,19 +335,8 @@ class Audit:
             audit_object.set_convolve_method(self.convolve_method)
             audit_object.set_approximation_threshold(self.approximation_threshold)
             #TODO: check this call
+
             audit_athena = audit_object.audit(margin, rs)
-            '''
-            if self.audit_type.lower() == "bravo" or self.audit_type.lower() == "wald":
-                audit_athena = audit_object.bravo(margin, self.alpha, rs)
-            elif self.audit_type.lower() == "arlo":
-                audit_athena = audit_object.arlo(margin, self.alpha, rs)
-            elif self.audit_type.lower() == "minerva":
-                audit_athena = audit_object.minerva(margin, self.alpha, rs)
-            elif self.audit_type.lower() == "metis":
-                audit_athena = audit_object.metis(margin, self.alpha, rs)
-            else:
-                audit_athena = audit_object.athena(margin, self.alpha, self.delta, rs)
-            '''
 
             #risk_goal = audit_athena["prob_tied_sum"]
             pairwise_audit_kmins = []
@@ -415,6 +412,8 @@ class Audit:
 
         if test_passed == True:
             passed = 1
+
+        self.status[contest_name].results.append(result)
 
         self.status[contest_name].audit_pairs = audit_pairs_next
 
