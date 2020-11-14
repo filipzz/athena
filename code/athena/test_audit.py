@@ -83,7 +83,6 @@ def test_find_kmins():
                         for res, exp in zip(computed, params["expected"]["round_candidates"]):
                             size = res[-1]
                             assert size == exp, ' find_next_round_sizes failed: got {}, expected {}'.format(size, exp)
-                        #print("%s vs %s" % (round_candidates, params["expected"]["round_candidates"]))
 
                     if method_tested == 'pvalue':
                         observations = params["observations"]
@@ -91,5 +90,16 @@ def test_find_kmins():
                         w.set_observations(total, total, observations)
                         computed = w.get_pval(contest_name)
                         exp = params["expected"]["pvalue"]
-                        assert abs(computed - exp) < error_level, "pvalue failed: got {}, expected {}".format(computed, exp)
+                        #if exp is float('inf'):
+                        assert computed == exp or abs(computed - exp) < error_level, "pvalue failed: got {}, expected {}".format(computed, exp)
+
+                        #part for pairwise
+                        if "pairwise" in params["expected"]:
+                            computed_full = w.status[contest_name].get_pairwise()
+
+                            for exxp, ress in zip(params["expected"]["pairwise"], computed_full[0]):
+                                expected_risk = params["expected"]["pairwise"][exxp]
+                                computed_risk = computed_full[0][ress]["risk"]
+                                assert computed_risk == expected_risk or abs(computed_risk - expected_risk) < error_level, "pvalue failed for {}: got {}, expected {}".format(
+                                    exxp, computed_risk, expected_risk)
 
