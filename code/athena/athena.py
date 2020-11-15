@@ -820,7 +820,13 @@ class AthenaAudit():
                         #pvalue[round] = inf
                         audit_ratio[round] = inf
             else:
-                audit_ratio[round] = inf
+                #audit_ratio[round] = inf
+                if sum(prob_table[audit_observations[round]:]) > 0:
+                    audit_ratio[round] = sum(prob_tied_table[audit_observations[round]:]) / sum(
+                        prob_table[audit_observations[round]:])
+                else:
+                    audit_ratio[round] = inf
+
                 #pvalue[round] = inf
 
             pvalue[round] = min(audit_ratio)
