@@ -403,7 +403,10 @@ class Audit:
             result[pair_id] = {"risk": audit_risk, "delta": deltas[-1],  "passed": test_info["passed"],
                                "observed_winner": self.observations[contest_name][winner_pos],
                                "observed_loser": self.observations[contest_name][loser_pos],
-                               "required": pairwise_audit_kmins}
+                               "required": pairwise_audit_kmins,
+                               "winner": self.election.contests[contest_name].candidates[winner_pos],
+                               "loser": self.election.contests[contest_name].candidates[loser_pos]
+                            }
 
             if margin < smallest_margin:
                 smallest_margin = margin
