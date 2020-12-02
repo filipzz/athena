@@ -101,19 +101,17 @@ class Contest:
 
     def find_winners(self):
         if len(self.results) > 0:
-            dkl = []
+            computed_list_of_winners = []
             self.min_to_win = min(heapq.nlargest(self.winners, self.results)) # this is the min number of votes to get to be a winner
             for candidate_id, candidate_result in zip(range(len(self.results)), self.results):
                 if candidate_result >= self.min_to_win:
                     self.declared_winners.append(candidate_id)
-                    dkl.append(self.candidates[candidate_id])
+                    computed_list_of_winners.append(self.candidates[candidate_id])
                 else:
                     self.declared_losers.append(candidate_id)
 
-            reported_list = self.reported_winners
-
             # check if the list of reported winners matches winners from the vote-count
-            if sorted(dkl) != sorted(self.reported_winners):
+            if sorted(computed_list_of_winners) != sorted(self.reported_winners):
                 raise ValueError("Incorrect reported winners")
 
             if len(self.declared_winners) > self.winners:
