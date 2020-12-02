@@ -110,8 +110,10 @@ class Contest:
                 else:
                     self.declared_losers.append(candidate_id)
 
+            reported_list = self.reported_winners
+
             # check if the list of reported winners matches winners from the vote-count
-            if sorted(dkl) != sorted(self.reported_list):
+            if sorted(dkl) != sorted(self.reported_winners):
                 raise ValueError("Incorrect reported winners")
 
             if len(self.declared_winners) > self.winners:
