@@ -7,7 +7,7 @@ from setuptools import find_packages
 
 setup(
     name='athena',
-    version='0.8.2',
+    version='0.8.3',
     packages=find_packages('code'),
     package_dir={'': 'code'},    
     py_modules=[splitext(basename(path))[0] for path in glob('code/athena/*.py')],
