@@ -23,6 +23,7 @@ class Contest:
         self.declared_winners = []
         self.declared_losers = []
         self.data = None
+        self.votes_allowed = 1 # number of votes allowed in that contest
         self.contest_type = ""
         if contest is not None:
 
@@ -55,6 +56,9 @@ class Contest:
             if "contest_type" in contest:
                 self.contest_type = contest["contest_type"]
 
+            if "votes_allowed" in contest:
+                self.votes_allowed = contest["votes_allowed"]
+
             # we store information about declared winners and declared losers
             self.declared_winners = []
             self.declared_losers = []
@@ -79,7 +83,7 @@ class Contest:
             raise Exception("Can't read the file")
         self.ballots_cast = self.data["total_ballots"]
 
-    def load_contest_data(self, contest, data = None):
+    def load_contest_data(self, contest, data=None):
 
         if data is not None:
             self.data = data
@@ -96,6 +100,9 @@ class Contest:
         self.declared_winners = []
         self.declared_losers = []
         self.name = contest
+
+        if "votes_allowed" in info:
+            self.votes_allowed = info["votes_allowed"]
 
         self.find_winners()
 

@@ -181,7 +181,10 @@ class Audit:
             raise ValueError("Audit already completed")
         else:
 
-            if new_valid_ballots > new_ballots or sum(round_observation) > new_valid_ballots:
+            votes_allowed = self.election.contests[contest_name].votes_allowed
+
+            #if new_valid_ballots > votes_allowed * new_ballots or \
+            if sum(round_observation) > votes_allowed * new_valid_ballots:
                 raise ValueError("Incorrect number of valid ballots entered")
 
             self.add_observations(round_observation, contest_name)
