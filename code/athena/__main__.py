@@ -216,18 +216,18 @@ if __name__ == '__main__':
         election["ballots_cast"] = ballots_cast
         results = election_object.results
         election["results"] = results
-        election["winners"] = 1
+        election["winners"] = winners
     else:
         election["ballots_cast"] = ballots_cast
         election["total_ballots"] = ballots_cast
         tally = {}
         for can, votes in zip(candidates, results):
             tally[can] = votes
-        tallyj = json.dumps(tally)
+        #tallyj = json.dumps(tally)
         #election["contests"] = f'{{"{contest_name}": {{"contest_ballots": {ballots_cast}, "tally": {tallyj}, "num_winners": {winners}, "reported_winners": ["A"]}} }}'
         #election["data"] = f'{{"name": "x", "total_ballots": {ballots_cast}, "contests" : {election["contests"]}}}'
         election["contests"] = {contest_name: {"contest_ballots": ballots_cast, "tally": tally, "num_winners": winners, "reported_winners": ["A"]}}
-        election["data"] = {"name": "x", "total_ballots": ballots_cast, "contests" : election["contests"]}
+        election["data"] = {"name": "x", "total_ballots": ballots_cast, "contests": election["contests"]}
         #print(election["contests"])
         #json.loads(election["contests"])
         #print(election["data"])
@@ -240,7 +240,7 @@ if __name__ == '__main__':
 
         #print("Candidates: ", candidates)
 
-        election_object = Contest(election)
+        election_object = Contest(election["contests"][contest_name])
         #election_object.load_contest_data("x", election["data"])
 
         #tools.print_election(election)
