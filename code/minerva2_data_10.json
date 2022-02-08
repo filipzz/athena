@@ -1,0 +1,1179 @@
+{
+  "results": [
+    {
+      "margin": 0.020000000000000018,
+      "risk_limit": 0.15,
+      "rounds": 2,
+      "round_sizes": [
+        4443,
+        13463
+      ],
+      "sprobs": [
+        0.42,
+        0.53
+      ],
+      "samples": {
+        "Alice": [
+          2223,
+          6832
+        ],
+        "Alice_so": [],
+        "Bob": [
+          2220,
+          6631
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.54,
+        0.10119
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.020000000000000018,
+      "risk_limit": 0.11,
+      "rounds": 3,
+      "round_sizes": [
+        6060,
+        14166,
+        33436
+      ],
+      "sprobs": [
+        0.47,
+        0.34,
+        0.91
+      ],
+      "samples": {
+        "Alice": [
+          3035,
+          7147,
+          16977
+        ],
+        "Alice_so": [],
+        "Bob": [
+          3025,
+          7019,
+          16459
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.49064,
+        0.38529,
+        0.00681
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.020000000000000018,
+      "risk_limit": 0.17,
+      "rounds": 1,
+      "round_sizes": [
+        9452
+      ],
+      "sprobs": [
+        0.8
+      ],
+      "samples": {
+        "Alice": [
+          4808
+        ],
+        "Alice_so": [],
+        "Bob": [
+          4644
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.07729
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.020000000000000018,
+      "risk_limit": 0.11,
+      "rounds": 2,
+      "round_sizes": [
+        3634,
+        8354
+      ],
+      "sprobs": [
+        0.22,
+        0.79
+      ],
+      "samples": {
+        "Alice": [
+          1865,
+          4249
+        ],
+        "Alice_so": [],
+        "Bob": [
+          1769,
+          4105
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.16174,
+        0.09919
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.020000000000000018,
+      "risk_limit": 0.03,
+      "rounds": 1,
+      "round_sizes": [
+        7176
+      ],
+      "sprobs": [
+        0.21
+      ],
+      "samples": {
+        "Alice": [
+          3753
+        ],
+        "Alice_so": [],
+        "Bob": [
+          3423
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.0036
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.020000000000000018,
+      "risk_limit": 0.05,
+      "rounds": 3,
+      "round_sizes": [
+        6979,
+        8235,
+        21373
+      ],
+      "sprobs": [
+        0.31,
+        0.25,
+        0.91
+      ],
+      "samples": {
+        "Alice": [
+          3572,
+          4192,
+          11007
+        ],
+        "Alice_so": [],
+        "Bob": [
+          3407,
+          4043,
+          10366
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.06444,
+        0.11544,
+        0.0001
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.020000000000000018,
+      "risk_limit": 0.07,
+      "rounds": 1,
+      "round_sizes": [
+        14144
+      ],
+      "sprobs": [
+        0.78
+      ],
+      "samples": {
+        "Alice": [
+          7221
+        ],
+        "Alice_so": [],
+        "Bob": [
+          6923
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.01382
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.020000000000000018,
+      "risk_limit": 0.13,
+      "rounds": 1,
+      "round_sizes": [
+        6145
+      ],
+      "sprobs": [
+        0.53
+      ],
+      "samples": {
+        "Alice": [
+          3153
+        ],
+        "Alice_so": [],
+        "Bob": [
+          2992
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.06483
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.020000000000000018,
+      "risk_limit": 0.18,
+      "rounds": 3,
+      "round_sizes": [
+        2658,
+        5864,
+        31458
+      ],
+      "sprobs": [
+        0.25,
+        0.33,
+        0.94
+      ],
+      "samples": {
+        "Alice": [
+          1342,
+          2931,
+          15909
+        ],
+        "Alice_so": [],
+        "Bob": [
+          1316,
+          2933,
+          15549
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.44357,
+        0.74092,
+        0.04887
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.020000000000000018,
+      "risk_limit": 0.11,
+      "rounds": 1,
+      "round_sizes": [
+        6704
+      ],
+      "sprobs": [
+        0.52
+      ],
+      "samples": {
+        "Alice": [
+          3426
+        ],
+        "Alice_so": [],
+        "Bob": [
+          3278
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.08299
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.050000000000000044,
+      "risk_limit": 0.05,
+      "rounds": 1,
+      "round_sizes": [
+        4196
+      ],
+      "sprobs": [
+        0.94
+      ],
+      "samples": {
+        "Alice": [
+          2195
+        ],
+        "Alice_so": [],
+        "Bob": [
+          2001
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.00239
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.050000000000000044,
+      "risk_limit": 0.13,
+      "rounds": 1,
+      "round_sizes": [
+        881
+      ],
+      "sprobs": [
+        0.47
+      ],
+      "samples": {
+        "Alice": [
+          475
+        ],
+        "Alice_so": [],
+        "Bob": [
+          406
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.05226
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.050000000000000044,
+      "risk_limit": 0.2,
+      "rounds": 1,
+      "round_sizes": [
+        1157
+      ],
+      "sprobs": [
+        0.74
+      ],
+      "samples": {
+        "Alice": [
+          646
+        ],
+        "Alice_so": [],
+        "Bob": [
+          511
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.00323
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.050000000000000044,
+      "risk_limit": 0.18,
+      "rounds": 1,
+      "round_sizes": [
+        1911
+      ],
+      "sprobs": [
+        0.88
+      ],
+      "samples": {
+        "Alice": [
+          1002
+        ],
+        "Alice_so": [],
+        "Bob": [
+          909
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.03315
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.050000000000000044,
+      "risk_limit": 0.16,
+      "rounds": 4,
+      "round_sizes": [
+        888,
+        2017,
+        2573,
+        3065
+      ],
+      "sprobs": [
+        0.54,
+        0.28,
+        0.53,
+        0.6
+      ],
+      "samples": {
+        "Alice": [
+          442,
+          1039,
+          1326,
+          1584
+        ],
+        "Alice_so": [],
+        "Bob": [
+          446,
+          978,
+          1247,
+          1481
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.59553,
+        0.25623,
+        0.20514,
+        0.13611
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.050000000000000044,
+      "risk_limit": 0.05,
+      "rounds": 2,
+      "round_sizes": [
+        1261,
+        3751
+      ],
+      "sprobs": [
+        0.37,
+        0.77
+      ],
+      "samples": {
+        "Alice": [
+          647,
+          1943
+        ],
+        "Alice_so": [],
+        "Bob": [
+          614,
+          1808
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.22704,
+        0.02929
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.050000000000000044,
+      "risk_limit": 0.12,
+      "rounds": 1,
+      "round_sizes": [
+        1670
+      ],
+      "sprobs": [
+        0.75
+      ],
+      "samples": {
+        "Alice": [
+          883
+        ],
+        "Alice_so": [],
+        "Bob": [
+          787
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.02577
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.050000000000000044,
+      "risk_limit": 0.05,
+      "rounds": 2,
+      "round_sizes": [
+        3168,
+        7331
+      ],
+      "sprobs": [
+        0.86,
+        0.84
+      ],
+      "samples": {
+        "Alice": [
+          1612,
+          3816
+        ],
+        "Alice_so": [],
+        "Bob": [
+          1556,
+          3515
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.16984,
+        0.00086
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.050000000000000044,
+      "risk_limit": 0.02,
+      "rounds": 2,
+      "round_sizes": [
+        1419,
+        6495
+      ],
+      "sprobs": [
+        0.23,
+        0.87
+      ],
+      "samples": {
+        "Alice": [
+          719,
+          3401
+        ],
+        "Alice_so": [],
+        "Bob": [
+          700,
+          3094
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.34379,
+        0.0002
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.050000000000000044,
+      "risk_limit": 0.15,
+      "rounds": 2,
+      "round_sizes": [
+        447,
+        2125
+      ],
+      "sprobs": [
+        0.2,
+        0.76
+      ],
+      "samples": {
+        "Alice": [
+          227,
+          1123
+        ],
+        "Alice_so": [],
+        "Bob": [
+          220,
+          1002
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.49738,
+        0.01496
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.10000000000000003,
+      "risk_limit": 0.2,
+      "rounds": 1,
+      "round_sizes": [
+        297
+      ],
+      "sprobs": [
+        0.74
+      ],
+      "samples": {
+        "Alice": [
+          158
+        ],
+        "Alice_so": [],
+        "Bob": [
+          139
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.19678
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.10000000000000003,
+      "risk_limit": 0.19,
+      "rounds": 1,
+      "round_sizes": [
+        152
+      ],
+      "sprobs": [
+        0.44
+      ],
+      "samples": {
+        "Alice": [
+          87
+        ],
+        "Alice_so": [],
+        "Bob": [
+          65
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.1382
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.10000000000000003,
+      "risk_limit": 0.11,
+      "rounds": 1,
+      "round_sizes": [
+        241
+      ],
+      "sprobs": [
+        0.44
+      ],
+      "samples": {
+        "Alice": [
+          138
+        ],
+        "Alice_so": [],
+        "Bob": [
+          103
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.05417
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.10000000000000003,
+      "risk_limit": 0.12,
+      "rounds": 3,
+      "round_sizes": [
+        635,
+        898,
+        1902
+      ],
+      "sprobs": [
+        0.89,
+        0.49,
+        0.94
+      ],
+      "samples": {
+        "Alice": [
+          333,
+          468,
+          1027
+        ],
+        "Alice_so": [],
+        "Bob": [
+          302,
+          430,
+          875
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.1286,
+        0.43052,
+        0.00104
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.10000000000000003,
+      "risk_limit": 0.04,
+      "rounds": 1,
+      "round_sizes": [
+        635
+      ],
+      "sprobs": [
+        0.73
+      ],
+      "samples": {
+        "Alice": [
+          357
+        ],
+        "Alice_so": [],
+        "Bob": [
+          278
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.00345
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.10000000000000003,
+      "risk_limit": 0.1,
+      "rounds": 1,
+      "round_sizes": [
+        342
+      ],
+      "sprobs": [
+        0.61
+      ],
+      "samples": {
+        "Alice": [
+          203
+        ],
+        "Alice_so": [],
+        "Bob": [
+          139
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.00545
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.10000000000000003,
+      "risk_limit": 0.09,
+      "rounds": 2,
+      "round_sizes": [
+        319,
+        604
+      ],
+      "sprobs": [
+        0.54,
+        0.24
+      ],
+      "samples": {
+        "Alice": [
+          163,
+          326
+        ],
+        "Alice_so": [],
+        "Bob": [
+          156,
+          278
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.39739,
+        0.08795
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.10000000000000003,
+      "risk_limit": 0.08,
+      "rounds": 1,
+      "round_sizes": [
+        361
+      ],
+      "sprobs": [
+        0.58
+      ],
+      "samples": {
+        "Alice": [
+          203
+        ],
+        "Alice_so": [],
+        "Bob": [
+          158
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.03019
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.10000000000000003,
+      "risk_limit": 0.02,
+      "rounds": 1,
+      "round_sizes": [
+        1331
+      ],
+      "sprobs": [
+        0.94
+      ],
+      "samples": {
+        "Alice": [
+          749
+        ],
+        "Alice_so": [],
+        "Bob": [
+          582
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        1e-05
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.10000000000000003,
+      "risk_limit": 0.13,
+      "rounds": 1,
+      "round_sizes": [
+        719
+      ],
+      "sprobs": [
+        0.93
+      ],
+      "samples": {
+        "Alice": [
+          379
+        ],
+        "Alice_so": [],
+        "Bob": [
+          340
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.08708
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.25,
+      "risk_limit": 0.06,
+      "rounds": 3,
+      "round_sizes": [
+        53,
+        198,
+        249
+      ],
+      "sprobs": [
+        0.41,
+        0.76,
+        0.65
+      ],
+      "samples": {
+        "Alice": [
+          27,
+          113,
+          149
+        ],
+        "Alice_so": [],
+        "Bob": [
+          26,
+          85,
+          100
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.5163,
+        0.08053,
+        0.00731
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.25,
+      "risk_limit": 0.2,
+      "rounds": 5,
+      "round_sizes": [
+        26,
+        110,
+        276,
+        319,
+        450
+      ],
+      "sprobs": [
+        0.44,
+        0.66,
+        0.82,
+        0.28,
+        0.86
+      ],
+      "samples": {
+        "Alice": [
+          12,
+          57,
+          153,
+          177,
+          254
+        ],
+        "Alice_so": [],
+        "Bob": [
+          14,
+          53,
+          123,
+          142,
+          196
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.7429,
+        1.17274,
+        0.35944,
+        1.09925,
+        0.12582
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.25,
+      "risk_limit": 0.2,
+      "rounds": 4,
+      "round_sizes": [
+        22,
+        34,
+        41,
+        95
+      ],
+      "sprobs": [
+        0.3,
+        0.49,
+        0.43,
+        0.85
+      ],
+      "samples": {
+        "Alice": [
+          14,
+          21,
+          24,
+          59
+        ],
+        "Alice_so": [],
+        "Bob": [
+          8,
+          13,
+          17,
+          36
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.25979,
+        0.23331,
+        0.32429,
+        0.03001
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.25,
+      "risk_limit": 0.19,
+      "rounds": 1,
+      "round_sizes": [
+        30
+      ],
+      "sprobs": [
+        0.49
+      ],
+      "samples": {
+        "Alice": [
+          19
+        ],
+        "Alice_so": [],
+        "Bob": [
+          11
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.18437
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.25,
+      "risk_limit": 0.19,
+      "rounds": 1,
+      "round_sizes": [
+        41
+      ],
+      "sprobs": [
+        0.64
+      ],
+      "samples": {
+        "Alice": [
+          27
+        ],
+        "Alice_so": [],
+        "Bob": [
+          14
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.07563
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.25,
+      "risk_limit": 0.04,
+      "rounds": 2,
+      "round_sizes": [
+        98,
+        321
+      ],
+      "sprobs": [
+        0.69,
+        0.86
+      ],
+      "samples": {
+        "Alice": [
+          51,
+          194
+        ],
+        "Alice_so": [],
+        "Bob": [
+          47,
+          127
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.38616,
+        0.00037
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.25,
+      "risk_limit": 0.19,
+      "rounds": 3,
+      "round_sizes": [
+        16,
+        25,
+        36
+      ],
+      "sprobs": [
+        0.2,
+        0.47,
+        0.51
+      ],
+      "samples": {
+        "Alice": [
+          11,
+          16,
+          26
+        ],
+        "Alice_so": [],
+        "Bob": [
+          5,
+          9,
+          10
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.25829,
+        0.23104,
+        0.05084
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.25,
+      "risk_limit": 0.13,
+      "rounds": 3,
+      "round_sizes": [
+        30,
+        42,
+        58
+      ],
+      "sprobs": [
+        0.39,
+        0.42,
+        0.54
+      ],
+      "samples": {
+        "Alice": [
+          19,
+          26,
+          36
+        ],
+        "Alice_so": [],
+        "Bob": [
+          11,
+          16,
+          22
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.18437,
+        0.18122,
+        0.11247
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.25,
+      "risk_limit": 0.18,
+      "rounds": 3,
+      "round_sizes": [
+        18,
+        62,
+        100
+      ],
+      "sprobs": [
+        0.25,
+        0.79,
+        0.26
+      ],
+      "samples": {
+        "Alice": [
+          11,
+          33,
+          59
+        ],
+        "Alice_so": [],
+        "Bob": [
+          7,
+          29,
+          41
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.37055,
+        0.37232,
+        0.15821
+      ],
+      "stopped": true
+    },
+    {
+      "margin": 0.25,
+      "risk_limit": 0.11,
+      "rounds": 2,
+      "round_sizes": [
+        69,
+        122
+      ],
+      "sprobs": [
+        0.7,
+        0.77
+      ],
+      "samples": {
+        "Alice": [
+          40,
+          78
+        ],
+        "Alice_so": [],
+        "Bob": [
+          29,
+          44
+        ],
+        "Bob_so": []
+      },
+      "risk": [
+        0.13981,
+        0.00578
+      ],
+      "stopped": true
+    }
+  ]
+}
