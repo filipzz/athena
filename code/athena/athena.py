@@ -203,7 +203,10 @@ class AthenaAudit():
         if 0 < margin < 1:
             bkm = ceil((sample_size * log(1 - margin) + log(delta))/(log(1 - margin) - log(1 + margin)))
         else:
-            raise ValueError("Margin needs to be different than 0 or 1")
+            # if margin == 0 or margin == 1 then we need to compute the kmin based on the delta (risk_limit) only:
+            # we need to sample at least: ceil(log(delta) / log(0.5)) ballots to be able to show that
+            # it is not a tied election with probability delta (i.e., to be able to reject the null hypothesis of a tied election)
+            bkm = ceil((log(delta) / log(0.5)))
 
         return bkm
 
@@ -380,137 +383,178 @@ class AthenaAudit():
 
         kmin_found = False
         bkm = floor(self.wald_k_min(round_candidate, margin, self.alpha))
-        middle_p = floor((.5 + p) * round_candidate // 2)
-        diff = bkm - middle_p
-        right = min(bkm, round_candidate)
-        #first_right = right
-        #right_sum = sum(prob_table[first_right:])
-        #right_sum_tied = sum(prob_table_tied[first_right:])
-        left = round_candidate // 2
-        #left = max()
-        mid = (right + left) // 2
-        #print("\t%s %s %s %s %s" % (right - left, left, mid, right, round_candidate))
-        #print("\t\tkmin search:")
-        #mid = right
 
-        #go = 5
-        #right = bkm
-        """
-        go = diff // 5
-        #print("\t\t\t\tdiff %s" % (go))
+        if 0 < margin < 1:
+            middle_p = floor((.5 + p) * round_candidate // 2)
+            diff = bkm - middle_p
+            right = min(bkm, round_candidate)
+            #first_right = right
+            #right_sum = sum(prob_table[first_right:])
+            #right_sum_tied = sum(prob_table_tied[first_right:])
+            left = round_candidate // 2
+            #left = max()
+            mid = (right + left) // 2
+            #print("\t%s %s %s %s %s" % (right - left, left, mid, right, round_candidate))
+            #print("\t\tkmin search:")
+            #mid = right
 
-        first_right = right
-        right_sum = sum(prob_table[first_right:])
-        right_sum_tied = sum(prob_table_tied[first_right:])
+            #go = 5
+            #right = bkm
+            """
+            go = diff // 5
+            #print("\t\t\t\tdiff %s" % (go))
 
-        check_right = False
-        while not check_right:
-            #print("\t\tfind right: %s" % (right))
-            check_right = self.check_delta * self.delta * prob_table[right] >= self.check_delta * prob_table_tied[right] \
-                          and self.check_sum * self.alpha * (
-                                  sum(prob_table[right:first_right]) + right_sum) + self.check_memory * sum(
-                self.pstop_round) \
-                          >= self.check_sum * (
-                                  sum(prob_table_tied[right:first_right]) + right_sum_tied) + self.check_memory * sum(
-                self.pstop_tied_round)
-            self.checks_made = self.checks_made + 1
-            if not check_right:
-                #go = 2 * go
-                right = right + go
-            else:
-                # we need to go to the previous value of right
-                #go = go // 2
-                #right = middle_p + go
-                right = right - go
-        #print("\t\t->find right: %s" % (right))
-        """
+            first_right = right
+            right_sum = sum(prob_table[first_right:])
+            right_sum_tied = sum(prob_table_tied[first_right:])
 
-        # mid = (right + left) // 2
-
-        checks = 0
-        checks_cond = 0
-        first_right = right
-        right_sum = sum(prob_table[first_right:])
-        right_sum_tied = sum(prob_table_tied[first_right:])
-
-        """
-        left = middle_p
-        check_left = True
-        go = 5
-        while check_left:
-            #print("\t\tfind left: %s" % (left))
-            check_left = self.check_delta * self.delta * prob_table[left] >= self.check_delta * prob_table_tied[left] \
-                        and self.check_sum * self.alpha * (
-                                    sum(prob_table[left:first_right]) + right_sum) + self.check_memory * sum(
-                self.pstop_round) \
-                        >= self.check_sum * (
-                                    sum(prob_table_tied[left:first_right]) + right_sum_tied) + self.check_memory * sum(
-                self.pstop_tied_round)
-            self.checks_made = self.checks_made + 1
-            if check_left:
-                go = 2 * go
-                left = middle_p - go
-        """
-
-        mid = (right + left) // 2
-
-        while right >= left:
-            #print("\t\t%s %s %s" % (left, mid, right))
-            ##print("\t\t\t%s >= %s\t%s >= %s" %
-            #      (self.check_delta * self.delta * prob_table[mid],
-            #       self.check_delta * prob_table_tied[mid],
-            #       self.check_sum * self.alpha * (sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)),
-            #       self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round))))
-            #if self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] \
-            #        and self.check_sum * self.alpha * (sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= \
-            #        self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round)):
-            #check_mid = self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] and self.check_sum * self.alpha * (
-            #            sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round))
-            check_mid = self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] \
-                        and self.check_sum * self.alpha * (sum(prob_table[mid:first_right]) + right_sum) + self.check_memory * sum(self.pstop_round) \
-                        >= self.check_sum * (sum(prob_table_tied[mid:first_right]) + right_sum_tied) + self.check_memory * sum(self.pstop_tied_round)
-            checks = checks + 1
-
-
-            if check_mid:
-                check_kmin = self.check_delta * self.delta * prob_table[mid-1] >= self.check_delta * prob_table_tied[mid-1] \
+            check_right = False
+            while not check_right:
+                #print("\t\tfind right: %s" % (right))
+                check_right = self.check_delta * self.delta * prob_table[right] >= self.check_delta * prob_table_tied[right] \
                             and self.check_sum * self.alpha * (
-                                        sum(prob_table[mid-1:first_right]) + right_sum) + self.check_memory * sum(
+                                    sum(prob_table[right:first_right]) + right_sum) + self.check_memory * sum(
                     self.pstop_round) \
-                            >= self.check_sum * (sum(
-                    prob_table_tied[mid-1:first_right]) + right_sum_tied) + self.check_memory * sum(self.pstop_tied_round)
-                checks_cond = checks_cond + 1
-                #check_kmin = self.check_delta * self.delta * prob_table[mid - 1] >= self.check_delta * prob_table_tied[
-                #    mid - 1] and self.check_sum * self.alpha * (
-                #                     sum(prob_table[mid - 1:]) + self.check_memory * sum(
-                #                 self.pstop_round)) >= self.check_sum * (
-                #                         sum(prob_table_tied[mid - 1:]) + self.check_memory * sum(
-                #                     self.pstop_tied_round))
-                if not check_kmin:
-                    ###print("\t\t\tmid + not kmin -> kmin found at %s" % (mid))
-                    """kmin found: holds for mid but not for mid-1"""
-                    kmin_found = True
-                    kmin_candidate = mid
-                    left = right + 1
+                            >= self.check_sum * (
+                                    sum(prob_table_tied[right:first_right]) + right_sum_tied) + self.check_memory * sum(
+                    self.pstop_tied_round)
+                self.checks_made = self.checks_made + 1
+                if not check_right:
+                    #go = 2 * go
+                    right = right + go
                 else:
-                    ##print("\t\t\tmid %s" % (check_mid))
-                    if right - left > 20:
-                        right_sum_tied = right_sum_tied + sum(prob_table_tied[mid:first_right])
-                        right_sum = right_sum + sum(prob_table[mid:first_right])
-                        first_right = mid
-                    right = mid
+                    # we need to go to the previous value of right
+                    #go = go // 2
+                    #right = middle_p + go
+                    right = right - go
+            #print("\t\t->find right: %s" % (right))
+            """
+
+            # mid = (right + left) // 2
+
+            checks = 0
+            checks_cond = 0
+            first_right = right
+            right_sum = sum(prob_table[first_right:])
+            right_sum_tied = sum(prob_table_tied[first_right:])
+
+            """
+            left = middle_p
+            check_left = True
+            go = 5
+            while check_left:
+                #print("\t\tfind left: %s" % (left))
+                check_left = self.check_delta * self.delta * prob_table[left] >= self.check_delta * prob_table_tied[left] \
+                            and self.check_sum * self.alpha * (
+                                        sum(prob_table[left:first_right]) + right_sum) + self.check_memory * sum(
+                    self.pstop_round) \
+                            >= self.check_sum * (
+                                        sum(prob_table_tied[left:first_right]) + right_sum_tied) + self.check_memory * sum(
+                    self.pstop_tied_round)
+                self.checks_made = self.checks_made + 1
+                if check_left:
+                    go = 2 * go
+                    left = middle_p - go
+            """
+
+            mid = (right + left) // 2
+
+            while right >= left:
+                #print("\t\t%s %s %s" % (left, mid, right))
+                ##print("\t\t\t%s >= %s\t%s >= %s" %
+                #      (self.check_delta * self.delta * prob_table[mid],
+                #       self.check_delta * prob_table_tied[mid],
+                #       self.check_sum * self.alpha * (sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)),
+                #       self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round))))
+                #if self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] \
+                #        and self.check_sum * self.alpha * (sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= \
+                #        self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round)):
+                #check_mid = self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] and self.check_sum * self.alpha * (
+                #            sum(prob_table[mid:]) + self.check_memory * sum(self.pstop_round)) >= self.check_sum * (sum(prob_table_tied[mid:]) + self.check_memory * sum(self.pstop_tied_round))
+                check_mid = self.check_delta * self.delta * prob_table[mid] >= self.check_delta * prob_table_tied[mid] \
+                            and self.check_sum * self.alpha * (sum(prob_table[mid:first_right]) + right_sum) + self.check_memory * sum(self.pstop_round) \
+                            >= self.check_sum * (sum(prob_table_tied[mid:first_right]) + right_sum_tied) + self.check_memory * sum(self.pstop_tied_round)
+                checks = checks + 1
+
+
+                if check_mid:
+                    check_kmin = self.check_delta * self.delta * prob_table[mid-1] >= self.check_delta * prob_table_tied[mid-1] \
+                                and self.check_sum * self.alpha * (
+                                            sum(prob_table[mid-1:first_right]) + right_sum) + self.check_memory * sum(
+                        self.pstop_round) \
+                                >= self.check_sum * (sum(
+                        prob_table_tied[mid-1:first_right]) + right_sum_tied) + self.check_memory * sum(self.pstop_tied_round)
+                    checks_cond = checks_cond + 1
+                    #check_kmin = self.check_delta * self.delta * prob_table[mid - 1] >= self.check_delta * prob_table_tied[
+                    #    mid - 1] and self.check_sum * self.alpha * (
+                    #                     sum(prob_table[mid - 1:]) + self.check_memory * sum(
+                    #                 self.pstop_round)) >= self.check_sum * (
+                    #                         sum(prob_table_tied[mid - 1:]) + self.check_memory * sum(
+                    #                     self.pstop_tied_round))
+                    if not check_kmin:
+                        ###print("\t\t\tmid + not kmin -> kmin found at %s" % (mid))
+                        """kmin found: holds for mid but not for mid-1"""
+                        kmin_found = True
+                        kmin_candidate = mid
+                        left = right + 1
+                    else:
+                        ##print("\t\t\tmid %s" % (check_mid))
+                        if right - left > 20:
+                            right_sum_tied = right_sum_tied + sum(prob_table_tied[mid:first_right])
+                            right_sum = right_sum + sum(prob_table[mid:first_right])
+                            first_right = mid
+                        right = mid
+                        mid = (left + right) // 2
+                elif not check_mid:
+                    ##print("\t\t\tnot mid %s" % (check_mid))
+                    left = mid + 1
                     mid = (left + right) // 2
-            elif not check_mid:
-                ##print("\t\t\tnot mid %s" % (check_mid))
-                left = mid + 1
-                mid = (left + right) // 2
+                else:
+                    ##print("\t\t\tfailed?")
+                    kmin_found = False
+
+
+            if kmin_found:
+                ##print("!!!!!!!!!!!!!!!!! %s: " % (kmin_candidate))
+                if self.check_delta:
+                    if prob_table[kmin_candidate] > 0:
+                        delta = prob_table_tied[kmin_candidate] / prob_table[kmin_candidate]
+                    else:
+                        delta = None
+
+                if sum(prob_table[kmin_candidate:]) > 0:
+                    alpha = sum(prob_table_tied[kmin_candidate:]) / sum(prob_table[kmin_candidate:])
+                else:
+                    alpha = None
+
+                #print("\t\t\t\t%s -> %s  %s" % (round_candidate // 2 - bkm, checks, checks_cond))
+                self.checks_made = self.checks_made + checks + checks_cond
+                return {
+                    "kmin": kmin_candidate,
+                    "prob_stop": sum(prob_table[kmin_candidate:]),
+                    "prob_stop_tied": sum(prob_table_tied[kmin_candidate:]),
+                    "prob_kmin": prob_table[kmin_candidate],
+                    "prob_kmin_tied": prob_table_tied[kmin_candidate],
+                    "delta": delta,
+                    "alpha": alpha
+                }
             else:
-                ##print("\t\t\tfailed?")
-                kmin_found = False
+                return {
+                    "kmin": None,
+                    "prob_stop": 0.0,
+                    "prob_stop_tied": 0.0,
+                    "prob_kmin": None,
+                    "prob_kmin_tied": None,
+                    "delta": None,
+                    "alpha": None
+                }
+        else:
+            # margin = 0 or margin = 1
+            kmin_candidate = self.wald_k_min(round_candidate, margin, self.alpha)
+            # print(prob_table)
+            # print(prob_table_tied)
+            # print("margin %s, round_candidate %s, kmin_candidate %s" % (margin, round_candidate, kmin_candidate))
 
-
-        if kmin_found:
-            ##print("!!!!!!!!!!!!!!!!! %s: " % (kmin_candidate))
             if self.check_delta:
                 if prob_table[kmin_candidate] > 0:
                     delta = prob_table_tied[kmin_candidate] / prob_table[kmin_candidate]
@@ -519,11 +563,7 @@ class AthenaAudit():
 
             if sum(prob_table[kmin_candidate:]) > 0:
                 alpha = sum(prob_table_tied[kmin_candidate:]) / sum(prob_table[kmin_candidate:])
-            else:
-                alpha = None
 
-            #print("\t\t\t\t%s -> %s  %s" % (round_candidate // 2 - bkm, checks, checks_cond))
-            self.checks_made = self.checks_made + checks + checks_cond
             return {
                 "kmin": kmin_candidate,
                 "prob_stop": sum(prob_table[kmin_candidate:]),
@@ -532,16 +572,6 @@ class AthenaAudit():
                 "prob_kmin_tied": prob_table_tied[kmin_candidate],
                 "delta": delta,
                 "alpha": alpha
-            }
-        else:
-            return {
-                "kmin": None,
-                "prob_stop": 0.0,
-                "prob_stop_tied": 0.0,
-                "prob_kmin": None,
-                "prob_kmin_tied": None,
-                "delta": None,
-                "alpha": None
             }
 
 
@@ -643,32 +673,37 @@ class AthenaAudit():
         else:
             round_min = 1
 
-
-        # the main loop:
-        # * we have round_min (for which the probability of stopping is smaller than quant), and
-        # * we have round_max (for which the probability of stopping is larger than quant)
-        # we perform binary search to find a candidate (round_candidate) for the next round size
-        # It may happen that this value:
-        # * will not be the first round size that satisfied our requirement
-        # * it may(?)  be slightly below the quant (because of non-monotonicity)
-        while True:
-            round_candidate = (round_max + round_min) // 2
-            ##print("\t\t%s %s %s" % (round_min, round_candidate, round_max))
-            new_round_schedule = round_schedule + [round_candidate]
-            stopping_probability = self.find_stopping_probability(margin, new_round_schedule, observations_i)
-            ##print("\t\t\t%s - %s" % (new_round_schedule[-1], stopping_probability))
-
-            if round_max - round_min <= 1:
-                round_candidate = round_max
+        if 0 < margin < 1:
+            # the main loop:
+            # * we have round_min (for which the probability of stopping is smaller than quant), and
+            # * we have round_max (for which the probability of stopping is larger than quant)
+            # we perform binary search to find a candidate (round_candidate) for the next round size
+            # It may happen that this value:
+            # * will not be the first round size that satisfied our requirement
+            # * it may(?)  be slightly below the quant (because of non-monotonicity)
+            while True:
+                round_candidate = (round_max + round_min) // 2
+                ##print("\t\t%s %s %s" % (round_min, round_candidate, round_max))
                 new_round_schedule = round_schedule + [round_candidate]
                 stopping_probability = self.find_stopping_probability(margin, new_round_schedule, observations_i)
-                ##print("\t\t%s -> %s" % (round_candidate, stopping_probability))
-                break
+                ##print("\t\t\t%s - %s" % (new_round_schedule[-1], stopping_probability))
 
-            if stopping_probability <= quant:
-                round_min = round_candidate
-            else:
-                round_max = round_candidate
+                if round_max - round_min <= 1:
+                    round_candidate = round_max
+                    new_round_schedule = round_schedule + [round_candidate]
+                    stopping_probability = self.find_stopping_probability(margin, new_round_schedule, observations_i)
+                    ##print("\t\t%s -> %s" % (round_candidate, stopping_probability))
+                    break
+
+                if stopping_probability <= quant:
+                    round_min = round_candidate
+                else:
+                    round_max = round_candidate
+        else:
+            # margin = 0 or margin = 1
+            round_candidate = self.wald_k_min(round_max, margin, self.alpha)
+            new_round_schedule = round_schedule + [round_candidate]
+            stopping_probability = self.find_stopping_probability(margin, new_round_schedule, observations_i)
 
 
         good_candidate = round_candidate
